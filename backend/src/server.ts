@@ -55,10 +55,10 @@ app.use((req: any, _res, next) => { req.io = io; next(); });
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // ─── API DOCUMENTATION ────────────────────────────────────────────────────────
-app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+app.use("/api/docs", swaggerUi.serve as any, swaggerUi.setup(swaggerSpec, {
   customSiteTitle: "UniMaintain API Docs",
   customCss: ".swagger-ui .topbar { background: #1A4731; }",
-}));
+}) as any);
 app.get("/api/docs.json", (_req, res) => res.json(swaggerSpec));
 
 // ─── ROUTES ───────────────────────────────────────────────────────────────────

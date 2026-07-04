@@ -148,7 +148,7 @@ router.get("/:id", getRequestById);
  *               properties:
  *                 request: { $ref: '#/components/schemas/ServiceRequest' }
  */
-router.post("/", upload.array("attachments", 5), createRequest);
+router.post("/", upload.array("attachments", 5) as any, createRequest);
 
 /**
  * @openapi

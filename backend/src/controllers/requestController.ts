@@ -1,0 +1,395 @@
+import { Request, Response } from "express";
+import pool from "../config/database";
+
+// Helper: emit socket event if io is attached to req
+function emit(req: Request, event: string, data: unknown) {
+  const io = (req as any).io;
+  if (io) io.emit(event, data);
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+
+const REQUEST_FIELDS = `
+  sr.id, sr.title, sr.description, sr.priority, sr.status, sr.location,
+  sr.has_attachment, sr.created_at, sr.updated_at, sr.resolved_at,
+  c.slug AS category, c.name AS category_name,
+  u.id AS submitted_by_id, u.name AS submitted_by_name,
+  o.id AS assigned_to_id, o.name AS assigned_to_name
+`;
+
+const REQUEST_JOINS = `
+  FROM service_requests sr
+  LEFT JOIN categories c  ON sr.category_id = c.id
+  LEFT JOIN users u       ON sr.submitted_by = u.id
+  LEFT JOIN users o       ON sr.assigned_to  = o.id
+`;
+
+function formatRequest(row: Record<string, unknown>) {
+  return {
+    id:              row.id,
+    title:           row.title,
+    description:     row.description,
+    category:        row.category,
+    categoryName:    row.category_name,
+    priority:        row.priority,
+    status:          row.status,
+    location:        row.location,
+    hasAttachment:   row.has_attachment,
+    createdAt:       row.created_at,
+    updatedAt:       row.updated_at,
+    resolvedAt:      row.resolved_at,
+    submittedBy:     row.submitted_by_id,
+    submittedByName: row.submitted_by_name,
+    assignedTo:      row.assigned_to_id,
+    assignedToName:  row.assigned_to_name,
+  };
+}
+
+async function addAuditLog(
+  requestId: string, action: string, performedBy: number, details: string
+): Promise<void> {
+  await pool.query(
+    `INSERT INTO audit_logs (request_id, action, performed_by, details) VALUES ($1, $2, $3, $4)`,
+    [requestId, action, performedBy, details]
+  );
+}
+
+async function createNotification(
+  userId: number, title: string, message: string, requestId: string
+): Promise<void> {
+  await pool.query(
+    `INSERT INTO notifications (user_id, title, message, request_id) VALUES ($1, $2, $3, $4)`,
+    [userId, title, message, requestId]
+  );
+}
+
+// ─── GET ALL ──────────────────────────────────────────────────────────────────
+
+// GET /api/requests
+export async function getAllRequests(req: Request, res: Response): Promise<void> {
+  const { status, category, priority, search, page = "1", limit = "10" } = req.query;
+  const user = req.user!;
+  const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
+
+  try {
+    const conditions: string[] = [];
+    const values: unknown[] = [];
+    let idx = 1;
+
+    // Role-based filtering
+    if (user.role === "student") {
+      conditions.push(`sr.submitted_by = $${idx++}`);
+      values.push(user.id);
+    } else if (user.role === "officer") {
+      conditions.push(`sr.assigned_to = $${idx++}`);
+      values.push(user.id);
+    }
+
+    if (status)   { conditions.push(`sr.status = $${idx++}`);      values.push(status); }
+    if (category) { conditions.push(`c.slug = $${idx++}`);          values.push(category); }
+    if (priority) { conditions.push(`sr.priority = $${idx++}`);     values.push(priority); }
+    if (search)   {
+      conditions.push(`(sr.title ILIKE $${idx} OR sr.id ILIKE $${idx})`);
+      values.push(`%${search}%`);
+      idx++;
+    }
+
+    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const countResult = await pool.query(
+      `SELECT COUNT(*) ${REQUEST_JOINS} ${where}`,
+      values
+    );
+    const total = parseInt(countResult.rows[0].count);
+
+    const dataResult = await pool.query(
+      `SELECT ${REQUEST_FIELDS} ${REQUEST_JOINS} ${where}
+       ORDER BY sr.created_at DESC
+       LIMIT $${idx} OFFSET $${idx + 1}`,
+      [...values, limit, offset]
+    );
+
+    res.json({
+      requests: dataResult.rows.map(formatRequest),
+      total,
+      page:  parseInt(page as string),
+      pages: Math.ceil(total / parseInt(limit as string)),
+    });
+  } catch (err) {
+    console.error("Get requests error:", err);
+    res.status(500).json({ error: "Failed to fetch requests" });
+  }
+}
+
+// GET /api/requests/:id
+export async function getRequestById(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const user = req.user!;
+
+  try {
+    const result = await pool.query(
+      `SELECT ${REQUEST_FIELDS} ${REQUEST_JOINS} WHERE sr.id = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: "Request not found" });
+      return;
+    }
+
+    const row = result.rows[0];
+
+    // Students can only see their own requests
+    if (user.role === "student" && row.submitted_by_id !== user.id) {
+      res.status(403).json({ error: "Access denied" });
+      return;
+    }
+
+    // Fetch audit log
+    const auditResult = await pool.query(
+      `SELECT al.id, al.action, al.details, al.created_at, u.name AS performed_by_name
+       FROM audit_logs al
+       JOIN users u ON al.performed_by = u.id
+       WHERE al.request_id = $1
+       ORDER BY al.created_at ASC`,
+      [id]
+    );
+
+    // Fetch attachments
+    const attachResult = await pool.query(
+      `SELECT id, original_name, mime_type, size_bytes, created_at FROM attachments WHERE request_id = $1`,
+      [id]
+    );
+
+    res.json({
+      request: {
+        ...formatRequest(row),
+        audit: auditResult.rows.map(a => ({
+          id:              a.id,
+          action:          a.action,
+          details:         a.details,
+          timestamp:       a.created_at,
+          performedByName: a.performed_by_name,
+        })),
+        attachments: attachResult.rows,
+      },
+    });
+  } catch (err) {
+    console.error("Get request error:", err);
+    res.status(500).json({ error: "Failed to fetch request" });
+  }
+}
+
+// ─── CREATE ───────────────────────────────────────────────────────────────────
+
+// POST /api/requests
+export async function createRequest(req: Request, res: Response): Promise<void> {
+  const { title, description, category, priority, location } = req.body;
+  const user = req.user!;
+  const hasAttachment = !!(req.files && (req.files as Express.Multer.File[]).length > 0);
+
+  try {
+    // Get category id
+    const catResult = await pool.query("SELECT id FROM categories WHERE slug = $1", [category]);
+    if (catResult.rows.length === 0) {
+      res.status(400).json({ error: "Invalid category" });
+      return;
+    }
+
+    // Generate request ID
+    const idResult = await pool.query("SELECT generate_request_id() AS id");
+    const requestId: string = idResult.rows[0].id;
+
+    await pool.query(
+      `INSERT INTO service_requests (id, title, description, category_id, priority, location, submitted_by, has_attachment)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [requestId, title, description, catResult.rows[0].id, priority || "medium", location, user.id, hasAttachment]
+    );
+
+    // Save attachments metadata
+    if (hasAttachment && req.files) {
+      const files = req.files as Express.Multer.File[];
+      for (const file of files) {
+        await pool.query(
+          `INSERT INTO attachments (request_id, filename, original_name, mime_type, size_bytes)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [requestId, file.filename, file.originalname, file.mimetype, file.size]
+        );
+      }
+    }
+
+    await addAuditLog(requestId, "Request Submitted", user.id,
+      `Submitted via portal${hasAttachment ? " with attachments." : "."}`);
+
+    // Notify all admins
+    const admins = await pool.query("SELECT id FROM users WHERE role = 'admin' AND active = TRUE");
+    for (const admin of admins.rows) {
+      await createNotification(
+        admin.id,
+        priority === "urgent" ? "New Urgent Request" : "New Request",
+        `${requestId}: ${title}`,
+        requestId
+      );
+    }
+
+    // Notify submitter
+    await createNotification(user.id, "Request Submitted",
+      `${requestId}: Your request has been received and is pending review.`, requestId);
+
+    // Fetch and return the created request
+    const created = await pool.query(
+      `SELECT ${REQUEST_FIELDS} ${REQUEST_JOINS} WHERE sr.id = $1`,
+      [requestId]
+    );
+
+    const formatted = formatRequest(created.rows[0]);
+    emit(req, "request:new", formatted);
+    res.status(201).json({ request: formatted });
+  } catch (err) {
+    console.error("Create request error:", err);
+    res.status(500).json({ error: "Failed to create request" });
+  }
+}
+
+// ─── UPDATE STATUS ────────────────────────────────────────────────────────────
+
+// PUT /api/requests/:id/status
+export async function updateStatus(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const { status, note } = req.body;
+  const user = req.user!;
+
+  const validTransitions: Record<string, string[]> = {
+    student: ["cancelled"],
+    staff:   ["cancelled"],
+    officer: ["in_progress", "resolved"],
+    admin:   ["closed", "pending", "cancelled"],
+  };
+  if (!validTransitions[user.role]?.includes(status)) {
+    res.status(400).json({ error: "Invalid status transition for your role" });
+    return;
+  }
+
+  try {
+    const existing = await pool.query("SELECT * FROM service_requests WHERE id = $1", [id]);
+    if (existing.rows.length === 0) {
+      res.status(404).json({ error: "Request not found" });
+      return;
+    }
+
+    const resolvedAt = status === "resolved" ? "NOW()" : "resolved_at";
+    await pool.query(
+      `UPDATE service_requests
+       SET status = $1, updated_at = NOW() ${status === "resolved" ? ", resolved_at = NOW()" : ""}
+       WHERE id = $2`,
+      [status, id]
+    );
+
+    const actionMap: Record<string, string> = {
+      in_progress: "Work Started",
+      resolved:    "Resolved",
+      closed:      "Closed",
+      pending:     "Reverted to Pending",
+    };
+
+    await addAuditLog(id, actionMap[status], user.id,
+      note || `Status updated to ${status.replace("_", " ")}.`);
+
+    // Notify request submitter
+    const req2 = existing.rows[0];
+    if (req2.submitted_by !== user.id) {
+      await createNotification(
+        req2.submitted_by,
+        "Request Updated",
+        `${id}: Status changed to ${status.replace("_", " ")}.`,
+        id
+      );
+    }
+
+    const updated = await pool.query(
+      `SELECT ${REQUEST_FIELDS} ${REQUEST_JOINS} WHERE sr.id = $1`, [id]
+    );
+    const formatted = formatRequest(updated.rows[0]);
+    emit(req, "request:updated", formatted);
+    res.json({ request: formatted });
+  } catch (err) {
+    console.error("Update status error:", err);
+    res.status(500).json({ error: "Failed to update status" });
+  }
+}
+
+// ─── ASSIGN OFFICER ───────────────────────────────────────────────────────────
+
+// PUT /api/requests/:id/assign
+export async function assignOfficer(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const { officerId } = req.body;
+  const user = req.user!;
+
+  try {
+    const officerResult = await pool.query(
+      "SELECT id, name, department FROM users WHERE id = $1 AND role = 'officer'",
+      [officerId]
+    );
+    if (officerResult.rows.length === 0) {
+      res.status(404).json({ error: "Officer not found" });
+      return;
+    }
+    const officer = officerResult.rows[0];
+
+    await pool.query(
+      `UPDATE service_requests SET assigned_to = $1, status = 'assigned', updated_at = NOW() WHERE id = $2`,
+      [officerId, id]
+    );
+
+    await addAuditLog(id, "Assigned to Officer", user.id,
+      `Assigned to ${officer.name} (${officer.department}).`);
+
+    // Notify officer
+    await createNotification(officerId, "New Assignment",
+      `${id}: A new maintenance task has been assigned to you.`, id);
+
+    // Notify submitter
+    const reqResult = await pool.query("SELECT submitted_by FROM service_requests WHERE id = $1", [id]);
+    if (reqResult.rows[0]?.submitted_by !== user.id) {
+      await createNotification(reqResult.rows[0].submitted_by, "Request Assigned",
+        `${id}: Your request has been assigned to ${officer.name}.`, id);
+    }
+
+    const updated = await pool.query(
+      `SELECT ${REQUEST_FIELDS} ${REQUEST_JOINS} WHERE sr.id = $1`, [id]
+    );
+    const formatted = formatRequest(updated.rows[0]);
+    emit(req, "request:assigned", formatted);
+    res.json({ request: formatted });
+  } catch (err) {
+    console.error("Assign officer error:", err);
+    res.status(500).json({ error: "Failed to assign officer" });
+  }
+}
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+
+// GET /api/requests/stats  (admin)
+export async function getStats(req: Request, res: Response): Promise<void> {
+  try {
+    const [total, byStatus, byCategory, byPriority] = await Promise.all([
+      pool.query("SELECT COUNT(*) FROM service_requests"),
+      pool.query("SELECT status, COUNT(*) FROM service_requests GROUP BY status"),
+      pool.query(`SELECT c.slug, c.name, COUNT(sr.id) AS count
+                  FROM categories c LEFT JOIN service_requests sr ON sr.category_id = c.id
+                  GROUP BY c.slug, c.name ORDER BY count DESC`),
+      pool.query("SELECT priority, COUNT(*) FROM service_requests GROUP BY priority"),
+    ]);
+
+    res.json({
+      total:      parseInt(total.rows[0].count),
+      byStatus:   byStatus.rows,
+      byCategory: byCategory.rows,
+      byPriority: byPriority.rows,
+    });
+  } catch (err) {
+    console.error("Stats error:", err);
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
+}

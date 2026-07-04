@@ -2,7 +2,7 @@ services:
   - type: web
     name: unimaintain-backend
     runtime: node
-    buildCommand: pnpm install --prod=false && pnpm build
+    buildCommand: yarn install --production=false && yarn build
     startCommand: node dist/server.js
     envVars:
       - key: NODE_ENV

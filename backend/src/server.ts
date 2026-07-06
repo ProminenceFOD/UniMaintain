@@ -24,7 +24,7 @@ const CORS_ORIGINS = [
   "http://localhost:5174",
 ];
 
-const API_URL = process.env.API_URL || `http://localhost:${PORT}`;
+const API_URL = process.env.API_URL || process.env.RENDER_EXTERNAL_URL || process.env.RENDER_URL || `http://localhost:${PORT}`;
 const swaggerSpec = getSwaggerSpec(API_URL);
 
 // ─── SOCKET.IO ────────────────────────────────────────────────────────────────

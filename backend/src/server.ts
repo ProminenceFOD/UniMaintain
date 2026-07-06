@@ -10,7 +10,7 @@ import authRoutes         from "./routes/auth";
 import userRoutes         from "./routes/users";
 import requestRoutes      from "./routes/requests";
 import notificationRoutes from "./routes/notifications";
-import { swaggerSpec }    from "./config/swagger";
+import { getSwaggerSpec } from "./config/swagger";
 
 dotenv.config();
 
@@ -23,6 +23,9 @@ const CORS_ORIGINS = [
   "http://localhost:3000",
   "http://localhost:5174",
 ];
+
+const API_URL = process.env.API_URL || `http://localhost:${PORT}`;
+const swaggerSpec = getSwaggerSpec(API_URL);
 
 // ─── SOCKET.IO ────────────────────────────────────────────────────────────────
 export const io = new SocketIO(server, {
@@ -85,9 +88,9 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 
 // ─── START ────────────────────────────────────────────────────────────────────
 server.listen(PORT, () => {
-  console.log(`🚀 UniMaintain API    → http://localhost:${PORT}`);
-  console.log(`📋 API Documentation  → http://localhost:${PORT}/api/docs`);
-  console.log(`⚡ Socket.io enabled  → ws://localhost:${PORT}`);
+  console.log(`🚀 UniMaintain API    → ${API_URL}`);
+  console.log(`📋 API Documentation  → ${API_URL}/api/docs`);
+  console.log(`⚡ Socket.io enabled  → ${API_URL.replace(/^http/, "ws")}`);
 });
 
 export default app;

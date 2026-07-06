@@ -1,6 +1,6 @@
 import swaggerJsdoc from "swagger-jsdoc";
 
-const options: swaggerJsdoc.Options = {
+const createSwaggerOptions = (apiUrl: string): swaggerJsdoc.Options => ({
   definition: {
     openapi: "3.0.0",
     info: {
@@ -40,9 +40,12 @@ Obtain a token via \`POST /api/auth/login\` or \`POST /api/auth/register\`.
       },
       license: { name: "MIT" },
     },
-    servers: [
-      { url: "http://localhost:5000", description: "Local development server" },
-    ],
+    servers: process.env.NODE_ENV === "production"
+      ? [{ url: apiUrl, description: "Current API server" }]
+      : [
+          { url: apiUrl, description: "Current API server" },
+          { url: "http://localhost:5000", description: "Local development server" },
+        ],
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -129,7 +132,7 @@ Obtain a token via \`POST /api/auth/login\` or \`POST /api/auth/register\`.
       { name: "Notifications", description: "In-app notification management" },
     ],
   },
-  apis: ["./src/routes/*.ts"],
-};
+  apis: [process.env.NODE_ENV === "production" ? "./src/routes/*.js" : "./src/routes/*.ts"],
+});
 
-export const swaggerSpec = swaggerJsdoc(options);
+export const getSwaggerSpec = (apiUrl: string) => swaggerJsdoc(createSwaggerOptions(apiUrl));

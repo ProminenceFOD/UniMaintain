@@ -22,7 +22,12 @@ const CORS_ORIGINS = [
   process.env.CLIENT_URL || "http://localhost:5173",
   "http://localhost:3000",
   "http://localhost:5174",
-];
+  // Allow the deployed Render host and any Render-provided external URL
+  process.env.API_URL,
+  process.env.RENDER_EXTERNAL_URL,
+  process.env.RENDER_URL,
+  "https://unimaintain-backend.onrender.com",
+].filter(Boolean) as string[];
 
 const API_URL = process.env.API_URL || process.env.RENDER_EXTERNAL_URL || process.env.RENDER_URL || `http://localhost:${PORT}`;
 const swaggerSpec = getSwaggerSpec(API_URL);
@@ -81,9 +86,12 @@ app.use((_req, res) => {
 });
 
 // Global error handler
-app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error("Unhandled error:", err.message);
-  res.status(500).json({ error: "Internal server error" });
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error("Unhandled error:", err && err.stack ? err.stack : err);
+  const show = process.env.SHOW_ERRORS === "true";
+  const payload: any = { error: "Internal server error" };
+  if (show && err && err.message) payload.details = err.message;
+  res.status(500).json(payload);
 });
 
 // ─── START ────────────────────────────────────────────────────────────────────

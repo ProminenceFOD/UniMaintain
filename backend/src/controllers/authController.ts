@@ -33,9 +33,13 @@ export async function register(req: Request, res: Response): Promise<void> {
     const token = signToken({ id: user.id, email: user.email, role: user.role, name: user.name });
 
     res.status(201).json({ token, user });
-  } catch (err) {
-    console.error("Register error:", err);
-    res.status(500).json({ error: "Registration failed. Please try again." });
+  } catch (err: any) {
+    console.error("Register error:", err && err.stack ? err.stack : err);
+    const payload: any = { error: "Registration failed. Please try again." };
+    if (process.env.SHOW_ERRORS === "true" && err && (err.message || err.toString())) {
+      payload.details = err.message || String(err);
+    }
+    res.status(500).json(payload);
   }
 }
 
@@ -71,9 +75,13 @@ export async function login(req: Request, res: Response): Promise<void> {
 
     const { password: _pw, ...safeUser } = user;
     res.json({ token, user: safeUser });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ error: "Login failed. Please try again." });
+  } catch (err: any) {
+    console.error("Login error:", err && err.stack ? err.stack : err);
+    const payload: any = { error: "Login failed. Please try again." };
+    if (process.env.SHOW_ERRORS === "true" && err && (err.message || err.toString())) {
+      payload.details = err.message || String(err);
+    }
+    res.status(500).json(payload);
   }
 }
 

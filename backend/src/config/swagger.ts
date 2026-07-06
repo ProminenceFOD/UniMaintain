@@ -1,3 +1,4 @@
+import path from "path";
 import swaggerJsdoc from "swagger-jsdoc";
 
 const createSwaggerOptions = (apiUrl: string): swaggerJsdoc.Options => ({
@@ -130,7 +131,11 @@ Obtain a token via \`POST /api/auth/login\` or \`POST /api/auth/register\`.
       { name: "Notifications", description: "In-app notification management" },
     ],
   },
-  apis: [process.env.NODE_ENV === "production" ? "./src/routes/*.js" : "./src/routes/*.ts"],
+  apis: [
+    process.env.NODE_ENV === "production"
+      ? path.join(__dirname, "..", "routes", "*.js")
+      : path.join(__dirname, "..", "routes", "*.ts"),
+  ],
 });
 
 export const getSwaggerSpec = (apiUrl: string) => swaggerJsdoc(createSwaggerOptions(apiUrl));

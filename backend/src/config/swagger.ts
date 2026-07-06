@@ -40,12 +40,10 @@ Obtain a token via \`POST /api/auth/login\` or \`POST /api/auth/register\`.
       },
       license: { name: "MIT" },
     },
-    servers: process.env.NODE_ENV === "production"
-      ? [{ url: apiUrl, description: "Current API server" }]
-      : [
-          { url: apiUrl, description: "Current API server" },
-          { url: "http://localhost:5000", description: "Local development server" },
-        ],
+    servers: [
+      { url: apiUrl, description: "Current API server" },
+      { url: "http://localhost:5000", description: "Local development server" },
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {

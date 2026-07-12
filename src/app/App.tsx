@@ -7,10 +7,11 @@ import "react-day-picker/dist/style.css";
 // ─── Extracted modules ────────────────────────────────────────────────────────
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../types";
 import { USERS, INITIAL_REQUESTS, INITIAL_NOTIFICATIONS } from "../data/mockData";
-import { initials, formatDate, formatDateTime, generateId, exportCSV } from "../lib/utils";
+import { initials, formatDate, formatDateTime, generateId, exportCSV, getGreeting } from "../lib/utils";
 import {
   DEMO_USER_KEY, DEMO_REQUESTS_KEY, DEMO_USERS_KEY, DEMO_NOTIFICATIONS_KEY,
   saveDemoSession, loadDemoSession, clearDemoUser, clearAllDemoData,
+  saveActiveTab, loadActiveTab, clearActiveTab,
 } from "../lib/session";
 import {
   apiLogin, apiRegister, apiGetMe, apiGetRequests, apiGetRequest,
@@ -483,8 +484,42 @@ function RegisterScreen({ onBack, onRegister, apiMode }: {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-5 sm:p-8">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen flex">
+      {/* Left panel */}
+      <div className="hidden lg:flex lg:w-2/5 bg-primary flex-col justify-between p-12">
+        <div>
+          <div className="flex items-center gap-2.5 mb-16">
+            <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
+              <Wrench size={16} className="text-white" />
+            </div>
+            <span className="text-white font-semibold text-sm tracking-wide" style={{ fontFamily: "var(--font-display)" }}>
+              UniMaintain
+            </span>
+          </div>
+          <h1 className="text-4xl font-bold text-white leading-tight mb-4" style={{ fontFamily: "var(--font-display)" }}>
+            Join UniMaintain<br />Today
+          </h1>
+          <p className="text-white/60 text-sm leading-relaxed max-w-xs">
+            Create an account to easily report issues, track repairs, and help keep our campus facilities running smoothly.
+          </p>
+        </div>
+        <div className="space-y-4">
+          {[
+            { icon: <Sparkles size={14} />, text: "Quickly report maintenance issues across campus" },
+            { icon: <CheckCircle2 size={14} />, text: "Track the status of your requests in real-time" },
+            { icon: <Bell size={14} />, text: "Stay informed with automated notifications" },
+          ].map((f, i) => (
+            <div key={i} className="flex items-center gap-3 text-white/70 text-sm">
+              <div className="text-white/50">{f.icon}</div>
+              {f.text}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Right panel */}
+      <div className="flex-1 flex items-center justify-center p-5 sm:p-8 bg-background">
+        <div className="w-full max-w-sm">
 
         {/* Mobile-only branding — register screen */}
         <div className="lg:hidden mb-8 text-center">
@@ -612,6 +647,7 @@ function RegisterScreen({ onBack, onRegister, apiMode }: {
             {loading ? "Creating account…" : "Create Account"}
           </button>
         </form>
+      </div>
       </div>
     </div>
   );
@@ -1851,7 +1887,7 @@ function StudentDashboard({ user, requests, onNewRequest, onSelect, globalSearch
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-display)" }}>
-              {activeTab === "requests" ? "My Requests" : `Good morning, ${user.name.split(" ")[0]}`}
+              {activeTab === "requests" ? "My Requests" : `${getGreeting()}, ${user.name.split(" ")[0]}`}
             </h1>
             <p className="text-sm text-muted-foreground mt-0.5">
               {activeTab === "requests" ? "Track and manage your maintenance requests" : `${user.department} · ${formatDate(new Date().toISOString())}`}
@@ -2241,7 +2277,7 @@ function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, activeTab,
   const completedToday = completed.filter(r => r.resolvedAt && new Date(r.resolvedAt).toDateString() === new Date().toDateString()).length;
 
   const pageTitle: Record<string, string> = {
-    overview:  `Good morning, ${user.name.split(" ")[0]}`,
+    overview:  `${getGreeting()}, ${user.name.split(" ")[0]}`,
     tasks:     "Assigned Tasks",
     completed: "Completed Tasks",
   };
@@ -3492,8 +3528,8 @@ function InviteUserModal({ onClose, onInvite }: {
 
 // ─── ADMIN DASHBOARD ──────────────────────────────────────────────────────────
 
-function AdminDashboard({ requests, users, onSelect, onAssign, onStatusUpdate, onToggleUser, onInviteUser, onEditUser, activeTab, globalSearch }: {
-  requests: Request[]; users: User[]; onSelect: (r: Request) => void;
+function AdminDashboard({ requests, users, currentUser, onSelect, onAssign, onStatusUpdate, onToggleUser, onInviteUser, onEditUser, activeTab, globalSearch }: {
+  requests: Request[]; users: User[]; currentUser: User; onSelect: (r: Request) => void;
   onAssign: (requestId: string, officerId: string) => void;
   onStatusUpdate: (id: string, status: Status, note: string) => void;
   onToggleUser: (id: string) => void;
@@ -3575,7 +3611,7 @@ function AdminDashboard({ requests, users, onSelect, onAssign, onStatusUpdate, o
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-display)" }}>
-              {activeTab === "overview"   ? "Overview"
+              {activeTab === "overview"   ? `${getGreeting()}, ${currentUser.name.split(" ")[0]}`
                : activeTab === "requests" ? "All Requests"
                : activeTab === "users"    ? "User Management"
                : activeTab === "analytics"? "Analytics"
@@ -4635,7 +4671,7 @@ export default function App() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [users, setUsers] = useState<User[]>(USERS);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(() => loadActiveTab());
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [showNewRequest, setShowNewRequest] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
@@ -4647,6 +4683,11 @@ export default function App() {
   useEffect(() => { requestsRef.current      = requests;      }, [requests]);
   useEffect(() => { usersRef.current         = users;         }, [users]);
   useEffect(() => { notificationsRef.current = notifications; }, [notifications]);
+  useEffect(() => {
+    if (currentUser && screen === "app") {
+      saveActiveTab(activeTab);
+    }
+  }, [activeTab, currentUser, screen]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [globalSearch, setGlobalSearch] = useState("");
@@ -4731,46 +4772,70 @@ export default function App() {
   // On mount: restore session from JWT (API mode) or localStorage (demo mode)
   useEffect(() => {
     async function checkSession() {
-      // Always show the loader for at least 1.8s so the splash is visible
-      const minDisplay = new Promise(r => setTimeout(r, 1800));
+      const params = new URLSearchParams(window.location.search);
+      const demoParam = params.get("demo"); // student, officer, admin, staff
+      const tabParam = params.get("tab");
+
+      // Bypass splash screen loader delay if demo query param is set
+      const minDisplay = new Promise(r => setTimeout(r, demoParam ? 0 : 1800));
 
       let nextScreen: "app" | "login" = "login";
 
-      // 1. Try JWT auth against backend
-      try {
-        const { user } = await apiGetMe();
-        setCurrentUser(adaptUser(user));
-        setApiMode(true);
-        setActiveTab("overview");
-        await refreshData(user.role, String(user.id));
-        nextScreen = "app";
-      } catch {
-        // 2. Check if backend is reachable at all
-        try {
-          await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/health`);
-          setApiMode(true);
-        } catch {
+      if (demoParam) {
+        const demoMap: Record<string, string> = {
+          student: "u1",
+          staff: "u10",
+          officer: "u5",
+          admin: "u8"
+        };
+        const userId = demoMap[demoParam];
+        const matchedUser = USERS.find(u => u.id === userId);
+        if (matchedUser) {
+          setCurrentUser(matchedUser);
+          setRequests(INITIAL_REQUESTS);
+          setUsers(USERS);
+          setNotifications(INITIAL_NOTIFICATIONS.filter(n => n.userId === matchedUser.id));
+          setActiveTab(tabParam || loadActiveTab(matchedUser.role));
           setApiMode(false);
-        }
-
-        // 3. Restore demo session from localStorage
-        const { user: demoUser, requests: demoRequests, users: demoUsers, notifications: demoNotifs } = loadDemoSession();
-        if (demoUser) {
-          const mergedUsers   = USERS.map(base => demoUsers.find(u => u.id === base.id) ?? base);
-          const extraUsers    = demoUsers.filter(u => !USERS.find(b => b.id === u.id));
-          const restoredUsers = [...mergedUsers, ...extraUsers];
-          // Restore notification read states from storage
-          const savedUserNotifs = demoNotifs.filter(n => n.userId === demoUser.id);
-          const restoredNotifs  = savedUserNotifs.length > 0
-            ? savedUserNotifs
-            : INITIAL_NOTIFICATIONS.filter(n => n.userId === demoUser.id);
-
-          setCurrentUser(demoUser);
-          setRequests(demoRequests.length > 0 ? demoRequests : INITIAL_REQUESTS);
-          setUsers(restoredUsers);
-          setNotifications(restoredNotifs);
-          setActiveTab("overview");
           nextScreen = "app";
+        }
+      } else {
+        // 1. Try JWT auth against backend
+        try {
+          const { user } = await apiGetMe();
+          setCurrentUser(adaptUser(user));
+          setApiMode(true);
+          setActiveTab(loadActiveTab(user.role));
+          await refreshData(user.role, String(user.id));
+          nextScreen = "app";
+        } catch {
+          // 2. Check if backend is reachable at all
+          try {
+            await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/health`);
+            setApiMode(true);
+          } catch {
+            setApiMode(false);
+          }
+
+          // 3. Restore demo session from localStorage
+          const { user: demoUser, requests: demoRequests, users: demoUsers, notifications: demoNotifs } = loadDemoSession();
+          if (demoUser) {
+            const mergedUsers   = USERS.map(base => demoUsers.find(u => u.id === base.id) ?? base);
+            const extraUsers    = demoUsers.filter(u => !USERS.find(b => b.id === u.id));
+            const restoredUsers = [...mergedUsers, ...extraUsers];
+            // Restore notification read states from storage
+            const savedUserNotifs = demoNotifs.filter(n => n.userId === demoUser.id);
+            const restoredNotifs  = savedUserNotifs.length > 0
+              ? savedUserNotifs
+              : INITIAL_NOTIFICATIONS.filter(n => n.userId === demoUser.id);
+
+            setCurrentUser(demoUser);
+            setRequests(demoRequests.length > 0 ? demoRequests : INITIAL_REQUESTS);
+            setUsers(restoredUsers);
+            setNotifications(restoredNotifs);
+            setActiveTab(loadActiveTab(demoUser.role));
+            nextScreen = "app";
+          }
         }
       }
 
@@ -4807,9 +4872,9 @@ export default function App() {
   const DEMO_USER_IDS = ["u1","u2","u3","u4","u5","u6","u7","u8","u9","u10"];
 
   async function handleLogin(user: User) {
-    setActiveTab("overview");
     if (apiMode) {
       setCurrentUser(user);
+      setActiveTab(loadActiveTab(user.role));
       await refreshData(user.role, user.id);
     } else if (DEMO_USER_IDS.includes(user.id)) {
       // Always load from storage first — this preserves data across logouts
@@ -4831,6 +4896,7 @@ export default function App() {
       setRequests(currentRequests);
       setUsers(currentUsers);
       setNotifications(currentNotifs);
+      setActiveTab(loadActiveTab(loggedInUser.role));
       saveDemoSession(loggedInUser, currentRequests, currentUsers, currentNotifs);
     } else {
       // Newly registered account — add to users list and start fresh
@@ -4867,6 +4933,7 @@ export default function App() {
       } catch { /* quota */ }
       clearDemoUser();
     }
+    clearActiveTab();
     setCurrentUser(null);
     setNotifications([]);
     setScreen("login");
@@ -5264,7 +5331,7 @@ export default function App() {
           />
         )}
         {currentUser.role === "admin" && !["reports","profile","settings","api-reference"].includes(activeTab) && (
-          <AdminDashboard requests={requests} users={users}
+          <AdminDashboard requests={requests} users={users} currentUser={currentUser}
             onSelect={setSelectedRequest} onAssign={handleAssign}
             onStatusUpdate={handleStatusUpdate} onToggleUser={handleToggleUser}
             onInviteUser={u => setUsers(p => [...p, u])}

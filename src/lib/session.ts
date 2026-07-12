@@ -4,6 +4,37 @@ export const DEMO_USER_KEY          = "unimaintain_demo_user";
 export const DEMO_REQUESTS_KEY      = "unimaintain_demo_requests";
 export const DEMO_USERS_KEY         = "unimaintain_demo_users";
 export const DEMO_NOTIFICATIONS_KEY = "unimaintain_demo_notifications";
+export const ACTIVE_TAB_KEY         = "unimaintain_active_tab";
+
+const STUDENT_TABS = ["overview", "requests", "profile"];
+const OFFICER_TABS = ["overview", "tasks", "completed", "profile"];
+const ADMIN_TABS = ["overview", "requests", "users", "analytics", "reports", "settings", "api-reference", "profile"];
+
+export function getValidActiveTab(tab: string | null | undefined, role?: string | null): string {
+  const allowedTabs = role === "officer" ? OFFICER_TABS : role === "admin" ? ADMIN_TABS : STUDENT_TABS;
+  return tab && allowedTabs.includes(tab) ? tab : "overview";
+}
+
+export function saveActiveTab(tab: string) {
+  const safeTab = getValidActiveTab(tab);
+  try { sessionStorage.setItem(ACTIVE_TAB_KEY, safeTab); } catch { /* quota exceeded */ }
+  try { localStorage.setItem(ACTIVE_TAB_KEY, safeTab); } catch { /* quota exceeded */ }
+}
+
+export function loadActiveTab(role?: string | null): string {
+  try {
+    const saved = sessionStorage.getItem(ACTIVE_TAB_KEY) ?? localStorage.getItem(ACTIVE_TAB_KEY);
+    return getValidActiveTab(saved, role);
+  } catch {
+    return getValidActiveTab(null, role);
+  }
+}
+
+export function clearActiveTab() {
+  [sessionStorage, localStorage].forEach(store => {
+    store.removeItem(ACTIVE_TAB_KEY);
+  });
+}
 
 export function saveDemoSession(user: User, requests: Request[], users: User[], notifications?: Notification[]) {
   const data = {

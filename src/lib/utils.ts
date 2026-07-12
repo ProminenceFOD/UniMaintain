@@ -35,3 +35,10 @@ export function exportCSV(requests: Request[]) {
   a.href = url; a.download = "maintenance_requests.csv"; a.click();
   URL.revokeObjectURL(url);
 }
+
+export function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}

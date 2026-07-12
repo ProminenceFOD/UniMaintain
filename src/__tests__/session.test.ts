@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import {
   saveDemoSession, loadDemoSession,
   clearDemoUser, clearAllDemoData,
+  saveActiveTab, loadActiveTab, clearActiveTab,
   DEMO_USER_KEY, DEMO_REQUESTS_KEY, DEMO_USERS_KEY,
 } from "../lib/session";
 import type { User, Request } from "../types";
@@ -113,5 +114,29 @@ describe("clearAllDemoData()", () => {
     expect(localStorage.getItem(DEMO_REQUESTS_KEY)).toBeNull();
     expect(localStorage.getItem(DEMO_USERS_KEY)).toBeNull();
     expect(sessionStorage.getItem(DEMO_USER_KEY)).toBeNull();
+  });
+});
+
+// ─── active tab persistence ─────────────────────────────────────────────────
+
+describe("active tab persistence", () => {
+  it("persists and restores a valid tab for the current role", () => {
+    saveActiveTab("requests");
+
+    expect(loadActiveTab("student")).toBe("requests");
+  });
+
+  it("falls back to the dashboard when the saved tab is not valid for the role", () => {
+    saveActiveTab("analytics");
+
+    expect(loadActiveTab("student")).toBe("overview");
+  });
+
+  it("clears the stored tab", () => {
+    saveActiveTab("users");
+    clearActiveTab();
+
+    expect(localStorage.getItem("unimaintain_active_tab")).toBeNull();
+    expect(sessionStorage.getItem("unimaintain_active_tab")).toBeNull();
   });
 });

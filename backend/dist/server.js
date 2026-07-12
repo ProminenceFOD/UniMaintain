@@ -25,6 +25,8 @@ const CORS_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5174",
 ];
+const API_URL = process.env.API_URL || `http://localhost:${PORT}`;
+const swaggerSpec = (0, swagger_1.getSwaggerSpec)(API_URL);
 // ─── SOCKET.IO ────────────────────────────────────────────────────────────────
 exports.io = new socket_io_1.Server(server, {
     cors: { origin: CORS_ORIGINS, credentials: true },
@@ -49,11 +51,11 @@ app.use((req, _res, next) => { req.io = exports.io; next(); });
 // Serve uploaded files statically
 app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../uploads")));
 // ─── API DOCUMENTATION ────────────────────────────────────────────────────────
-app.use("/api/docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.swaggerSpec, {
+app.use("/api/docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec, {
     customSiteTitle: "UniMaintain API Docs",
     customCss: ".swagger-ui .topbar { background: #1A4731; }",
 }));
-app.get("/api/docs.json", (_req, res) => res.json(swagger_1.swaggerSpec));
+app.get("/api/docs.json", (_req, res) => res.json(swaggerSpec));
 // ─── ROUTES ───────────────────────────────────────────────────────────────────
 app.use("/api/auth", auth_1.default);
 app.use("/api/users", users_1.default);
@@ -74,8 +76,8 @@ app.use((err, _req, res, _next) => {
 });
 // ─── START ────────────────────────────────────────────────────────────────────
 server.listen(PORT, () => {
-    console.log(`🚀 UniMaintain API    → http://localhost:${PORT}`);
-    console.log(`📋 API Documentation  → http://localhost:${PORT}/api/docs`);
-    console.log(`⚡ Socket.io enabled  → ws://localhost:${PORT}`);
+    console.log(`🚀 UniMaintain API    → ${API_URL}`);
+    console.log(`📋 API Documentation  → ${API_URL}/api/docs`);
+    console.log(`⚡ Socket.io enabled  → ${API_URL.replace(/^http/, "ws")}`);
 });
 exports.default = app;

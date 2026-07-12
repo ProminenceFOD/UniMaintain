@@ -3,9 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.swaggerSpec = void 0;
+exports.getSwaggerSpec = void 0;
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
-const options = {
+const createSwaggerOptions = (apiUrl) => ({
     definition: {
         openapi: "3.0.0",
         info: {
@@ -45,9 +45,12 @@ Obtain a token via \`POST /api/auth/login\` or \`POST /api/auth/register\`.
             },
             license: { name: "MIT" },
         },
-        servers: [
-            { url: "http://localhost:5000", description: "Local development server" },
-        ],
+        servers: process.env.NODE_ENV === "production"
+            ? [{ url: apiUrl, description: "Current API server" }]
+            : [
+                { url: apiUrl, description: "Current API server" },
+                { url: "http://localhost:5000", description: "Local development server" },
+            ],
         components: {
             securitySchemes: {
                 bearerAuth: {
@@ -134,6 +137,7 @@ Obtain a token via \`POST /api/auth/login\` or \`POST /api/auth/register\`.
             { name: "Notifications", description: "In-app notification management" },
         ],
     },
-    apis: ["./src/routes/*.ts"],
-};
-exports.swaggerSpec = (0, swagger_jsdoc_1.default)(options);
+    apis: [process.env.NODE_ENV === "production" ? "./src/routes/*.js" : "./src/routes/*.ts"],
+});
+const getSwaggerSpec = (apiUrl) => (0, swagger_jsdoc_1.default)(createSwaggerOptions(apiUrl));
+exports.getSwaggerSpec = getSwaggerSpec;

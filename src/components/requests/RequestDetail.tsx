@@ -1,6 +1,9 @@
-import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, CheckCircle2, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, Paperclip, ChevronDown, ChevronLeft, ChevronRight, Send, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Activity, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
-import { formatDate, formatDateTime } from "../../lib/utils";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import { formatDate, formatDateTime } from "../../lib/utils";
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, CheckCircle2, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, Paperclip, ChevronDown, ChevronLeft, ChevronRight, Send, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Activity, Key, Trash2, Edit, Hash, PieChart, MoreVertical, User as UserIcon, Info, Mail } from "lucide-react";
+
+
+
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { Avatar } from "../../components/ui/Avatar";
 import { StatusBadge } from "../../components/ui/StatusBadge";
@@ -11,20 +14,14 @@ import { FeedbackModal } from "../../components/requests/FeedbackModal";
 
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import {
-  Bell, Check, ChevronDown, Filter, LogOut, Menu, MoreVertical,
-  Plus, Search, Settings, User as UserIcon, X, Calendar, Clock,
-  MessageSquare, FileText, AlertTriangle, AlertCircle, Info,
-  MapPin, CheckCircle, Mail, Key, Shield, UserPlus, Eye, EyeOff,
-  Edit, Trash2, Download, RefreshCw, BarChart2, PieChart, TrendingUp, ChevronLeft, ChevronRight, Hash
-} from "lucide-react";
+
 import { format, parseISO, isAfter, isBefore, subDays, startOfMonth, endOfMonth, isSameMonth, subMonths, addMonths } from "date-fns";
 import {
   LineChart, Line, BarChart, Bar, PieChart as RePieChart, Pie,
   Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer
 } from "recharts";
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
-import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+
 import type { CatConfig } from "../../lib/constants";
 
 export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, onDelete, onAssign, officers, onAddComment }: {

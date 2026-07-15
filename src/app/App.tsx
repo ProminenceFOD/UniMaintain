@@ -1,3 +1,7 @@
+import { apiLogin, apiRegister, apiGetMe, apiGetRequests, apiGetRequest, apiCreateRequest, apiUpdateStatus, apiAssignOfficer, apiGetStats, apiGetUsers, apiGetOfficers, apiToggleUser, apiGetNotifications, apiMarkRead, apiMarkAllRead, saveToken, clearToken, type ApiUser, type ApiRequest, type ApiNotification } from "../lib/api";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG, DEFAULT_CATEGORIES, CATEGORIES_KEY, SETTINGS_KEY } from "../lib/constants";
+import { initials, formatDate, formatDateTime, generateId, exportCSV, getGreeting } from "../lib/utils";
+import { Bell, Search, LogOut, Plus, Download, X, Zap, Wifi, Menu, UserPlus, EyeOff, ArrowLeft, Droplets, Package, Wrench, Wind, CheckCircle2, Clock, AlertTriangle, AlertCircle, Users, BarChart2, Eye, Home, FileText, Shield, MapPin, Paperclip, ChevronDown, ChevronLeft, ChevronRight, UserCheck, ArrowUpRight, Send, Building2, Edit2, CheckCheck, Circle, Filter, Check, Copy, RefreshCw, Layers, ClipboardList, TrendingUp, Printer, Code, Settings, MessageSquare, Image as ImageIcon, Calendar, Activity, Sparkles, Key } from "lucide-react";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { injectFavicon } from "./favicon";
@@ -7,35 +11,19 @@ import "react-day-picker/dist/style.css";
 // ─── Extracted modules ────────────────────────────────────────────────────────
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../types";
 import { USERS, INITIAL_REQUESTS, INITIAL_NOTIFICATIONS } from "../data/mockData";
-import { initials, formatDate, formatDateTime, generateId, exportCSV, getGreeting } from "../lib/utils";
+
 import {
   DEMO_USER_KEY, DEMO_REQUESTS_KEY, DEMO_USERS_KEY, DEMO_NOTIFICATIONS_KEY,
   saveDemoSession, loadDemoSession, clearDemoUser, clearAllDemoData,
   saveActiveTab, loadActiveTab, clearActiveTab,
 } from "../lib/session";
-import {
-  apiLogin, apiRegister, apiGetMe, apiGetRequests, apiGetRequest,
-  apiCreateRequest, apiUpdateStatus, apiAssignOfficer, apiGetStats,
-  apiGetUsers, apiGetOfficers, apiToggleUser,
-  apiGetNotifications, apiMarkRead, apiMarkAllRead,
-  saveToken, clearToken,
-  type ApiUser, type ApiRequest, type ApiNotification,
-} from "../lib/api";
-import {
-  Bell, Search, LogOut, Plus, Download, X, Zap, Wifi, Menu, UserPlus, EyeOff, ArrowLeft,
-  Droplets, Package, Wrench, Wind, CheckCircle2, Clock,
-  AlertTriangle, AlertCircle, Users, BarChart2, Eye,
-  Home, FileText, Shield, MapPin, Paperclip, ChevronDown,
-  ChevronLeft, ChevronRight, UserCheck, ArrowUpRight,
-  Send, Building2, Edit2, CheckCheck, Circle, Filter, Check, Copy,
-  RefreshCw, Layers, ClipboardList, TrendingUp, Printer, Code, Settings,
-  MessageSquare, Image as ImageIcon, Calendar, Activity, Sparkles, Key,
-} from "lucide-react";
+
+
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
-import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG, DEFAULT_CATEGORIES, CATEGORIES_KEY, SETTINGS_KEY } from "../lib/constants";
+
 import type { CategoryItem } from "../types";
 
 

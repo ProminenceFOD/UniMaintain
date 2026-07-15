@@ -1,5 +1,7 @@
-import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, Send, Edit2, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG, DEFAULT_CATEGORIES, CATEGORIES_KEY, SETTINGS_KEY } from "../../lib/constants";
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, Send, Edit2, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart, MoreVertical, User as UserIcon, Info, Mail } from "lucide-react";
+
+
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment, CategoryItem } from "../../types";
 function loadSiteSettings() {
   try {
@@ -8,27 +10,21 @@ function loadSiteSettings() {
   } catch { return { allowSignups: true, emailNotifs: false, institution: "MIVA Open University", supportEmail: "maintenance@university.edu" }; }
 }
 
-import { CheckCircle, Edit2 } from "lucide-react";
-import { CATEGORIES_KEY, SETTINGS_KEY, DEFAULT_CATEGORIES } from "../../lib/constants";
+
+
 import type { CategoryItem } from "../../types";
 function loadCategories() { try { const c = localStorage.getItem(CATEGORIES_KEY); return c ? JSON.parse(c) : DEFAULT_CATEGORIES; } catch { return DEFAULT_CATEGORIES; } }
 
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import {
-  Bell, Check, ChevronDown, Filter, LogOut, Menu, MoreVertical,
-  Plus, Search, Settings, User as UserIcon, X, Calendar, Clock,
-  MessageSquare, FileText, AlertTriangle, AlertCircle, Info,
-  MapPin, CheckCircle, Mail, Key, Shield, UserPlus, Eye, EyeOff,
-  Edit, Trash2, Download, RefreshCw, BarChart2, PieChart, TrendingUp, ChevronLeft, ChevronRight, Hash
-} from "lucide-react";
+
 import { format, parseISO, isAfter, isBefore, subDays, startOfMonth, endOfMonth, isSameMonth, subMonths, addMonths } from "date-fns";
 import {
   LineChart, Line, BarChart, Bar, PieChart as RePieChart, Pie,
   Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer
 } from "recharts";
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
-import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+
 import type { CatConfig } from "../../lib/constants";
 
 export function SiteSettingsPage() {

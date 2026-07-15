@@ -1,15 +1,19 @@
-import { AlertCircle } from "lucide-react";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG, DEFAULT_CATEGORIES, CATEGORIES_KEY, SETTINGS_KEY } from "../lib/constants";
+import { AlertCircle, Info } from "lucide-react";
+
+
 import type { Status, Priority, Category, CategoryItem } from "../types";
 
 import React from "react";
-import { AlertCircle, Info } from "lucide-react";
+
 import type { Status, Priority, Category } from "../types";
 
 export const STATUS_CONFIG: Record<Status, { label: string; bg: string; text: string; dot: string }> = {
   pending:     { label: "Pending Review",  bg: "bg-amber-50",   text: "text-amber-700",  dot: "bg-amber-500" },
+  assigned:    { label: "Assigned",        bg: "bg-purple-50",  text: "text-purple-700", dot: "bg-purple-500" },
   in_progress: { label: "In Progress",     bg: "bg-blue-50",    text: "text-blue-700",   dot: "bg-blue-500" },
   resolved:    { label: "Resolved",        bg: "bg-emerald-50", text: "text-emerald-700",dot: "bg-emerald-500" },
+  closed:      { label: "Closed",          bg: "bg-gray-50",    text: "text-gray-700",   dot: "bg-gray-500" },
   cancelled:   { label: "Cancelled",       bg: "bg-slate-50",   text: "text-slate-700",  dot: "bg-slate-500" },
 };
 

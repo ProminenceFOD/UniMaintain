@@ -1,3 +1,7 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +19,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function FiltersBar({ search, setSearch, statusFilter, setStatusFilter, categoryFilter, setCategoryFilter }: {
+
+export function FiltersBar({ search, setSearch, statusFilter, setStatusFilter, categoryFilter, setCategoryFilter }: {
   search: string; setSearch: (v: string) => void;
   statusFilter: string; setStatusFilter: (v: string) => void;
   categoryFilter: string; setCategoryFilter: (v: string) => void;
@@ -45,4 +50,4 @@ import type { CatConfig } from "../../lib/constants";
       </select>
     </div>
   );
-}\n
+}

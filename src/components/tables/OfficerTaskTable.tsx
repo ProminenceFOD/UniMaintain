@@ -1,3 +1,12 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, CheckCheck, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { formatDate } from "../../lib/utils";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+import { StatusBadge } from "../../components/ui/StatusBadge";
+import { CategoryTag } from "../../components/ui/CategoryTag";
+import { PriorityLabel } from "../../components/ui/PriorityLabel";
+import { Pagination } from "../../components/tables/Pagination";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +24,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function OfficerTaskTable({ requests, onSelect, onStatusUpdate, emptyLabel }: {
+
+export function OfficerTaskTable({ requests, onSelect, onStatusUpdate, emptyLabel }: {
   requests: Request[]; onSelect: (r: Request) => void;
   onStatusUpdate: (id: string, status: Status, note: string) => void;
   emptyLabel: string;
@@ -119,4 +129,4 @@ import type { CatConfig } from "../../lib/constants";
       <Pagination page={page} total={filtered.length} perPage={perPage} onPage={setPage} />
     </div>
   );
-}\n
+}

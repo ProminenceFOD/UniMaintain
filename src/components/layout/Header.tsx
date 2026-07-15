@@ -1,3 +1,9 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, CheckCircle2, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, UserCheck, ArrowUpRight, CheckCheck, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Key, Sun, Moon, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { formatDate } from "../../lib/utils";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+import { Avatar } from "../../components/ui/Avatar";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "../../hooks/useTheme";
 import { createPortal } from "react-dom";
@@ -16,7 +22,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function Header({ user, notifications, onBell, showNotif, onCloseNotif, onMarkRead, onMarkAllRead, globalSearch, onSearch, onToggleSidebar, onNotifClick, onGoToProfile, onLogoutFromHeader }: {
+
+export function Header({ user, notifications, onBell, showNotif, onCloseNotif, onMarkRead, onMarkAllRead, globalSearch, onSearch, onToggleSidebar, onNotifClick, onGoToProfile, onLogoutFromHeader }: {
   user: User; notifications: Notification[];
   onBell: () => void; showNotif: boolean; onCloseNotif: () => void;
   onMarkRead: (id: string) => void; onMarkAllRead: () => void;
@@ -231,4 +238,4 @@ import type { CatConfig } from "../../lib/constants";
       </div>
     </div>
   );
-}\n
+}

@@ -1,3 +1,12 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, CheckCircle2, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, Filter, Check, RefreshCw, TrendingUp, Printer, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { formatDate } from "../../lib/utils";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+import { Avatar } from "../../components/ui/Avatar";
+import { StatCard } from "../../components/ui/StatCard";
+import { CalendarPopover } from "../../components/ui/CalendarPopover";
+import { MonthPicker } from "../../components/ui/MonthPicker";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +24,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function AdminReports({ requests, users }: { requests: Request[]; users: User[] }) {
+
+export function AdminReports({ requests, users }: { requests: Request[]; users: User[] }) {
   const officers = users.filter(u => u.role === "officer" && u.active !== false);
 
   // ── Date filter state ──────────────────────────────────────────────────────
@@ -159,7 +169,7 @@ import type { CatConfig } from "../../lib/constants";
       "ID,Title,Category,Priority,Status,Submitted By,Assigned To,Date",
       ...filtered.map(r => `${r.id},"${r.title}",${r.category},${r.priority},${r.status},${r.submittedByName},${r.assignedToName ?? "Unassigned"},${formatDate(r.createdAt)}`),
     ];
-    const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+    const blob = new Blob([lines.join("\\n")], { type: "text/csv" });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
     a.href = url; a.download = `unimaintain-report-${new Date().toISOString().slice(0,10)}.csv`; a.click();
@@ -455,4 +465,4 @@ import type { CatConfig } from "../../lib/constants";
       </div>
     </div>
   );
-}\n
+}

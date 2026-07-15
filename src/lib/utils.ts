@@ -1,3 +1,6 @@
+import { initials, formatDate, formatDateTime, generateId, exportCSV, getGreeting } from "../lib/utils";
+import type { Status, Priority, Category, Request } from "../types";
+
 import type { Request } from "../types";
 
 export function initials(name: string) {
@@ -28,7 +31,7 @@ export function exportCSV(requests: Request[]) {
     r.submittedByName, r.assignedToName ?? "Unassigned",
     formatDate(r.createdAt), formatDate(r.updatedAt),
   ]);
-  const csv = [headers, ...rows].map(row => row.map(v => `"${v}"`).join(",")).join("\n");
+  const csv = [headers, ...rows].map(row => row.map(v => `"${v}"`).join(",")).join("\\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement("a");

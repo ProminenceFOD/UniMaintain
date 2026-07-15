@@ -1,3 +1,14 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, CheckCircle2, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, Paperclip, ChevronDown, ChevronLeft, ChevronRight, Send, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Activity, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { formatDate, formatDateTime } from "../../lib/utils";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+import { Avatar } from "../../components/ui/Avatar";
+import { StatusBadge } from "../../components/ui/StatusBadge";
+import { CategoryTag } from "../../components/ui/CategoryTag";
+import { PriorityLabel } from "../../components/ui/PriorityLabel";
+import { CancelConfirmModal } from "../../components/requests/CancelConfirmModal";
+import { FeedbackModal } from "../../components/requests/FeedbackModal";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +26,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function RequestDetail({ request, currentUser, onClose, onStatusUpdate, onDelete, onAssign, officers, onAddComment }: {
+
+export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, onDelete, onAssign, officers, onAddComment }: {
   request: Request; currentUser: User; onClose: () => void;
   onStatusUpdate: (id: string, status: Status, note: string) => void;
   onDelete: (id: string) => void;
@@ -418,4 +430,4 @@ import type { CatConfig } from "../../lib/constants";
       )}
     </div>
   );
-}\n
+}

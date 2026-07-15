@@ -1,3 +1,13 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, UserCheck, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { formatDate } from "../../lib/utils";
+import { USERS } from "../../data/mockData";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+import { Avatar } from "../../components/ui/Avatar";
+import { StatusBadge } from "../../components/ui/StatusBadge";
+import { CategoryTag } from "../../components/ui/CategoryTag";
+import { PriorityLabel } from "../../components/ui/PriorityLabel";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +25,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function RequestTable({ requests, onSelect, showAssign, officers, onAssign, hideRequester, users }: {
+
+export function RequestTable({ requests, onSelect, showAssign, officers, onAssign, hideRequester, users }: {
   requests: Request[]; onSelect: (r: Request) => void;
   showAssign?: boolean; officers?: User[];
   onAssign?: (requestId: string, officerId: string) => void;
@@ -161,4 +172,4 @@ import type { CatConfig } from "../../lib/constants";
       </table>
     </div>
   );
-}\n
+}

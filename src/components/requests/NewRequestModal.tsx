@@ -1,3 +1,9 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, Paperclip, ChevronDown, ChevronLeft, ChevronRight, Send, Filter, Check, RefreshCw, Layers, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { generateId } from "../../lib/utils";
+import { apiCreateRequest } from "../../lib/api";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +21,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, existingRequests }: {
+
+export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, existingRequests }: {
   currentUser: User; onClose: () => void;
   onSubmit: (req: Request) => void;
   apiMode: boolean;
@@ -266,4 +273,4 @@ import type { CatConfig } from "../../lib/constants";
       </div>
     </div>
   );
-}\n
+}

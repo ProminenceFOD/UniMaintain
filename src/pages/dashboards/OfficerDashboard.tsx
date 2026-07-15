@@ -1,3 +1,15 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, CheckCheck, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { formatDate, getGreeting } from "../../lib/utils";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+
+import { StatCard } from "../../components/ui/StatCard";
+import { StatusBadge } from "../../components/ui/StatusBadge";
+import { CategoryTag } from "../../components/ui/CategoryTag";
+import { OfficerTaskTable } from "../../components/tables/OfficerTaskTable";
+import { getGreeting, formatDate } from "../../lib/utils";
+import { CheckCircle, CheckCheck } from "lucide-react";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +27,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, activeTab, globalSearch }: {
+
+export function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, activeTab, globalSearch }: {
   user: User; requests: Request[]; onSelect: (r: Request) => void;
   onStatusUpdate: (id: string, status: Status, note: string) => void;
   activeTab: string; globalSearch: string;
@@ -57,7 +70,7 @@ import type { CatConfig } from "../../lib/constants";
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <StatCard label="Awaiting Start"  value={assigned.filter(r => r.status === "assigned").length}   icon={<Clock size={18} />} />
               <StatCard label="In Progress"     value={assigned.filter(r => r.status === "in_progress").length} icon={<RefreshCw size={18} />} accent />
-              <StatCard label="Completed Today" value={completedToday}                                          icon={<CheckCircle2 size={18} />} />
+              <StatCard label="Completed Today" value={completedToday}                                          icon={<CheckCircle size={18} />} />
               <StatCard label="Total Completed" value={completed.length}                                        icon={<CheckCheck size={18} />} />
             </div>
 
@@ -201,4 +214,4 @@ import type { CatConfig } from "../../lib/constants";
       </div>
     </div>
   );
-}\n
+}

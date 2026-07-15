@@ -1,3 +1,5 @@
+import { Search } from "lucide-react";
+
 "use client";
 
 import * as React from "react";

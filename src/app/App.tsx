@@ -35,34 +35,38 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
-
-// ─── TYPES ────────────────────────────────────────────────────────────────────
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG, DEFAULT_CATEGORIES, CATEGORIES_KEY, SETTINGS_KEY } from "../lib/constants";
+import type { CategoryItem } from "../types";
 
 
 
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
-// ─── SMALL COMPONENTS ─────────────────────────────────────────────────────────
-// ─── LOGIN SCREEN ─────────────────────────────────────────────────────────────
-// ─── REGISTER SCREEN ──────────────────────────────────────────────────────────
-// ─── SIDEBAR ──────────────────────────────────────────────────────────────────
-// ─── HEADER ───────────────────────────────────────────────────────────────────
-// ─── REQUEST DETAIL PANEL ─────────────────────────────────────────────────────
-// ─── NEW REQUEST MODAL ────────────────────────────────────────────────────────
-// ─── REQUEST TABLE ────────────────────────────────────────────────────────────
-// ─── PAGINATION ───────────────────────────────────────────────────────────────
-// ─── FILTERS BAR ──────────────────────────────────────────────────────────────
-// ─── STUDENT DASHBOARD ────────────────────────────────────────────────────────
-// ─── OFFICER DASHBOARD ────────────────────────────────────────────────────────
-// ─── MONTH PICKER ────────────────────────────────────────────────────────────
-// ─── CALENDAR POPOVER ────────────────────────────────────────────────────────
-// ─── ADMIN REPORTS PAGE ───────────────────────────────────────────────────────
-// ─── RESET PASSWORD MODAL ────────────────────────────────────────────────────
-// ─── EDIT USER MODAL ─────────────────────────────────────────────────────────
-// ─── ADMIN DASHBOARD ──────────────────────────────────────────────────────────
+// ─── EXTRACTED COMPONENTS ────────────────────────────────────────────────────────
+import { LoginScreen } from "../pages/auth/LoginScreen";
+import { RegisterScreen } from "../pages/auth/RegisterScreen";
+import { Sidebar } from "../components/layout/Sidebar";
+import { Header } from "../components/layout/Header";
+import { RequestDetail } from "../components/requests/RequestDetail";
+import { NewRequestModal } from "../components/requests/NewRequestModal";
+import { RequestTable } from "../components/tables/RequestTable";
+import { Pagination } from "../components/tables/Pagination";
+import { FiltersBar } from "../components/tables/FiltersBar";
+import { StudentDashboard } from "../pages/dashboards/StudentDashboard";
+import { OfficerDashboard } from "../pages/dashboards/OfficerDashboard";
+import { MonthPicker } from "../components/ui/MonthPicker";
+import { CalendarPopover } from "../components/ui/CalendarPopover";
+import { AdminReports } from "../pages/admin/AdminReports";
+import { ResetPasswordModal } from "../components/admin/ResetPasswordModal";
+import { EditUserModal } from "../components/admin/EditUserModal";
+import { AdminDashboard } from "../pages/dashboards/AdminDashboard";
+import { InviteUserModal } from "../components/admin/InviteUserModal";
+import { CancelConfirmModal } from "../components/requests/CancelConfirmModal";
+import { FeedbackModal } from "../components/requests/FeedbackModal";
+import { SiteSettingsPage } from "../pages/admin/SiteSettingsPage";
+import { ProfilePage } from "../pages/ProfilePage";
+import { Spinner } from "../components/ui/Spinner";
 
-// ─── INVITE USER MODAL ───────────────────────────────────────────────────────
-// ─── ADMIN DASHBOARD ──────────────────────────────────────────────────────────
 // Session helpers imported from ../lib/session
 
 // ─── CANCEL CONFIRMATION MODAL ───────────────────────────────────────────────

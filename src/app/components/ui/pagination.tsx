@@ -1,3 +1,5 @@
+import { Pagination } from "../../../components/tables/Pagination";
+
 import * as React from "react";
 import {
   ChevronLeftIcon,

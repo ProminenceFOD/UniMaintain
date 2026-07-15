@@ -1,3 +1,12 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { formatDate } from "../lib/utils";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../types";
+import { Avatar } from "../components/ui/Avatar";
+
+import { CheckCircle } from "lucide-react";
+import { formatDate } from "../lib/utils";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +24,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../lib/constants";
 import type { CatConfig } from "../lib/constants";
-\nexport function ProfilePage({ user, onSave }: { user: User; onSave: (u: User) => void }) {
+
+export function ProfilePage({ user, onSave }: { user: User; onSave: (u: User) => void }) {
   const [form, setForm] = useState({ name: user.name, department: user.department });
   const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
   const [saved, setSaved] = useState(false);
@@ -115,7 +125,7 @@ import type { CatConfig } from "../lib/constants";
                 style={{ fontFamily: "var(--font-display)" }}>
                 Save Changes
               </button>
-              {saved && <span className="text-xs text-emerald-600 font-medium flex items-center gap-1"><CheckCircle2 size={13} /> Saved!</span>}
+              {saved && <span className="text-xs text-emerald-600 font-medium flex items-center gap-1"><CheckCircle size={13} /> Saved!</span>}
             </div>
           </form>
         </div>
@@ -147,11 +157,11 @@ import type { CatConfig } from "../lib/constants";
                 style={{ fontFamily: "var(--font-display)" }}>
                 Update Password
               </button>
-              {pwSaved && <span className="text-xs text-emerald-600 font-medium flex items-center gap-1"><CheckCircle2 size={13} /> Password updated!</span>}
+              {pwSaved && <span className="text-xs text-emerald-600 font-medium flex items-center gap-1"><CheckCircle size={13} /> Password updated!</span>}
             </div>
           </form>
         </div>
       </div>
     </div>
   );
-}\n
+}

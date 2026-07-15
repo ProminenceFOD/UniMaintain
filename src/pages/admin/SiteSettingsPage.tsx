@@ -1,3 +1,18 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, Send, Edit2, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG, DEFAULT_CATEGORIES, CATEGORIES_KEY, SETTINGS_KEY } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment, CategoryItem } from "../../types";
+function loadSiteSettings() {
+  try {
+    const s = localStorage.getItem("SETTINGS_KEY");
+    return s ? JSON.parse(s) : { allowSignups: true, emailNotifs: false, institution: "MIVA Open University", supportEmail: "maintenance@university.edu" };
+  } catch { return { allowSignups: true, emailNotifs: false, institution: "MIVA Open University", supportEmail: "maintenance@university.edu" }; }
+}
+
+import { CheckCircle, Edit2 } from "lucide-react";
+import { CATEGORIES_KEY, SETTINGS_KEY, DEFAULT_CATEGORIES } from "../../lib/constants";
+import type { CategoryItem } from "../../types";
+function loadCategories() { try { const c = localStorage.getItem(CATEGORIES_KEY); return c ? JSON.parse(c) : DEFAULT_CATEGORIES; } catch { return DEFAULT_CATEGORIES; } }
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +30,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function SiteSettingsPage() {
+
+export function SiteSettingsPage() {
   const [tab, setTab] = useState<"branding" | "categories">("branding");
   const [settings, setSettings] = useState(loadSiteSettings);
   const [saved, setSaved] = useState(false);
@@ -114,7 +130,7 @@ import type { CatConfig } from "../../lib/constants";
                 style={{ fontFamily: "var(--font-display)" }}>
                 Save Settings
               </button>
-              {saved && <span className="text-xs text-emerald-600 font-medium flex items-center gap-1"><CheckCircle2 size={13} /> Saved!</span>}
+              {saved && <span className="text-xs text-emerald-600 font-medium flex items-center gap-1"><CheckCircle size={13} /> Saved!</span>}
             </div>
           </>
         )}
@@ -220,7 +236,7 @@ import type { CatConfig } from "../../lib/constants";
             </table>
             {catSaved && (
               <div className="px-5 py-3 flex items-center gap-2 text-xs text-emerald-600 font-medium border-t border-border">
-                <CheckCircle2 size={13} /> Changes saved to storage
+                <CheckCircle size={13} /> Changes saved to storage
               </div>
             )}
           </div>
@@ -228,4 +244,4 @@ import type { CatConfig } from "../../lib/constants";
       </div>
     </div>
   );
-}\n
+}

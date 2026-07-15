@@ -1,3 +1,8 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, CheckCircle2, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, Filter, Check, Copy, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Sparkles, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+import { Avatar } from "../../components/ui/Avatar";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +20,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function ResetPasswordModal({ user, onClose, onReset }: { 
+
+export function ResetPasswordModal({ user, onClose, onReset }: { 
   user: User; 
   onClose: () => void; 
   onReset: (userId: string, newPassword: string) => void;
@@ -272,4 +278,4 @@ import type { CatConfig } from "../../lib/constants";
       </div>
     </div>
   );
-}\n
+}

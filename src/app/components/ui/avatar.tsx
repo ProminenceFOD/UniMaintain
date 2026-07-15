@@ -1,3 +1,5 @@
+import { Avatar } from "../../../components/ui/Avatar";
+
 "use client";
 
 import * as React from "react";

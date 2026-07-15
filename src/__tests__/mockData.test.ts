@@ -1,3 +1,5 @@
+import { USERS, INITIAL_REQUESTS, INITIAL_NOTIFICATIONS } from "../data/mockData";
+
 import { describe, it, expect } from "vitest";
 import { USERS, INITIAL_REQUESTS, INITIAL_NOTIFICATIONS } from "../data/mockData";
 

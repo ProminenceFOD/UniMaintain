@@ -1,3 +1,11 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, ArrowLeft, Wrench, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, Circle, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Sparkles, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { apiRegister, saveToken } from "../../lib/api";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+
+import { ArrowLeft, Wrench, Sparkles, CheckCircle, Circle } from "lucide-react";
+import { apiRegister, saveToken } from "../../lib/api";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +23,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function RegisterScreen({ onBack, onRegister, apiMode }: {
+
+export function RegisterScreen({ onBack, onRegister, apiMode }: {
   onBack: () => void;
   onRegister: (user: User) => void;
   apiMode: boolean;
@@ -150,7 +159,7 @@ import type { CatConfig } from "../../lib/constants";
         <div className="space-y-4">
           {[
             { icon: <Sparkles size={14} />, text: "Quickly report maintenance issues across campus" },
-            { icon: <CheckCircle2 size={14} />, text: "Track the status of your requests in real-time" },
+            { icon: <CheckCircle size={14} />, text: "Track the status of your requests in real-time" },
             { icon: <Bell size={14} />, text: "Stay informed with automated notifications" },
           ].map((f, i) => (
             <div key={i} className="flex items-center gap-3 text-white/70 text-sm">
@@ -243,7 +252,7 @@ import type { CatConfig } from "../../lib/constants";
                       ].map((req, idx) => (
                         <div key={idx} className="flex items-center gap-2">
                           {req.met ? (
-                            <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0" />
+                            <CheckCircle size={14} className="text-emerald-600 flex-shrink-0" />
                           ) : (
                             <Circle size={14} className="text-muted-foreground flex-shrink-0" />
                           )}
@@ -295,4 +304,4 @@ import type { CatConfig } from "../../lib/constants";
       </div>
     </div>
   );
-}\n
+}

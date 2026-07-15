@@ -1,3 +1,6 @@
+import { USERS, INITIAL_REQUESTS, INITIAL_NOTIFICATIONS } from "../data/mockData";
+import type { Priority, User, Request, Notification } from "../types";
+
 import type { User, Request, Notification } from "../types";
 
 export const USERS: User[] = [

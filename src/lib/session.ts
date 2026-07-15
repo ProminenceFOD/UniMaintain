@@ -1,5 +1,7 @@
 import type { User, Request, Notification } from "../types";
 
+import type { User, Request, Notification } from "../types";
+
 export const DEMO_USER_KEY          = "unimaintain_demo_user";
 export const DEMO_REQUESTS_KEY      = "unimaintain_demo_requests";
 export const DEMO_USERS_KEY         = "unimaintain_demo_users";

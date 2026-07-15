@@ -1,3 +1,7 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, Wrench, CheckCircle, Clock, AlertTriangle, AlertCircle, Users, BarChart2, Eye, Home, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, CheckCheck, Filter, Check, RefreshCw, Layers, ClipboardList, TrendingUp, Code, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +19,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function Sidebar({ user, activeTab, onTab, open, onClose, collapsed, onToggleCollapse }: {
+
+export function Sidebar({ user, activeTab, onTab, open, onClose, collapsed, onToggleCollapse }: {
   user: User; activeTab: string; onTab: (t: string) => void;
   open: boolean; onClose: () => void;
   collapsed: boolean; onToggleCollapse: () => void;
@@ -102,4 +107,4 @@ import type { CatConfig } from "../../lib/constants";
       <div className="pb-4" />
     </div>
   );
-}\n
+}

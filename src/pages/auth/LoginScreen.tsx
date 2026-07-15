@@ -1,3 +1,14 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, Wrench, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { apiLogin, saveToken } from "../../lib/api";
+import { USERS } from "../../data/mockData";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+
+import { Wrench, CheckCircle } from "lucide-react";
+import { Avatar } from "../../components/ui/Avatar";
+import { apiLogin, saveToken } from "../../lib/api";
+import { USERS } from "../../data/mockData";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +26,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function LoginScreen({ onLogin, onGoRegister, apiMode }: {
+
+export function LoginScreen({ onLogin, onGoRegister, apiMode }: {
   onLogin: (user: User) => void;
   onGoRegister: () => void;
   apiMode: boolean;
@@ -116,7 +128,7 @@ import type { CatConfig } from "../../lib/constants";
         <div className="space-y-4">
           {[
             { icon: <Shield size={14} />, text: "Role-based access control for all user types" },
-            { icon: <CheckCircle2 size={14} />, text: "Real-time request tracking with full audit trail" },
+            { icon: <CheckCircle size={14} />, text: "Real-time request tracking with full audit trail" },
             { icon: <BarChart2 size={14} />, text: "Analytics dashboard and data export" },
           ].map((f, i) => (
             <div key={i} className="flex items-center gap-3 text-white/70 text-sm">
@@ -229,7 +241,7 @@ import type { CatConfig } from "../../lib/constants";
             {/* Hint when a demo account is selected */}
             {demos.some(d => USERS.find(u => u.id === d.userId)?.email === email) && (
               <p className="text-xs text-center text-muted-foreground mt-2 flex items-center justify-center gap-1">
-                <CheckCircle2 size={11} className="text-primary" />
+                <CheckCircle size={11} className="text-primary" />
                 Credentials filled — click <span className="font-semibold text-foreground mx-1">Sign In</span> to continue
               </p>
             )}
@@ -245,4 +257,4 @@ import type { CatConfig } from "../../lib/constants";
       </div>
     </div>
   );
-}\n
+}

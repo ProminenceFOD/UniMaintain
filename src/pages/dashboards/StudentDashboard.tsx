@@ -1,3 +1,18 @@
+import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, ChevronDown, ChevronLeft, ChevronRight, Filter, Check, RefreshCw, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart } from "lucide-react";
+import { formatDate, getGreeting } from "../../lib/utils";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
+
+import { StatCard } from "../../components/ui/StatCard";
+import { StatusBadge } from "../../components/ui/StatusBadge";
+import { CategoryTag } from "../../components/ui/CategoryTag";
+import { PriorityLabel } from "../../components/ui/PriorityLabel";
+import { Avatar } from "../../components/ui/Avatar";
+import { FiltersBar } from "../../components/tables/FiltersBar";
+import { Pagination } from "../../components/tables/Pagination";
+import { getGreeting, formatDate } from "../../lib/utils";
+import { CheckCircle } from "lucide-react";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -15,7 +30,8 @@ import {
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
 import type { CatConfig } from "../../lib/constants";
-\nexport function StudentDashboard({ user, requests, onNewRequest, onSelect, globalSearch, activeTab, onTabChange }: {
+
+export function StudentDashboard({ user, requests, onNewRequest, onSelect, globalSearch, activeTab, onTabChange }: {
   user: User; requests: Request[]; onNewRequest: () => void; onSelect: (r: Request) => void;
   globalSearch: string; activeTab: string; onTabChange: (t: string) => void;
 }) {
@@ -75,7 +91,7 @@ import type { CatConfig } from "../../lib/constants";
               <StatCard label="Total Requests" value={stats.total} icon={<FileText size={18} />} />
               <StatCard label="Pending Review" value={stats.pending} icon={<Clock size={18} />} accent />
               <StatCard label="In Progress" value={stats.inProgress} icon={<RefreshCw size={18} />} />
-              <StatCard label="Resolved" value={stats.resolved} icon={<CheckCircle2 size={18} />} />
+              <StatCard label="Resolved" value={stats.resolved} icon={<CheckCircle size={18} />} />
             </div>
 
             {/* Priority Distribution */}
@@ -298,7 +314,7 @@ import type { CatConfig } from "../../lib/constants";
                                 onClick={() => onSelect(r)}
                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded text-xs font-semibold hover:bg-emerald-700 transition-colors"
                                 style={{ fontFamily: "var(--font-display)" }}>
-                                <CheckCircle2 size={12} /> Acknowledge
+                                <CheckCircle size={12} /> Acknowledge
                               </button>
                             )}
                           </div>
@@ -315,4 +331,4 @@ import type { CatConfig } from "../../lib/constants";
       </div>
     </div>
   );
-}\n
+}

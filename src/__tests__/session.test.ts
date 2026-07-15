@@ -1,3 +1,5 @@
+import type { User, Request } from "../types";
+
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   saveDemoSession, loadDemoSession,

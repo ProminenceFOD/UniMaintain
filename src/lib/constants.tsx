@@ -1,3 +1,7 @@
+import { AlertCircle } from "lucide-react";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG, DEFAULT_CATEGORIES, CATEGORIES_KEY, SETTINGS_KEY } from "../lib/constants";
+import type { Status, Priority, Category, CategoryItem } from "../types";
+
 import React from "react";
 import { AlertCircle, Info } from "lucide-react";
 import type { Status, Priority, Category } from "../types";

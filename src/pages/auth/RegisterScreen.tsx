@@ -138,30 +138,31 @@ export function RegisterScreen({ onBack, onRegister, apiMode }: {
       {/* Left panel */}
       <div className="hidden lg:flex lg:w-2/5 bg-primary flex-col justify-between p-12">
         <div>
-          <div className="flex items-center gap-2.5 mb-16">
-            <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
-              <Wrench size={16} className="text-white" />
+          <div className="flex items-center gap-2 mb-12">
+            <div className="w-8 h-8 bg-primary-foreground/20 rounded flex items-center justify-center">
+              <Wrench size={16} className="text-primary-foreground" />
             </div>
-            <span className="text-white font-semibold text-sm tracking-wide" style={{ fontFamily: "var(--font-display)" }}>
-              UniMaintain
+            <span className="text-primary-foreground font-semibold text-sm tracking-wide" style={{ fontFamily: "var(--font-display)" }}>
+              UNIMAINTAIN
             </span>
           </div>
-          <h1 className="text-4xl font-bold text-white leading-tight mb-4" style={{ fontFamily: "var(--font-display)" }}>
-            Join UniMaintain<br />Today
+          <h1 className="text-4xl font-bold text-primary-foreground leading-tight mb-4" style={{ fontFamily: "var(--font-display)" }}>
+            Create your account.
           </h1>
-          <p className="text-white/60 text-sm leading-relaxed max-w-xs">
-            Create an account to easily report issues, track repairs, and help keep our campus facilities running smoothly.
+          <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-xs">
+            Get started with your university email to report and track issues instantly.
           </p>
         </div>
+
         <div className="space-y-4">
           {[
-            { icon: <Sparkles size={14} />, text: "Quickly report maintenance issues across campus" },
-            { icon: <CheckCircle size={14} />, text: "Track the status of your requests in real-time" },
-            { icon: <Bell size={14} />, text: "Stay informed with automated notifications" },
+            { icon: <MapPin size={18} />, text: "Track requests by building and room" },
+            { icon: <Shield size={18} />, text: "Secure access for students & staff" },
+            { icon: <CheckCircle size={18} />, text: "Real-time updates on resolutions" }
           ].map((f, i) => (
-            <div key={i} className="flex items-center gap-3 text-white/70 text-sm">
-              <div className="text-white/50">{f.icon}</div>
-              {f.text}
+            <div key={i} className="flex items-center gap-3 text-primary-foreground/80 text-sm">
+              <div className="text-primary-foreground/50">{f.icon}</div>
+              <span>{f.text}</span>
             </div>
           ))}
         </div>

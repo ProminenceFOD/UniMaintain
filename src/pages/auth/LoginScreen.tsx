@@ -107,30 +107,31 @@ export function LoginScreen({ onLogin, onGoRegister, apiMode }: {
       {/* Left panel */}
       <div className="hidden lg:flex lg:w-2/5 bg-primary flex-col justify-between p-12">
         <div>
-          <div className="flex items-center gap-2.5 mb-16">
-            <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
-              <Wrench size={16} className="text-white" />
+          <div className="flex items-center gap-2 mb-12">
+            <div className="w-8 h-8 bg-primary-foreground/20 rounded flex items-center justify-center">
+              <Wrench size={16} className="text-primary-foreground" />
             </div>
-            <span className="text-white font-semibold text-sm tracking-wide" style={{ fontFamily: "var(--font-display)" }}>
-              UniMaintain
+            <span className="text-primary-foreground font-semibold text-sm tracking-wide" style={{ fontFamily: "var(--font-display)" }}>
+              UNIMAINTAIN
             </span>
           </div>
-          <h1 className="text-4xl font-bold text-white leading-tight mb-4" style={{ fontFamily: "var(--font-display)" }}>
-            Campus Maintenance<br />Request System
+          <h1 className="text-4xl font-bold text-primary-foreground leading-tight mb-4" style={{ fontFamily: "var(--font-display)" }}>
+            Streamline campus maintenance today.
           </h1>
-          <p className="text-white/60 text-sm leading-relaxed max-w-xs">
-            Submit, track, and manage facility maintenance requests across all campus buildings and departments.
+          <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-xs">
+            Join thousands of students and staff reporting and resolving issues faster.
           </p>
         </div>
+
         <div className="space-y-4">
           {[
-            { icon: <Shield size={14} />, text: "Role-based access control for all user types" },
-            { icon: <CheckCircle size={14} />, text: "Real-time request tracking with full audit trail" },
-            { icon: <BarChart2 size={14} />, text: "Analytics dashboard and data export" },
+            { icon: <MapPin size={18} />, text: "Track requests by building and room" },
+            { icon: <Shield size={18} />, text: "Secure access for students & staff" },
+            { icon: <CheckCircle size={18} />, text: "Real-time updates on resolutions" }
           ].map((f, i) => (
-            <div key={i} className="flex items-center gap-3 text-white/70 text-sm">
-              <div className="text-white/50">{f.icon}</div>
-              {f.text}
+            <div key={i} className="flex items-center gap-3 text-primary-foreground/80 text-sm">
+              <div className="text-primary-foreground/50">{f.icon}</div>
+              <span>{f.text}</span>
             </div>
           ))}
         </div>

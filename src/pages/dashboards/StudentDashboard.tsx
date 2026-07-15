@@ -195,15 +195,15 @@ export function StudentDashboard({ user, requests, onNewRequest, onSelect, globa
               </div>
 
               {/* Quick action */}
-              <div className="bg-primary rounded p-5 text-white">
+              <div className="bg-primary rounded p-5 text-primary-foreground">
                 <h3 className="text-sm font-semibold mb-1" style={{ fontFamily: "var(--font-display)" }}>
                   Report an Issue
                 </h3>
-                <p className="text-xs text-white/70 mb-4 leading-relaxed">
+                <p className="text-xs text-primary-foreground/70 mb-4 leading-relaxed">
                   Spotted a fault on campus? Submit a maintenance request and track its progress.
                 </p>
                 <button onClick={onNewRequest}
-                  className="w-full flex items-center justify-center gap-2 bg-white text-primary py-2 rounded text-xs font-semibold hover:bg-white/90 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 bg-primary-foreground text-primary py-2 rounded text-xs font-semibold hover:bg-primary-foreground/90 transition-colors"
                   style={{ fontFamily: "var(--font-display)" }}>
                   <Plus size={13} /> New Request
                 </button>

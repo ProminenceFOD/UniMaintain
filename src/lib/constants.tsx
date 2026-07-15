@@ -1,27 +1,23 @@
-import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG, DEFAULT_CATEGORIES, CATEGORIES_KEY, SETTINGS_KEY } from "../lib/constants";
 import { AlertCircle, Info } from "lucide-react";
-
 
 import type { Status, Priority, Category, CategoryItem } from "../types";
 
 import React from "react";
 
-import type { Status, Priority, Category } from "../types";
-
 export const STATUS_CONFIG: Record<Status, { label: string; bg: string; text: string; dot: string }> = {
-  pending:     { label: "Pending Review",  bg: "bg-amber-50",   text: "text-amber-700",  dot: "bg-amber-500" },
-  assigned:    { label: "Assigned",        bg: "bg-purple-50",  text: "text-purple-700", dot: "bg-purple-500" },
-  in_progress: { label: "In Progress",     bg: "bg-blue-50",    text: "text-blue-700",   dot: "bg-blue-500" },
-  resolved:    { label: "Resolved",        bg: "bg-emerald-50", text: "text-emerald-700",dot: "bg-emerald-500" },
-  closed:      { label: "Closed",          bg: "bg-gray-50",    text: "text-gray-700",   dot: "bg-gray-500" },
-  cancelled:   { label: "Cancelled",       bg: "bg-slate-50",   text: "text-slate-700",  dot: "bg-slate-500" },
+  pending:     { label: "Pending Review",  bg: "bg-amber-50 dark:bg-amber-500/20",   text: "text-amber-700 dark:text-amber-300",  dot: "bg-amber-500 dark:bg-amber-400" },
+  assigned:    { label: "Assigned",        bg: "bg-purple-50 dark:bg-purple-500/20",  text: "text-purple-700 dark:text-purple-300", dot: "bg-purple-500 dark:bg-purple-400" },
+  in_progress: { label: "In Progress",     bg: "bg-blue-50 dark:bg-blue-500/20",    text: "text-blue-700 dark:text-blue-300",   dot: "bg-blue-500 dark:bg-blue-400" },
+  resolved:    { label: "Resolved",        bg: "bg-emerald-50 dark:bg-emerald-500/20", text: "text-emerald-700 dark:text-emerald-300",dot: "bg-emerald-500 dark:bg-emerald-400" },
+  closed:      { label: "Closed",          bg: "bg-gray-50 dark:bg-gray-500/20",    text: "text-gray-700 dark:text-gray-300",   dot: "bg-gray-500 dark:bg-gray-400" },
+  cancelled:   { label: "Cancelled",       bg: "bg-slate-50 dark:bg-slate-500/20",   text: "text-slate-700 dark:text-slate-300",  dot: "bg-slate-500 dark:bg-slate-400" },
 };
 
 export const PRIORITY_CONFIG: Record<Priority, { label: string; color: string }> = {
-  urgent: { label: "Urgent", color: "text-red-600 bg-red-50 ring-red-500/20" },
-  high:   { label: "High",   color: "text-orange-600 bg-orange-50 ring-orange-500/20" },
-  medium: { label: "Medium", color: "text-yellow-600 bg-yellow-50 ring-yellow-500/20" },
-  low:    { label: "Low",    color: "text-green-600 bg-green-50 ring-green-500/20" },
+  urgent: { label: "Urgent", color: "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/20 ring-red-500/20 dark:ring-red-400/30" },
+  high:   { label: "High",   color: "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/20 ring-orange-500/20 dark:ring-orange-400/30" },
+  medium: { label: "Medium", color: "text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-500/20 ring-yellow-500/20 dark:ring-yellow-400/30" },
+  low:    { label: "Low",    color: "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/20 ring-green-500/20 dark:ring-green-400/30" },
 };
 
 export type CatConfig = { label: string; icon: React.ReactNode };

@@ -105,32 +105,34 @@ export function LoginScreen({ onLogin, onGoRegister, apiMode }: {
       )}
 
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-2/5 bg-primary flex-col justify-between p-12">
-        <div>
+      <div className="hidden lg:flex lg:w-2/5 bg-[#122F21] dark:bg-[#080D0A] flex-col justify-between p-12 relative overflow-hidden">
+        {/* Subtle decorative glow */}
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none bg-gradient-to-br from-primary/10 to-transparent"></div>
+        <div className="relative z-10">
           <div className="flex items-center gap-2 mb-12">
-            <div className="w-8 h-8 bg-primary-foreground/20 rounded flex items-center justify-center">
-              <Wrench size={16} className="text-primary-foreground" />
+            <div className="w-8 h-8 bg-white/20 dark:bg-white/10 rounded flex items-center justify-center">
+              <Wrench size={16} className="text-white" />
             </div>
-            <span className="text-primary-foreground font-semibold text-sm tracking-wide" style={{ fontFamily: "var(--font-display)" }}>
+            <span className="text-white font-semibold text-sm tracking-wide" style={{ fontFamily: "var(--font-display)" }}>
               UNIMAINTAIN
             </span>
           </div>
-          <h1 className="text-4xl font-bold text-primary-foreground leading-tight mb-4" style={{ fontFamily: "var(--font-display)" }}>
+          <h1 className="text-4xl font-bold text-white leading-tight mb-4" style={{ fontFamily: "var(--font-display)" }}>
             Streamline campus maintenance today.
           </h1>
-          <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-xs">
+          <p className="text-white/70 text-sm leading-relaxed max-w-xs">
             Join thousands of students and staff reporting and resolving issues faster.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 relative z-10">
           {[
             { icon: <MapPin size={18} />, text: "Track requests by building and room" },
             { icon: <Shield size={18} />, text: "Secure access for students & staff" },
             { icon: <CheckCircle size={18} />, text: "Real-time updates on resolutions" }
           ].map((f, i) => (
-            <div key={i} className="flex items-center gap-3 text-primary-foreground/80 text-sm">
-              <div className="text-primary-foreground/50">{f.icon}</div>
+            <div key={i} className="flex items-center gap-3 text-white/80 text-sm">
+              <div className="text-white/50">{f.icon}</div>
               <span>{f.text}</span>
             </div>
           ))}

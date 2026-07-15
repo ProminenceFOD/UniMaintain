@@ -12,7 +12,6 @@ import {
   LineChart, Line, BarChart, Bar, PieChart as RePieChart, Pie,
   Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer
 } from "recharts";
-import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 
 import type { CatConfig } from "../../lib/constants";
 
@@ -43,26 +42,26 @@ export function Sidebar({ user, activeTab, onTab, open, onClose, collapsed, onTo
 
   return (
     <div className={`fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto flex-shrink-0 bg-primary flex flex-col h-full transition-all duration-300 ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"} ${collapsed ? "lg:w-16 w-64" : "w-64 lg:w-56"}`}>
-      <div className="p-4 border-b border-white/10 relative">
+      <div className="p-4 border-b border-primary-foreground/10 relative">
         <div className="flex items-center justify-between">
           <div className={`flex items-center gap-2 ${collapsed ? "justify-center w-full" : ""}`}>
-            <div className="w-7 h-7 bg-white/20 rounded flex items-center justify-center flex-shrink-0">
-              <Wrench size={13} className="text-white" />
+            <div className="w-7 h-7 bg-primary-foreground/20 rounded flex items-center justify-center flex-shrink-0">
+              <Wrench size={13} className="text-primary-foreground" />
             </div>
             {!collapsed && (
-              <span className="text-white font-bold text-sm tracking-wide" style={{ fontFamily: "var(--font-display)" }}>
-                UniMaintain
+              <span className="text-primary-foreground font-bold text-sm tracking-wide" style={{ fontFamily: "var(--font-display)" }}>
+                UNIMAINTAIN
               </span>
             )}
           </div>
-          <button onClick={onClose} className="lg:hidden text-white/60 hover:text-white p-1">
+          <button onClick={onClose} className="lg:hidden text-primary-foreground/60 hover:text-primary-foreground p-1">
             <X size={16} />
           </button>
         </div>
         {/* Collapse toggle — desktop only */}
         <button
           onClick={onToggleCollapse}
-          className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary border border-white/20 rounded-full items-center justify-center text-white/70 hover:text-white hover:bg-primary/80 transition-all z-10">
+          className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary border border-primary-foreground/20 rounded-full items-center justify-center text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary/80 transition-all z-10">
           {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
         </button>
       </div>
@@ -70,7 +69,7 @@ export function Sidebar({ user, activeTab, onTab, open, onClose, collapsed, onTo
       <div className={`py-4 flex-1 ${collapsed ? "px-2" : "px-3"}`}>
         {!collapsed && (
           <div className="mb-2 px-2">
-            <span className="text-white/30 text-xs uppercase tracking-widest font-semibold" style={{ fontFamily: "var(--font-mono)" }}>
+            <span className="text-primary-foreground/30 text-xs uppercase tracking-widest font-semibold" style={{ fontFamily: "var(--font-mono)" }}>
               {user.role === "student" ? "Student" : user.role === "staff" ? "Staff" : user.role === "officer" ? "Officer" : "Admin"}
             </span>
           </div>
@@ -89,8 +88,8 @@ export function Sidebar({ user, activeTab, onTab, open, onClose, collapsed, onTo
                 collapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2"
               } ${
                 activeTab === l.id
-                  ? "bg-white/15 text-white"
-                  : "text-white/60 hover:text-white hover:bg-white/8"
+                  ? "bg-primary-foreground/15 text-primary-foreground"
+                  : "text-primary-foreground/60 hover:text-primary-foreground hover:bg-primary-foreground/10"
               }`}>
               {l.icon}
               {!collapsed && l.label}

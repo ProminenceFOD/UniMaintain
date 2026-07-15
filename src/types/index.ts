@@ -19,6 +19,7 @@ export interface AuditEntry {
   performedByName: string;
   details: string;
   timestamp: string;
+  attachments?: string[];
 }
 
 export interface Comment {
@@ -49,6 +50,7 @@ export interface Request {
   updatedAt: string;
   resolvedAt?: string;
   hasAttachment: boolean;
+  attachments?: string[];
   audit: AuditEntry[];
   comments?: Comment[];
 }

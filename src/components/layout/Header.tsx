@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useTheme } from "../../hooks/useTheme";
 import { createPortal } from "react-dom";
 import {
   Bell, Check, ChevronDown, Filter, LogOut, Menu, MoreVertical,
   Plus, Search, Settings, User as UserIcon, X, Calendar, Clock,
   MessageSquare, FileText, AlertTriangle, AlertCircle, Info,
   MapPin, CheckCircle, Mail, Key, Shield, UserPlus, Eye, EyeOff,
-  Edit, Trash2, Download, RefreshCw, BarChart2, PieChart, TrendingUp, ChevronLeft, ChevronRight, Hash
+  Edit, Trash2, Download, RefreshCw, BarChart2, PieChart, TrendingUp, ChevronLeft, ChevronRight, Hash, Sun, Moon
 } from "lucide-react";
 import { format, parseISO, isAfter, isBefore, subDays, startOfMonth, endOfMonth, isSameMonth, subMonths, addMonths } from "date-fns";
 import {
@@ -28,6 +29,7 @@ import type { CatConfig } from "../../lib/constants";
   const mine = notifications.filter(n => n.userId === user.id);
   const unread = mine.filter(n => !n.read).length;
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,6 +61,11 @@ import type { CatConfig } from "../../lib/constants";
       </div>
 
       <div className="flex items-center gap-3 relative">
+        <button onClick={toggleTheme}
+          className="relative p-2 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+
         <button onClick={onBell}
           className="relative p-2 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
           <Bell size={16} />

@@ -85,13 +85,32 @@ export function ResetPasswordModal({ user, onClose, onReset }: {
   }
 
   async function copyToClipboard() {
-    try {
-      await navigator.clipboard.writeText(newPassword);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
+    // Try the modern Clipboard API only when permission is already granted
+    const canUseClipboard = !!navigator.clipboard && typeof navigator.permissions?.query === 'function';
+    if (canUseClipboard) {
+      try {
+        const status = await navigator.permissions.query({ name: 'clipboard-write' as PermissionName });
+        if (status.state === 'granted') {
+          await navigator.clipboard.writeText(newPassword);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          return;
+        }
+      } catch {
+        // If permission query fails, fall back to legacy method below
+      }
     }
+
+    // Legacy fallback – works everywhere without prompting (mobile & desktop when permission not granted)
+    const el = document.createElement('textarea');
+    el.value = newPassword;
+    document.body.appendChild(el);
+    el.select();
+    // Legacy copy command works without a permission prompt
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   return (

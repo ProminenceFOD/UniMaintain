@@ -136,12 +136,22 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
             </div>
           </div>
 
-          {request.hasAttachment && (
+          {(request.attachments?.length ?? 0) > 0 && (
+          <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded p-2.5">
               <Paperclip size={13} />
-              <span>Attachments included with this request</span>
+              <span>{request.attachments?.length} attachment(s) included with this request</span>
             </div>
-          )}
+            <ul className="list-disc list-inside text-sm text-foreground">
+              {request.attachments?.map((file, idx) => (
+                <li key={idx} className="flex items-center gap-1">
+                  <FileText size={12} className="text-muted-foreground" />
+                  <a href={file} target="_blank" rel="noopener noreferrer" className="underline">{file}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
           {/* Feedback rating — visible to admin/officer when request is closed */}
           {["admin","officer"].includes(currentUser.role) && request.status === "closed" && (() => {

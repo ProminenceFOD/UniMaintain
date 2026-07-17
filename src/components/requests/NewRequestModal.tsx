@@ -79,6 +79,7 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
           status: "pending", location,
           submittedBy: currentUser.id, submittedByName: currentUser.name, submittedByRole: currentUser.role,
           createdAt: now, updatedAt: now, hasAttachment: files.length > 0,
+          attachments: files,
           audit: [{ id: `init-${Date.now()}`, action: "Request Submitted", performedByName: currentUser.name,
             details: `Submitted via portal${files.length > 0 ? ` with ${files.length} attachment(s)` : ""}.`, timestamp: now }],
         });

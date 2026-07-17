@@ -50,7 +50,7 @@ export interface ApiUser {
   id: number;
   name: string;
   email: string;
-  role: "student" | "officer" | "admin";
+  role: "student" | "staff" | "officer" | "admin";
   department: string;
   active: boolean;
   created_at: string;

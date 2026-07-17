@@ -24,8 +24,13 @@ const CORS_ORIGINS = [
     process.env.CLIENT_URL || "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:5174",
-];
-const API_URL = process.env.API_URL || `http://localhost:${PORT}`;
+    // Allow the deployed Render host and any Render-provided external URL
+    process.env.API_URL,
+    process.env.RENDER_EXTERNAL_URL,
+    process.env.RENDER_URL,
+    "https://unimaintain-backend.onrender.com",
+].filter(Boolean);
+const API_URL = process.env.API_URL || process.env.RENDER_EXTERNAL_URL || process.env.RENDER_URL || `http://localhost:${PORT}`;
 const swaggerSpec = (0, swagger_1.getSwaggerSpec)(API_URL);
 // ─── SOCKET.IO ────────────────────────────────────────────────────────────────
 exports.io = new socket_io_1.Server(server, {
@@ -65,14 +70,22 @@ app.use("/api/notifications", notifications_1.default);
 app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+// Root route
+app.get("/", (_req, res) => {
+    res.json({ message: "UniMaintain API is running" });
+});
 // 404 handler
 app.use((_req, res) => {
     res.status(404).json({ error: "Route not found" });
 });
 // Global error handler
 app.use((err, _req, res, _next) => {
-    console.error("Unhandled error:", err.message);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Unhandled error:", err && err.stack ? err.stack : err);
+    const show = process.env.SHOW_ERRORS === "true";
+    const payload = { error: "Internal server error" };
+    if (show && err && err.message)
+        payload.details = err.message;
+    res.status(500).json(payload);
 });
 // ─── START ────────────────────────────────────────────────────────────────────
 server.listen(PORT, () => {

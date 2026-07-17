@@ -33,8 +33,12 @@ async function register(req, res) {
         res.status(201).json({ token, user });
     }
     catch (err) {
-        console.error("Register error:", err);
-        res.status(500).json({ error: "Registration failed. Please try again." });
+        console.error("Register error:", err && err.stack ? err.stack : err);
+        const payload = { error: "Registration failed. Please try again." };
+        if (process.env.SHOW_ERRORS === "true" && err && (err.message || err.toString())) {
+            payload.details = err.message || String(err);
+        }
+        res.status(500).json(payload);
     }
 }
 // POST /api/auth/login
@@ -61,8 +65,12 @@ async function login(req, res) {
         res.json({ token, user: safeUser });
     }
     catch (err) {
-        console.error("Login error:", err);
-        res.status(500).json({ error: "Login failed. Please try again." });
+        console.error("Login error:", err && err.stack ? err.stack : err);
+        const payload = { error: "Login failed. Please try again." };
+        if (process.env.SHOW_ERRORS === "true" && err && (err.message || err.toString())) {
+            payload.details = err.message || String(err);
+        }
+        res.status(500).json(payload);
     }
 }
 // GET /api/auth/me  (requires authenticate middleware)

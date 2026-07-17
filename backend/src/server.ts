@@ -75,10 +75,11 @@ app.use("/api/users",          userRoutes);
 app.use("/api/requests",       requestRoutes);
 app.use("/api/notifications",  notificationRoutes);
 
-// Health check
+ // Health check
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+app.get("/api", (_req, res) => res.json({ message: "UniMaintain API is running" }));
 
 // Root route
 app.get("/", (_req, res) => {

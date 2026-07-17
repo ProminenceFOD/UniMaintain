@@ -80,6 +80,11 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// Root route
+app.get("/", (_req, res) => {
+  res.json({ message: "UniMaintain API is running" });
+});
+
 // 404 handler
 app.use((_req, res) => {
   res.status(404).json({ error: "Route not found" });

@@ -8,7 +8,7 @@ A full-stack web application for submitting and managing campus facility mainten
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 18 · TypeScript · Tailwind CSS · Vite |
+| Frontend | React 18 · TypeScript · Vanilla CSS · Vite |
 | Backend | Node.js · Express · TypeScript |
 | Database | PostgreSQL |
 | Auth | JWT (jsonwebtoken) · bcryptjs |
@@ -49,7 +49,7 @@ A full-stack web application for submitting and managing campus facility mainten
 
 - Node.js ≥ 18
 - PostgreSQL ≥ 14
-- pnpm ≥ 8
+- Yarn ≥ 1.22
 
 ---
 
@@ -93,8 +93,10 @@ psql -U postgres -d unimaintain -f backend/db/seed.sql
 
 ```bash
 cd backend
-pnpm install
-pnpm dev
+
+yarn install
+
+yarn dev
 ```
 
 The API will be available at **http://localhost:5000**
@@ -105,8 +107,10 @@ The API will be available at **http://localhost:5000**
 
 ```bash
 # From the project root
-pnpm install
-pnpm dev
+
+yarn install
+
+yarn dev
 ```
 
 The app will be available at **http://localhost:5173**

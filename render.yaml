@@ -3,7 +3,7 @@ services:
     name: unimaintain-backend
     env: node
     rootDir: backend
-    buildCommand: yarn install --production=false && yarn build
+    buildCommand: npm install && npm run build
     startCommand: node dist/server.js
     envVars:
       - key: NODE_ENV

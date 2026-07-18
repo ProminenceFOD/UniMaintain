@@ -100,6 +100,8 @@ const mockRequests: any[] = [
   },
 ];
 
+const mockAttachments: any[] = [];
+
 const pool = {
   query: jest.fn((sql: string, params: any[] = []) => {
     const normalizedSql = sql.replace(/\s+/g, " ").trim();
@@ -183,6 +185,21 @@ const pool = {
 
     if (normalizedSql.includes("INSERT INTO notifications")) {
       return Promise.resolve({ rows: [] });
+    }
+
+    if (normalizedSql.includes("INSERT INTO attachments")) {
+      const [request_id, filename, original_name, mime_type, size_bytes] = params;
+      const newAttach = {
+        id: mockAttachments.length + 1,
+        request_id,
+        filename,
+        original_name,
+        mime_type,
+        size_bytes,
+        created_at: new Date(),
+      };
+      mockAttachments.push(newAttach);
+      return Promise.resolve({ rows: [newAttach] });
     }
 
     // COUNT QUERY for GET /api/requests
@@ -285,7 +302,9 @@ const pool = {
 
     // ─── ATTACHMENTS ───
     if (normalizedSql.includes("FROM attachments")) {
-      return Promise.resolve({ rows: [] });
+      const reqId = params[0];
+      const filtered = mockAttachments.filter((a) => a.request_id === reqId);
+      return Promise.resolve({ rows: filtered });
     }
 
     // ─── STATS ───

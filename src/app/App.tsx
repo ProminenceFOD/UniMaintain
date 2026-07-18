@@ -131,6 +131,7 @@ export default function App() {
       assignedToName: r.assignedToName,
       createdAt: r.createdAt, updatedAt: r.updatedAt, resolvedAt: r.resolvedAt,
       hasAttachment: r.hasAttachment,
+      attachments: r.attachments || [],
       audit: (r.audit ?? []).map(a => ({
         id: String(a.id), action: a.action,
         performedByName: a.performedByName,
@@ -375,6 +376,20 @@ export default function App() {
         `${req.id}: Your request has been received and is pending review.`, req.id);
     }
     if (apiMode) await refreshData(currentUser!.role, currentUser!.id);
+  }
+
+  async function handleSelectRequest(req: Request) {
+    setSelectedRequest(req);
+    if (apiMode) {
+      try {
+        const res = await apiGetRequest(req.id);
+        const adapted = adaptRequest(res.request);
+        setSelectedRequest(adapted);
+        setRequests(prev => prev.map(r => r.id === req.id ? adapted : r));
+      } catch (err) {
+        console.error("Failed to load request details:", err);
+      }
+    }
   }
 
   async function handleStatusUpdate(requestId: string, status: Status, note: string) {
@@ -703,7 +718,7 @@ export default function App() {
             if (n.requestId) {
               const req = requests.find(r => r.id === n.requestId);
               if (req) {
-                setSelectedRequest(req);
+                handleSelectRequest(req);
                 // Navigate to correct tab so request is visible in background
                 if (["student", "staff"].includes(currentUser.role)) setActiveTab("requests");
                 if (currentUser.role === "officer") setActiveTab(
@@ -736,19 +751,19 @@ export default function App() {
 
         {["student","staff"].includes(currentUser.role) && activeTab !== "profile" && (
           <StudentDashboard user={currentUser} requests={requests}
-            onNewRequest={() => setShowNewRequest(true)} onSelect={setSelectedRequest}
+            onNewRequest={() => setShowNewRequest(true)} onSelect={handleSelectRequest}
             globalSearch={globalSearch} activeTab={activeTab} onTabChange={setActiveTab}
           />
         )}
         {currentUser.role === "officer" && activeTab !== "profile" && (
           <OfficerDashboard user={currentUser} requests={requests}
-            onSelect={setSelectedRequest} onStatusUpdate={handleStatusUpdate}
+            onSelect={handleSelectRequest} onStatusUpdate={handleStatusUpdate}
             activeTab={activeTab} globalSearch={globalSearch}
           />
         )}
         {currentUser.role === "admin" && !["reports","profile","settings","api-reference"].includes(activeTab) && (
           <AdminDashboard requests={requests} users={users} currentUser={currentUser}
-            onSelect={setSelectedRequest} onAssign={handleAssign}
+            onSelect={handleSelectRequest} onAssign={handleAssign}
             onStatusUpdate={handleStatusUpdate} onToggleUser={handleToggleUser}
             onInviteUser={u => setUsers(p => [...p, u])}
             onEditUser={handleEditUser}

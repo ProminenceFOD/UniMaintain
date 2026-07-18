@@ -160,8 +160,12 @@ export async function getRequestById(req: Request, res: Response): Promise<void>
 
     // Fetch attachments
     const attachResult = await pool.query(
-      `SELECT id, original_name, mime_type, size_bytes, created_at FROM attachments WHERE request_id = $1`,
+      `SELECT id, filename, original_name, mime_type, size_bytes, created_at FROM attachments WHERE request_id = $1`,
       [id]
+    );
+
+    const attachments = attachResult.rows.map((row: any) => 
+      `${req.protocol}://${req.get("host")}/uploads/${row.filename}`
     );
 
     res.json({
@@ -174,7 +178,7 @@ export async function getRequestById(req: Request, res: Response): Promise<void>
           timestamp:       a.created_at,
           performedByName: a.performed_by_name,
         })),
-        attachments: attachResult.rows,
+        attachments,
       },
     });
   } catch (err) {

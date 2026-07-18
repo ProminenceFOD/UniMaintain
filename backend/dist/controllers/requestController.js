@@ -137,7 +137,8 @@ async function getRequestById(req, res) {
        WHERE al.request_id = $1
        ORDER BY al.created_at ASC`, [id]);
         // Fetch attachments
-        const attachResult = await database_1.default.query(`SELECT id, original_name, mime_type, size_bytes, created_at FROM attachments WHERE request_id = $1`, [id]);
+        const attachResult = await database_1.default.query(`SELECT id, filename, original_name, mime_type, size_bytes, created_at FROM attachments WHERE request_id = $1`, [id]);
+        const attachments = attachResult.rows.map((row) => `${req.protocol}://${req.get("host")}/uploads/${row.filename}`);
         res.json({
             request: {
                 ...formatRequest(row),
@@ -148,7 +149,7 @@ async function getRequestById(req, res) {
                     timestamp: a.created_at,
                     performedByName: a.performed_by_name,
                 })),
-                attachments: attachResult.rows,
+                attachments,
             },
         });
     }

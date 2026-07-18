@@ -82,6 +82,7 @@ export interface ApiRequest {
   assignedTo?: number;
   assignedToName?: string;
   audit?: ApiAuditEntry[];
+  attachments?: string[];
 }
 
 export interface ApiNotification {

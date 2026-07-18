@@ -10,6 +10,8 @@
 import request from "supertest";
 import app from "../server";
 
+jest.mock("../config/database");
+
 // ─── AUTH TESTS ───────────────────────────────────────────────────────────────
 
 describe("POST /api/auth/register", () => {

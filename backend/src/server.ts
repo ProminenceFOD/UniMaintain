@@ -101,10 +101,12 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 });
 
 // ─── START ────────────────────────────────────────────────────────────────────
-server.listen(PORT, () => {
-  console.log(`🚀 UniMaintain API    → ${API_URL}`);
-  console.log(`📋 API Documentation  → ${API_URL}/api/docs`);
-  console.log(`⚡ Socket.io enabled  → ${API_URL.replace(/^http/, "ws")}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  server.listen(PORT, () => {
+    console.log(`🚀 UniMaintain API    → ${API_URL}`);
+    console.log(`📋 API Documentation  → ${API_URL}/api/docs`);
+    console.log(`⚡ Socket.io enabled  → ${API_URL.replace(/^http/, "ws")}`);
+  });
+}
 
 export default app;

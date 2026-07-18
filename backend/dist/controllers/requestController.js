@@ -71,6 +71,10 @@ async function getAllRequests(req, res) {
             conditions.push(`sr.submitted_by = $${idx++}`);
             values.push(user.id);
         }
+        else if (user.role === "staff") {
+            conditions.push(`sr.submitted_by = $${idx++}`);
+            values.push(user.id);
+        }
         else if (user.role === "officer") {
             conditions.push(`sr.assigned_to = $${idx++}`);
             values.push(user.id);
@@ -121,8 +125,8 @@ async function getRequestById(req, res) {
             return;
         }
         const row = result.rows[0];
-        // Students can only see their own requests
-        if (user.role === "student" && row.submitted_by_id !== user.id) {
+        // Students and staff can only see their own requests
+        if ((user.role === "student" || user.role === "staff") && row.submitted_by_id !== user.id) {
             res.status(403).json({ error: "Access denied" });
             return;
         }
@@ -137,7 +141,7 @@ async function getRequestById(req, res) {
         res.json({
             request: {
                 ...formatRequest(row),
-                audit: auditResult.rows.map(a => ({
+                audit: auditResult.rows.map((a) => ({
                     id: a.id,
                     action: a.action,
                     details: a.details,

@@ -18,7 +18,6 @@ import {
   LineChart, Line, BarChart, Bar, PieChart as RePieChart, Pie,
   Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer
 } from "recharts";
-import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 
 import type { CatConfig } from "../../lib/constants";
 

@@ -70,6 +70,7 @@ app.use("/api/notifications", notifications_1.default);
 app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+app.get("/api", (_req, res) => res.json({ message: "UniMaintain API is running" }));
 // Root route
 app.get("/", (_req, res) => {
     res.json({ message: "UniMaintain API is running" });
@@ -88,9 +89,11 @@ app.use((err, _req, res, _next) => {
     res.status(500).json(payload);
 });
 // ─── START ────────────────────────────────────────────────────────────────────
-server.listen(PORT, () => {
-    console.log(`🚀 UniMaintain API    → ${API_URL}`);
-    console.log(`📋 API Documentation  → ${API_URL}/api/docs`);
-    console.log(`⚡ Socket.io enabled  → ${API_URL.replace(/^http/, "ws")}`);
-});
+if (process.env.NODE_ENV !== "test") {
+    server.listen(PORT, () => {
+        console.log(`🚀 UniMaintain API    → ${API_URL}`);
+        console.log(`📋 API Documentation  → ${API_URL}/api/docs`);
+        console.log(`⚡ Socket.io enabled  → ${API_URL.replace(/^http/, "ws")}`);
+    });
+}
 exports.default = app;

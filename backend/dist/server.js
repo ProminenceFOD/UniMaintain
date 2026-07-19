@@ -16,6 +16,7 @@ const users_1 = __importDefault(require("./routes/users"));
 const requests_1 = __importDefault(require("./routes/requests"));
 const notifications_1 = __importDefault(require("./routes/notifications"));
 const swagger_1 = require("./config/swagger");
+const database_1 = __importDefault(require("./config/database"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
@@ -67,8 +68,19 @@ app.use("/api/users", users_1.default);
 app.use("/api/requests", requests_1.default);
 app.use("/api/notifications", notifications_1.default);
 // Health check
-app.get("/api/health", (_req, res) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
+app.get("/api/health", async (_req, res) => {
+    try {
+        if (process.env.MOCK_DB === "true") {
+            return res.json({ status: "ok", database: "mock", timestamp: new Date().toISOString() });
+        }
+        // Query database to keep connection alive and verify health
+        await database_1.default.query("SELECT 1");
+        res.json({ status: "ok", database: "connected", timestamp: new Date().toISOString() });
+    }
+    catch (err) {
+        console.error("Health check database connection error:", err.message);
+        res.status(500).json({ status: "error", message: "Database connection failed", error: err.message });
+    }
 });
 app.get("/api", (_req, res) => res.json({ message: "UniMaintain API is running" }));
 // Root route

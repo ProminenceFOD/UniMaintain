@@ -11,6 +11,7 @@ import userRoutes         from "./routes/users";
 import requestRoutes      from "./routes/requests";
 import notificationRoutes from "./routes/notifications";
 import { getSwaggerSpec } from "./config/swagger";
+import pool from "./config/database";
 
 dotenv.config();
 
@@ -75,9 +76,19 @@ app.use("/api/users",          userRoutes);
 app.use("/api/requests",       requestRoutes);
 app.use("/api/notifications",  notificationRoutes);
 
- // Health check
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+// Health check
+app.get("/api/health", async (_req, res) => {
+  try {
+    if (process.env.MOCK_DB === "true") {
+      return res.json({ status: "ok", database: "mock", timestamp: new Date().toISOString() });
+    }
+    // Query database to keep connection alive and verify health
+    await pool.query("SELECT 1");
+    res.json({ status: "ok", database: "connected", timestamp: new Date().toISOString() });
+  } catch (err: any) {
+    console.error("Health check database connection error:", err.message);
+    res.status(500).json({ status: "error", message: "Database connection failed", error: err.message });
+  }
 });
 app.get("/api", (_req, res) => res.json({ message: "UniMaintain API is running" }));
 

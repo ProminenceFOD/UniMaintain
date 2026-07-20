@@ -20,7 +20,7 @@ else {
         user: process.env.DB_USER || "postgres",
         password: process.env.DB_PASSWORD || "",
         // SSL required for Supabase and most cloud PostgreSQL providers
-        ssl: process.env.DB_HOST?.includes("supabase.co")
+        ssl: (process.env.DB_HOST?.includes("supabase.co") || process.env.DB_HOST?.includes("supabase.com"))
             ? { rejectUnauthorized: false }
             : false,
     });

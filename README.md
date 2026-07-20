@@ -134,6 +134,54 @@ All seeded accounts use the password: **`password123`**
 
 ---
 
+## User Testing Guide
+
+To test the core features of UniMaintain, follow this step-by-step lifecycle walkthrough using the seeded demo accounts:
+
+### Scenario 1: Complete Request Lifecycle
+1. **Submit a Request (Student / Staff):**
+   - Log in as **Prominence Damilola** (Student) using the "Demo Student" button.
+   - Click **Submit Request** on the dashboard.
+   - Fill out the form (e.g., *Title: "AC Leaking in Room 204"*, *Category: "HVAC"*, *Priority: "Medium"*). Optionally attach an image/PDF.
+   - Click **Submit**. You will see it listed on your dashboard under **Pending**.
+   - Log out.
+
+2. **Assign a Maintenance Officer (Admin):**
+   - Log in as **Damilola Ogunlade** (Admin) using the "Demo Admin" button.
+   - You will see the new pending request on the administrator dashboard.
+   - Click on the request to view its details and audit trail.
+   - Under **Assign Officer**, select **Ademola Moyinoluwa** (or another officer) and click **Assign**. The status changes to **Assigned**.
+   - Log out.
+
+3. **Perform Work & Resolve (Maintenance Officer):**
+   - Log in as **Ademola Moyinoluwa** (Maintenance Officer) using the "Demo Officer" button.
+   - The request will appear in your **Assigned Tasks** list.
+   - Click the request and click **Start Work** (status changes to **In Progress**).
+   - Once completed, click **Mark as Resolved**, enter a resolution note (e.g., *"Replaced drain pipe"*), and submit.
+   - Log out.
+
+4. **Acknowledge and Close (Student / Staff):**
+   - Log in as **Prominence Damilola** (Student) again.
+   - Click the **Notification bell** in the header to see the update, then click it to go to the request.
+   - Review the resolution notes and click **Close Request** to finalize.
+
+---
+
+### Scenario 2: Reports & CSV Export
+1. Log in as **Damilola Ogunlade** (Admin).
+2. Click **Reports** in the navigation bar.
+3. Use the filter controls to filter requests by status, priority, or category.
+4. Click **Export to CSV** to download the spreadsheet of the filtered requests.
+
+---
+
+### Scenario 3: Admin User Management
+1. Log in as **Damilola Ogunlade** (Admin).
+2. Click **Users** in the navigation bar to see all university staff, students, and maintenance officers.
+3. Use the toggle switch next to any user to **deactivate** or **activate** their account access.
+
+---
+
 ## API Documentation
 
 With the backend running, visit:

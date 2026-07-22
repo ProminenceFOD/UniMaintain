@@ -136,6 +136,28 @@ export default function App() {
     const rawStatus = (r.status as Status) || "pending";
     const finalStatus = (r.assignedTo && rawStatus === "pending") ? "assigned" : rawStatus;
 
+    const canonical = canonicalMap.get(r.id);
+    const rawAtts = (r.attachments && r.attachments.length > 0)
+      ? r.attachments
+      : (canonical?.attachments && canonical.attachments.length > 0 ? canonical.attachments : []);
+
+    const sanitizedAttachments = rawAtts.map(att => {
+      if (typeof att === "string") {
+        if (att.startsWith("http") || att.startsWith("data:")) return att;
+        const apiBase = (import.meta.env.VITE_API_URL || "https://unimaintain-backend.onrender.com/api").replace(/\/api\/?$/, "");
+        return `${apiBase}/uploads/${att.replace(/^\/?(uploads\/)?/, "")}`;
+      }
+      if (att && typeof att === "object" && (att as any).filename) {
+        const fn = (att as any).filename;
+        if (fn.startsWith("http") || fn.startsWith("data:")) return fn;
+        const apiBase = (import.meta.env.VITE_API_URL || "https://unimaintain-backend.onrender.com/api").replace(/\/api\/?$/, "");
+        return `${apiBase}/uploads/${fn.replace(/^\/?(uploads\/)?/, "")}`;
+      }
+      return String(att);
+    });
+
+    const hasAttachment = Boolean(r.hasAttachment || sanitizedAttachments.length > 0);
+
     return {
       id: r.id, title: r.title, description: r.description,
       category: (r.category as Category) || "other",
@@ -148,8 +170,8 @@ export default function App() {
       assignedTo: r.assignedTo ? String(r.assignedTo) : undefined,
       assignedToName: r.assignedToName,
       createdAt: r.createdAt, updatedAt: r.updatedAt, resolvedAt: r.resolvedAt,
-      hasAttachment: r.hasAttachment,
-      attachments: r.attachments || [],
+      hasAttachment,
+      attachments: sanitizedAttachments,
       audit: (r.audit ?? []).map(a => ({
         id: String(a.id), action: a.action,
         performedByName: a.performedByName?.includes("Newest User") ? "Janet Folakemi" : a.performedByName,
@@ -209,7 +231,7 @@ export default function App() {
     async function checkSession() {
       // Automatic versioned cache buster to purge stale localStorage cache across deployments
       try {
-        const CACHE_VERSION = "unimaintain_v2026_07_23_v4";
+        const CACHE_VERSION = "unimaintain_v2026_07_23_v5";
         if (!localStorage.getItem(CACHE_VERSION)) {
           clearAllDemoData();
           localStorage.setItem(CACHE_VERSION, "true");
@@ -276,10 +298,9 @@ export default function App() {
               ? savedUserNotifs
               : INITIAL_NOTIFICATIONS.filter(n => n.userId === demoUser.id);
 
-            const canonicalMap = new Map(INITIAL_REQUESTS.map(req => [req.id, req]));
             const rawRequests = demoRequests.length > 0 ? demoRequests : INITIAL_REQUESTS;
             const sanitizedRequests = rawRequests.map(r => {
-              const canonical = canonicalMap.get(r.id);
+              const canonical = CANONICAL_MAP.get(r.id);
               const updatedStatus = (r.assignedTo && r.status === "pending") ? ("assigned" as Status) : r.status;
               if (canonical) {
                 return {

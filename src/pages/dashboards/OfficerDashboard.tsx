@@ -30,35 +30,49 @@ export function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, act
   onStatusUpdate: (id: string, status: Status, note: string) => void;
   activeTab: string; globalSearch: string;
 }) {
+  const deptCategoriesMap: Record<string, string[]> = useMemo(() => ({
+    "electrical systems": ["electricity"],
+    "plumbing & civil": ["plumbing"],
+    "it & networks": ["internet"],
+    "general maintenance": ["hvac", "furniture", "other"],
+  }), []);
+
   const assigned = useMemo(() => {
     const userIdStr = String(user.id).toLowerCase();
     const userNameStr = (user.name || "").toLowerCase();
+    const userDept = (user.department || "").trim().toLowerCase();
+    const deptCats = deptCategoriesMap[userDept] || [];
 
     return requests.filter(r => {
       const assignByStr = String(r.assignedTo || "").toLowerCase();
       const assignNameStr = (r.assignedToName || "").toLowerCase();
 
-      const matchId = assignByStr && (assignByStr === userIdStr || assignByStr === `u${userIdStr}` || userIdStr === `u${assignByStr}`);
+      const matchId = Boolean(assignByStr && (assignByStr === userIdStr || assignByStr === `u${userIdStr}` || userIdStr === `u${assignByStr}`));
       const matchName = Boolean(userNameStr && assignNameStr && (userNameStr.includes(assignNameStr) || assignNameStr.includes(userNameStr)));
+      const matchDept = deptCats.length > 0 && deptCats.includes(r.category);
+      const isUnassigned = !r.assignedTo;
 
-      return (matchId || matchName) && ["pending", "assigned", "in_progress"].includes(r.status);
+      return (matchId || matchName || matchDept || isUnassigned) && ["pending", "assigned", "in_progress"].includes(r.status);
     });
-  }, [requests, user]);
+  }, [requests, user, deptCategoriesMap]);
 
   const completed = useMemo(() => {
     const userIdStr = String(user.id).toLowerCase();
     const userNameStr = (user.name || "").toLowerCase();
+    const userDept = (user.department || "").trim().toLowerCase();
+    const deptCats = deptCategoriesMap[userDept] || [];
 
     return requests.filter(r => {
       const assignByStr = String(r.assignedTo || "").toLowerCase();
       const assignNameStr = (r.assignedToName || "").toLowerCase();
 
-      const matchId = assignByStr && (assignByStr === userIdStr || assignByStr === `u${userIdStr}` || userIdStr === `u${assignByStr}`);
+      const matchId = Boolean(assignByStr && (assignByStr === userIdStr || assignByStr === `u${userIdStr}` || userIdStr === `u${assignByStr}`));
       const matchName = Boolean(userNameStr && assignNameStr && (userNameStr.includes(assignNameStr) || assignNameStr.includes(userNameStr)));
+      const matchDept = deptCats.length > 0 && deptCats.includes(r.category);
 
-      return (matchId || matchName) && ["resolved", "closed"].includes(r.status);
+      return (matchId || matchName || matchDept) && ["resolved", "closed"].includes(r.status);
     });
-  }, [requests, user]);
+  }, [requests, user, deptCategoriesMap]);
 
   // Apply global search to assigned tasks tab
   const assignedFiltered = useMemo(() => {

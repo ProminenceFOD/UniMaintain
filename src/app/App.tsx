@@ -201,7 +201,7 @@ export default function App() {
     async function checkSession() {
       // Automatic versioned cache buster to purge stale localStorage cache across deployments
       try {
-        const CACHE_VERSION = "unimaintain_v2026_07_23_v3";
+        const CACHE_VERSION = "unimaintain_v2026_07_23_v4";
         if (!localStorage.getItem(CACHE_VERSION)) {
           clearAllDemoData();
           localStorage.setItem(CACHE_VERSION, "true");
@@ -268,12 +268,22 @@ export default function App() {
               ? savedUserNotifs
               : INITIAL_NOTIFICATIONS.filter(n => n.userId === demoUser.id);
 
+            const canonicalMap = new Map(INITIAL_REQUESTS.map(req => [req.id, req]));
             const rawRequests = demoRequests.length > 0 ? demoRequests : INITIAL_REQUESTS;
             const sanitizedRequests = rawRequests.map(r => {
-              if (r.assignedTo && r.status === "pending") {
-                return { ...r, status: "assigned" as Status };
+              const canonical = canonicalMap.get(r.id);
+              const updatedStatus = (r.assignedTo && r.status === "pending") ? ("assigned" as Status) : r.status;
+              if (canonical) {
+                return {
+                  ...r,
+                  status: updatedStatus,
+                  submittedByName: canonical.submittedByName,
+                  submittedByEmail: canonical.submittedByEmail,
+                  submittedByRole: canonical.submittedByRole,
+                  submittedBy: canonical.submittedBy,
+                };
               }
-              return r;
+              return { ...r, status: updatedStatus };
             });
 
             setCurrentUser(demoUser);

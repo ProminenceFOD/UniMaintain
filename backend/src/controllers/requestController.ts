@@ -220,6 +220,10 @@ export async function getRequestById(req: Request, res: Response): Promise<void>
 export async function createRequest(req: Request, res: Response): Promise<void> {
   const { title, description, category, priority, location } = req.body;
   const user = req.user!;
+  if (user.role === "admin" || user.role === "officer") {
+    res.status(403).json({ error: "Only students and staff can submit maintenance requests" });
+    return;
+  }
   const hasAttachment = !!(req.files && (req.files as Express.Multer.File[]).length > 0);
 
   try {

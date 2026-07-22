@@ -148,27 +148,37 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 });
 
 async function syncDatabaseSeed() {
-  if (process.env.MOCK_DB === "true") return;
   try {
     console.log("🔄 Syncing database request submitted_by foreign keys...");
 
-    // Find student IDs in live database
+    // Find student & staff IDs in database
     const studentRes = await pool.query(
       "SELECT id, email, name FROM users WHERE role = 'student' ORDER BY id ASC"
     );
+    const staffRes = await pool.query(
+      "SELECT id, email, name FROM users WHERE role = 'staff' ORDER BY id ASC"
+    );
 
-    if (studentRes.rows.length > 0) {
+    if (studentRes.rows && studentRes.rows.length > 0) {
       const students = studentRes.rows;
+      const staff = (staffRes.rows && staffRes.rows.length > 0) ? staffRes.rows[0].id : students[0].id;
       const s1 = students[0]?.id; // Prominence Damilola
       const s2 = students[1]?.id || s1; // Marcus Johnson
       const s3 = students[2]?.id || s1; // Priya Patel
       const s4 = students[3]?.id || s1; // Aiden Walsh
 
-      // Update service_requests table so student tickets point to actual student user IDs in PostgreSQL database
+      // Update service_requests table so student tickets point to actual student user IDs in database
       await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-001', 'MR-2026-004', 'MR-2026-013')", [s1]);
       await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-002', 'MR-2026-006', 'MR-2026-009', 'MR-2026-014')", [s2]);
       await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-003', 'MR-2026-007', 'MR-2026-010')", [s3]);
-      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-005', 'MR-2026-008', 'MR-2026-011')", [s4]);
+      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-005', 'MR-2026-008')", [s4]);
+      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-011', 'MR-2026-012', 'MR-2026-015')", [staff]);
+
+      // Global safety fallback: reassign any admin or officer submitted_by requests to student Prominence Damilola
+      await pool.query(
+        "UPDATE service_requests SET submitted_by = $1 WHERE submitted_by IN (SELECT id FROM users WHERE role IN ('admin', 'officer'))",
+        [s1]
+      );
 
       console.log("✅ Database request submitted_by foreign keys updated successfully!");
     }

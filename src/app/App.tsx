@@ -99,11 +99,15 @@ export default function App() {
   useEffect(() => { requestsRef.current      = requests;      }, [requests]);
   useEffect(() => { usersRef.current         = users;         }, [users]);
   useEffect(() => { notificationsRef.current = notifications; }, [notifications]);
+  // Auto-sync selectedRequest with live requests list whenever any request is updated
   useEffect(() => {
-    if (currentUser && screen === "app") {
-      saveActiveTab(activeTab);
+    if (selectedRequest) {
+      const updated = requests.find(r => r.id === selectedRequest.id);
+      if (updated && updated !== selectedRequest) {
+        setSelectedRequest(updated);
+      }
     }
-  }, [activeTab, currentUser, screen]);
+  }, [requests, selectedRequest]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [globalSearch, setGlobalSearch] = useState("");

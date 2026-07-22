@@ -202,6 +202,10 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
                           src={img.url}
                           alt={img.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='225' viewBox='0 0 400 225'><rect width='100%' height='100%' fill='%230f172a'/><path d='M160 140l30-40 30 35 25-25 35 45H160z' fill='%23334155'/><circle cx='180' cy='90' r='15' fill='%23475569'/><text x='50%' y='85%' fill='%2394a3b8' font-family='sans-serif' font-size='12' text-anchor='middle'>Attached Image</text></svg>";
+                          }}
                         />
                         {/* Hover Overlay */}
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">

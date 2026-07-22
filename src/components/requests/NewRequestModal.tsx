@@ -42,6 +42,23 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
     return !(form as any)[field];
   }
 
+  async function readFilesAsDataUrls(fileList: File[]): Promise<string[]> {
+    return Promise.all(
+      fileList.map(file => {
+        return new Promise<string>((resolve) => {
+          if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (evt) => resolve((evt.target?.result as string) || file.name);
+            reader.onerror = () => resolve(file.name);
+            reader.readAsDataURL(file);
+          } else {
+            resolve(file.name);
+          }
+        });
+      })
+    );
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setTouched({ title: true, category: true, building: true, description: true });
@@ -52,6 +69,8 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
     const location = `${form.building}${form.room ? ` — ${form.room}` : ""}`;
 
     try {
+      const base64Attachments = await readFilesAsDataUrls(fileObjects);
+
       if (apiMode) {
         const { request } = await apiCreateRequest({
           title: form.title, description: form.description,
@@ -59,6 +78,10 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
           location, files: fileObjects,
         });
         const now = new Date().toISOString();
+        const finalAttachments = (request.attachments && request.attachments.length > 0 && request.attachments.some(a => a.startsWith("data:") || a.startsWith("http")))
+          ? request.attachments
+          : base64Attachments;
+
         onSubmit({
           id: request.id, title: request.title, description: request.description,
           category: (request.category as Category) || "other",
@@ -66,8 +89,8 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
           status: "pending", location: request.location,
           submittedBy: currentUser.id, submittedByName: currentUser.name, submittedByRole: currentUser.role,
           createdAt: request.createdAt, updatedAt: request.updatedAt,
-          hasAttachment: request.hasAttachment || files.length > 0,
-          attachments: (request.attachments && request.attachments.length > 0) ? request.attachments : files,
+          hasAttachment: request.hasAttachment || base64Attachments.length > 0,
+          attachments: finalAttachments.length > 0 ? finalAttachments : base64Attachments,
           audit: [{ id: "init", action: "Request Submitted", performedByName: currentUser.name,
             details: "Submitted via portal.", timestamp: now }],
         });
@@ -78,10 +101,10 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
           category: form.category as Category, priority: form.priority,
           status: "pending", location,
           submittedBy: currentUser.id, submittedByName: currentUser.name, submittedByRole: currentUser.role,
-          createdAt: now, updatedAt: now, hasAttachment: files.length > 0,
-          attachments: files,
+          createdAt: now, updatedAt: now, hasAttachment: base64Attachments.length > 0,
+          attachments: base64Attachments,
           audit: [{ id: `init-${Date.now()}`, action: "Request Submitted", performedByName: currentUser.name,
-            details: `Submitted via portal${files.length > 0 ? ` with ${files.length} attachment(s)` : ""}.`, timestamp: now }],
+            details: `Submitted via portal${base64Attachments.length > 0 ? ` with ${base64Attachments.length} attachment(s)` : ""}.`, timestamp: now }],
         });
       }
       onClose();

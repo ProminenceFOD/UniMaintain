@@ -491,10 +491,36 @@ export default function App() {
   }
 
   async function handleAssign(requestId: string, officerId: string) {
-    if (apiMode) {
+    const rawId = String(officerId);
+    const cleanId = rawId.replace(/\D/g, "");
+    const numericOfficerId = parseInt(cleanId || rawId, 10);
+
+    const officer = usersRef.current.find(u =>
+      String(u.id) === rawId ||
+      (cleanId && String(u.id) === cleanId) ||
+      String(u.id) === `u${cleanId}` ||
+      (cleanId && String(u.id) === `u${cleanId}`)
+    );
+
+    if (apiMode && !isNaN(numericOfficerId)) {
       try {
-        const { request: updated } = await apiAssignOfficer(requestId, parseInt(officerId));
-        setRequests(p => p.map(r => r.id === requestId ? adaptRequest(updated) : r));
+        const { request: updated } = await apiAssignOfficer(requestId, numericOfficerId);
+        const adapted = adaptRequest(updated);
+        setRequests(p => p.map(r => {
+          if (r.id !== requestId) return r;
+          const isReassign = !!r.assignedTo && String(r.assignedTo) !== rawId;
+          const newEntry: AuditEntry = {
+            id: `audit-${Date.now()}`,
+            action: isReassign ? "Reassigned to Officer" : "Assigned to Officer",
+            performedByName: currentUser?.name || "Admin",
+            details: isReassign
+              ? `Reassigned from ${r.assignedToName || "Officer"} to ${adapted.assignedToName || officer?.name || "Officer"}${officer?.department ? ` (${officer.department})` : ""}.`
+              : `Assigned to ${adapted.assignedToName || officer?.name || "Officer"}${officer?.department ? ` (${officer.department})` : ""}.`,
+            timestamp: new Date().toISOString(),
+          };
+          const mergedAudit = (adapted.audit && adapted.audit.length > 0) ? adapted.audit : [...(r.audit || []), newEntry];
+          return { ...r, ...adapted, audit: mergedAudit };
+        }));
         apiGetNotifications().then(res => {
           if (!currentUser) return;
           setNotifications(res.notifications.map(n => ({
@@ -508,32 +534,30 @@ export default function App() {
         console.error("Assign failed:", err);
       }
     }
+
     // Fallback local (demo mode, or API mode after failed request)
-    const officer = usersRef.current.find(u => u.id === officerId);
     if (!officer) return; // officer not found — no-op
     const now = new Date().toISOString();
     const updatedRequests = requestsRef.current.map(r => {
       if (r.id !== requestId) return r;
-      const isReassign = !!r.assignedTo && r.assignedTo !== officerId;
+      const isReassign = !!r.assignedTo && String(r.assignedTo) !== rawId;
       const entry: AuditEntry = {
         id: `audit-${Date.now()}`,
         action: isReassign ? "Reassigned to Officer" : "Assigned to Officer",
-        performedByName: currentUser!.name,
+        performedByName: currentUser?.name || "Admin",
         details: isReassign
-          ? `Reassigned from ${r.assignedToName} to ${officer.name} (${officer.department}).`
+          ? `Reassigned from ${r.assignedToName || "Officer"} to ${officer.name} (${officer.department}).`
           : `Assigned to ${officer.name} (${officer.department}).`,
         timestamp: now,
       };
-      return { ...r, status: "assigned" as Status, assignedTo: officerId, assignedToName: officer.name, updatedAt: now, audit: [...r.audit, entry] };
+      return { ...r, status: "assigned" as Status, assignedTo: officer.id, assignedToName: officer.name, updatedAt: now, audit: [...(r.audit || []), entry] };
     });
-    const req = requestsRef.current.find(r => r.id === requestId); // read BEFORE setRequests updates the ref
+    const req = requestsRef.current.find(r => r.id === requestId);
     setRequests(updatedRequests);
     if (currentUser) {
       saveDemoSession(currentUser, updatedRequests, usersRef.current, notificationsRef.current);
-      // Notify the assigned officer
-      pushNotif(officerId, "New Assignment",
+      pushNotif(officer.id, "New Assignment",
         `${requestId}: ${req?.title ?? "A maintenance request"} has been assigned to you.`, requestId);
-      // Notify the requester if it's not the admin themselves
       if (req && req.submittedBy !== currentUser.id) {
         pushNotif(req.submittedBy, "Request Assigned",
           `${requestId}: ${officer.name} has been assigned to your request.`, requestId);

@@ -382,10 +382,27 @@ export async function updateStatus(req: Request, res: Response): Promise<void> {
       );
     }
 
+    const auditResult = await pool.query(
+      `SELECT al.id, al.action, al.details, al.created_at, u.name AS performed_by_name
+       FROM audit_logs al
+       JOIN users u ON al.performed_by = u.id
+       WHERE al.request_id = $1
+       ORDER BY al.created_at ASC`,
+      [id]
+    );
     const updated = await pool.query(
       `SELECT ${REQUEST_FIELDS} ${REQUEST_JOINS} WHERE sr.id = $1`, [id]
     );
-    const formatted = formatRequest(updated.rows[0]);
+    const formatted = {
+      ...formatRequest(updated.rows[0]),
+      audit: auditResult.rows.map((a: any) => ({
+        id:              a.id,
+        action:          a.action,
+        details:         a.details,
+        timestamp:       a.created_at,
+        performedByName: a.performed_by_name,
+      })),
+    };
     emit(req, "request:updated", formatted);
     res.json({ request: formatted });
   } catch (err) {
@@ -432,10 +449,27 @@ export async function assignOfficer(req: Request, res: Response): Promise<void> 
         `${id}: Your request has been assigned to ${officer.name}.`, id);
     }
 
+    const auditResult = await pool.query(
+      `SELECT al.id, al.action, al.details, al.created_at, u.name AS performed_by_name
+       FROM audit_logs al
+       JOIN users u ON al.performed_by = u.id
+       WHERE al.request_id = $1
+       ORDER BY al.created_at ASC`,
+      [id]
+    );
     const updated = await pool.query(
       `SELECT ${REQUEST_FIELDS} ${REQUEST_JOINS} WHERE sr.id = $1`, [id]
     );
-    const formatted = formatRequest(updated.rows[0]);
+    const formatted = {
+      ...formatRequest(updated.rows[0]),
+      audit: auditResult.rows.map((a: any) => ({
+        id:              a.id,
+        action:          a.action,
+        details:         a.details,
+        timestamp:       a.created_at,
+        performedByName: a.performed_by_name,
+      })),
+    };
     emit(req, "request:assigned", formatted);
     res.json({ request: formatted });
   } catch (err) {

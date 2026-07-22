@@ -193,6 +193,15 @@ export default function App() {
   // On mount: restore session from JWT (API mode) or localStorage (demo mode)
   useEffect(() => {
     async function checkSession() {
+      // Automatic versioned cache buster to purge stale localStorage cache across deployments
+      try {
+        const CACHE_VERSION = "unimaintain_v2026_07_22_b";
+        if (!localStorage.getItem(CACHE_VERSION)) {
+          clearAllDemoData();
+          localStorage.setItem(CACHE_VERSION, "true");
+        }
+      } catch { /* storage disabled */ }
+
       const params = new URLSearchParams(window.location.search);
       const demoParam = params.get("demo"); // student, officer, admin, staff
       const tabParam = params.get("tab");

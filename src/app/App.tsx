@@ -293,10 +293,17 @@ export default function App() {
   const DEMO_USER_IDS = ["u1","u2","u3","u4","u5","u6","u7","u8","u9","u10"];
 
   async function handleLogin(user: User) {
+    const role = (user.role || "student").toLowerCase() as Role;
+    const normalizedUser = { ...user, role };
+
     if (apiMode) {
-      setCurrentUser(user);
-      setActiveTab(loadActiveTab(user.role));
-      await refreshData(user.role, user.id);
+      setCurrentUser(normalizedUser);
+      setActiveTab(loadActiveTab(role));
+      try {
+        await refreshData(role, normalizedUser.id);
+      } catch (err) {
+        console.error("Data refresh error:", err);
+      }
     } else if (DEMO_USER_IDS.includes(user.id)) {
       // Always load from storage first — this preserves data across logouts
       const { requests: savedRequests, users: savedUsers, notifications: savedNotifs } = loadDemoSession();
@@ -307,11 +314,10 @@ export default function App() {
       });
       const newUsers = savedUsers.filter(u => !USERS.find(b => b.id === u.id));
       const currentUsers = [...mergedUsers, ...newUsers];
-      const loggedInUser = currentUsers.find(u => u.id === user.id) ?? user;
-      // Restore saved notification read states — fall back to INITIAL_NOTIFICATIONS for this user
-      const baseNotifs = INITIAL_NOTIFICATIONS.filter(n => n.userId === user.id);
-      const currentNotifs = savedNotifs.filter(n => n.userId === user.id).length > 0
-        ? savedNotifs.filter(n => n.userId === user.id)
+      const loggedInUser = currentUsers.find(u => u.id === normalizedUser.id) ?? normalizedUser;
+      const baseNotifs = INITIAL_NOTIFICATIONS.filter(n => n.userId === normalizedUser.id);
+      const currentNotifs = savedNotifs.filter(n => n.userId === normalizedUser.id).length > 0
+        ? savedNotifs.filter(n => n.userId === normalizedUser.id)
         : baseNotifs;
       setCurrentUser(loggedInUser);
       setRequests(currentRequests);
@@ -324,11 +330,13 @@ export default function App() {
       setRequests([]);
       setNotifications([]);
       setUsers(prev => {
-        const exists = prev.find(u => u.id === user.id);
-        const updated = exists ? prev : [user, ...prev];
-        saveDemoSession(user, [], updated);
+        const exists = prev.find(u => u.id === normalizedUser.id);
+        const updated = exists ? prev : [normalizedUser, ...prev];
+        saveDemoSession(normalizedUser, [], updated);
         return updated;
       });
+      setCurrentUser(normalizedUser);
+      setActiveTab(loadActiveTab(role));
     }
     setScreen("app");
   }
@@ -753,19 +761,19 @@ export default function App() {
           }} />
         )}
 
-        {["student","staff"].includes(currentUser.role) && activeTab !== "profile" && (
+        {["student","staff"].includes((currentUser.role || "").toLowerCase()) && activeTab !== "profile" && (
           <StudentDashboard user={currentUser} requests={requests}
             onNewRequest={() => setShowNewRequest(true)} onSelect={handleSelectRequest}
             globalSearch={globalSearch} activeTab={activeTab} onTabChange={setActiveTab}
           />
         )}
-        {currentUser.role === "officer" && activeTab !== "profile" && (
+        {(currentUser.role || "").toLowerCase() === "officer" && activeTab !== "profile" && (
           <OfficerDashboard user={currentUser} requests={requests}
             onSelect={handleSelectRequest} onStatusUpdate={handleStatusUpdate}
             activeTab={activeTab} globalSearch={globalSearch}
           />
         )}
-        {currentUser.role === "admin" && !["reports","profile","settings","api-reference"].includes(activeTab) && (
+        {(currentUser.role || "").toLowerCase() === "admin" && !["reports","profile","settings","api-reference"].includes(activeTab) && (
           <AdminDashboard requests={requests} users={users} currentUser={currentUser}
             onSelect={handleSelectRequest} onAssign={handleAssign}
             onStatusUpdate={handleStatusUpdate} onToggleUser={handleToggleUser}
@@ -774,10 +782,10 @@ export default function App() {
             activeTab={activeTab} globalSearch={globalSearch}
           />
         )}
-        {currentUser.role === "admin" && activeTab === "reports" && (
+        {(currentUser.role || "").toLowerCase() === "admin" && activeTab === "reports" && (
           <AdminReports requests={requests} users={users} />
         )}
-        {currentUser.role === "admin" && activeTab === "settings" && (
+        {(currentUser.role || "").toLowerCase() === "admin" && activeTab === "settings" && (
           <SiteSettingsPage />
         )}
       </div>

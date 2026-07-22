@@ -84,18 +84,20 @@ export function RegisterScreen({ onBack, onRegister, apiMode }: {
       if (apiMode) {
         const { token, user } = await apiRegister({ ...form, role: form.role as Role });
         saveToken(token);
+        const normalizedRole = (user.role || form.role || "student").toLowerCase() as Role;
         onRegister({
           id: String(user.id), name: user.name, email: user.email,
-          role: user.role, department: user.department,
+          role: normalizedRole, department: user.department || form.department,
           joinedAt: user.created_at?.split("T")[0] ?? new Date().toISOString().split("T")[0],
-          active: user.active,
+          active: user.active ?? true,
         });
       } else {
+        const normalizedRole = (form.role || "student").toLowerCase() as Role;
         const newUser: User = {
           id: `u${Date.now()}`,
           name: form.name,
           email: form.email,
-          role: form.role as Role,
+          role: normalizedRole,
           department: form.department,
           joinedAt: new Date().toISOString().split("T")[0],
           active: true,

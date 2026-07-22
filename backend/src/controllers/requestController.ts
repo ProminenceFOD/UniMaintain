@@ -76,15 +76,19 @@ export async function getAllRequests(req: Request, res: Response): Promise<void>
     const values: unknown[] = [];
     let idx = 1;
 
-    // Role-based filtering (shows user's tasks or falls back to existing requests if none assigned/submitted yet)
+    // Role-based filtering (matches by ID, email, or name to preserve user's initial requests across auth modes)
     if (user.role === "student" || user.role === "staff") {
-      conditions.push(`(sr.submitted_by = $${idx} OR NOT EXISTS (SELECT 1 FROM service_requests WHERE submitted_by = $${idx}))`);
-      values.push(user.id);
-      idx++;
+      conditions.push(
+        `(sr.submitted_by = $${idx} OR LOWER(u.email) = LOWER($${idx + 1}) OR LOWER(u.name) = LOWER($${idx + 2}) OR NOT EXISTS (SELECT 1 FROM service_requests WHERE submitted_by = $${idx}))`
+      );
+      values.push(user.id, user.email || "", user.name || "");
+      idx += 3;
     } else if (user.role === "officer") {
-      conditions.push(`(sr.assigned_to = $${idx} OR sr.assigned_to IS NULL OR NOT EXISTS (SELECT 1 FROM service_requests WHERE assigned_to = $${idx}))`);
-      values.push(user.id);
-      idx++;
+      conditions.push(
+        `(sr.assigned_to = $${idx} OR LOWER(o.email) = LOWER($${idx + 1}) OR LOWER(o.name) = LOWER($${idx + 2}) OR sr.assigned_to IS NULL OR NOT EXISTS (SELECT 1 FROM service_requests WHERE assigned_to = $${idx}))`
+      );
+      values.push(user.id, user.email || "", user.name || "");
+      idx += 3;
     }
 
     if (status)   { conditions.push(`sr.status = $${idx++}`);      values.push(status); }

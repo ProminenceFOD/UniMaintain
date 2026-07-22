@@ -274,7 +274,12 @@ export default function App() {
         apiGetRequests({ limit: 200 }),
         apiGetNotifications(),
       ]);
-      setRequests(reqRes.requests.map(adaptRequest));
+      const apiAdapted = reqRes.requests.map(adaptRequest);
+      const { requests: localSaved } = loadDemoSession();
+      const apiIds = new Set(apiAdapted.map(r => r.id));
+      const extraLocal = localSaved.filter(r => !apiIds.has(r.id));
+      const combinedRequests = [...extraLocal, ...apiAdapted];
+      setRequests(combinedRequests);
       setNotifications(notifRes.notifications.map(n => ({
         id: String(n.id), userId,
         title: n.title, message: n.message,

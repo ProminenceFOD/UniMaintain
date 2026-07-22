@@ -92,6 +92,10 @@ export async function getAllRequests(req: Request, res: Response): Promise<void>
       values.push(user.id, user.email || "", user.name || "");
       idx += 3;
     }
+    // Exclude admin-submitted requests from admin view (admin should not submit requests)
+    if (user.role === "admin") {
+      conditions.push(`u.role != 'admin'`);
+    }
 
     if (status)   { conditions.push(`sr.status = $${idx++}`);      values.push(status); }
     if (category) { conditions.push(`c.slug = $${idx++}`);          values.push(category); }

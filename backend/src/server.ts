@@ -147,12 +147,43 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   res.status(500).json(payload);
 });
 
+async function syncDatabaseSeed() {
+  if (process.env.MOCK_DB === "true") return;
+  try {
+    console.log("🔄 Syncing database request submitted_by foreign keys...");
+
+    // Find student IDs in live database
+    const studentRes = await pool.query(
+      "SELECT id, email, name FROM users WHERE role = 'student' ORDER BY id ASC"
+    );
+
+    if (studentRes.rows.length > 0) {
+      const students = studentRes.rows;
+      const s1 = students[0]?.id; // Prominence Damilola
+      const s2 = students[1]?.id || s1; // Marcus Johnson
+      const s3 = students[2]?.id || s1; // Priya Patel
+      const s4 = students[3]?.id || s1; // Aiden Walsh
+
+      // Update service_requests table so student tickets point to actual student user IDs in PostgreSQL database
+      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-001', 'MR-2026-004', 'MR-2026-013')", [s1]);
+      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-002', 'MR-2026-006', 'MR-2026-009', 'MR-2026-014')", [s2]);
+      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-003', 'MR-2026-007', 'MR-2026-010')", [s3]);
+      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-005', 'MR-2026-008', 'MR-2026-011')", [s4]);
+
+      console.log("✅ Database request submitted_by foreign keys updated successfully!");
+    }
+  } catch (err: any) {
+    console.warn("Database seed sync warning:", err.message);
+  }
+}
+
 // ─── START ────────────────────────────────────────────────────────────────────
 if (process.env.NODE_ENV !== "test") {
   server.listen(PORT, () => {
     console.log(`🚀 UniMaintain API    → ${API_URL}`);
     console.log(`📋 API Documentation  → ${API_URL}/api/docs`);
     console.log(`⚡ Socket.io enabled  → ${API_URL.replace(/^http/, "ws")}`);
+    syncDatabaseSeed();
   });
 }
 

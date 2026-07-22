@@ -11,6 +11,7 @@ import { CategoryTag } from "../../components/ui/CategoryTag";
 import { PriorityLabel } from "../../components/ui/PriorityLabel";
 import { CancelConfirmModal } from "../../components/requests/CancelConfirmModal";
 import { FeedbackModal } from "../../components/requests/FeedbackModal";
+import { ImageLightboxModal } from "../../components/ui/ImageLightboxModal";
 
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
@@ -22,6 +23,36 @@ import {
 } from "recharts";
 
 import type { CatConfig } from "../../lib/constants";
+
+function isImageUrl(url: string): boolean {
+  if (!url) return false;
+  const clean = url.toLowerCase().split("?")[0];
+  return (
+    clean.endsWith(".jpg") ||
+    clean.endsWith(".jpeg") ||
+    clean.endsWith(".png") ||
+    clean.endsWith(".gif") ||
+    clean.endsWith(".webp") ||
+    clean.endsWith(".svg") ||
+    clean.includes("images") ||
+    clean.startsWith("data:image/")
+  );
+}
+
+function resolveFileUrl(file: string): string {
+  if (!file) return "";
+  if (file.startsWith("http://") || file.startsWith("https://") || file.startsWith("data:")) {
+    return file;
+  }
+  const rawApi = (import.meta as any).env?.VITE_API_URL || "https://unimaintain-backend.onrender.com/api";
+  const apiBase = rawApi.replace(/\/api\/?$/, "");
+  
+  const cleanPath = file.startsWith("/") ? file : `/${file}`;
+  if (cleanPath.startsWith("/uploads/")) {
+    return `${apiBase}${cleanPath}`;
+  }
+  return `${apiBase}/uploads${cleanPath}`;
+}
 
 export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, onDelete, onAssign, officers, onAddComment }: {
   request: Request; currentUser: User; onClose: () => void;
@@ -38,6 +69,7 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [showComments, setShowComments] = useState(true);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const isMyRequest = ["student","staff"].includes(currentUser.role) && request.submittedBy === currentUser.id;
   const isMyTask    = currentUser.role === "officer"  && request.assignedTo  === currentUser.id;
@@ -135,22 +167,114 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
             </div>
           </div>
 
-          {(request.attachments?.length ?? 0) > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded p-2.5">
-              <Paperclip size={13} />
-              <span>{request.attachments?.length} attachment(s) included with this request</span>
-            </div>
-            <ul className="list-disc list-inside text-sm text-foreground">
-              {request.attachments?.map((file, idx) => (
-                <li key={idx} className="flex items-center gap-1">
-                  <FileText size={12} className="text-muted-foreground" />
-                  <a href={file} target="_blank" rel="noopener noreferrer" className="underline">{file}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          {(request.attachments?.length ?? 0) > 0 && (() => {
+            const allFiles = (request.attachments || []).map(f => ({
+              raw: f,
+              url: resolveFileUrl(f),
+              isImg: isImageUrl(f),
+              name: f.split("/").pop() || "Attachment",
+            }));
+            const imageFiles = allFiles.filter(f => f.isImg);
+            const docFiles = allFiles.filter(f => !f.isImg);
+
+            return (
+              <div className="space-y-3 bg-muted/30 border border-border/60 rounded-lg p-3.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                    <Paperclip size={14} className="text-primary" />
+                    <span>Attachments ({allFiles.length})</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono">
+                    {imageFiles.length} Image(s), {docFiles.length} Doc(s)
+                  </span>
+                </div>
+
+                {/* Image Attachments Gallery */}
+                {imageFiles.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                    {imageFiles.map((img, idx) => (
+                      <div
+                        key={idx}
+                        className="group relative aspect-video rounded-md overflow-hidden bg-background border border-border/80 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                        onClick={() => setLightboxIndex(idx)}
+                      >
+                        <img
+                          src={img.url}
+                          alt={img.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        />
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLightboxIndex(idx);
+                            }}
+                            className="p-1.5 bg-white/20 hover:bg-white/40 text-white rounded-full transition-colors"
+                            title="View Image"
+                          >
+                            <Eye size={14} />
+                          </button>
+                          <a
+                            href={img.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1.5 bg-white/20 hover:bg-white/40 text-white rounded-full transition-colors"
+                            title="Download Image"
+                          >
+                            <Download size={14} />
+                          </a>
+                        </div>
+                        {/* Filename tag */}
+                        <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-xs px-2 py-0.5 text-[10px] text-white/90 truncate font-mono">
+                          {img.name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Document Attachments List */}
+                {docFiles.length > 0 && (
+                  <div className="space-y-1.5">
+                    {docFiles.map((doc, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between p-2 bg-background border border-border/70 rounded text-xs hover:border-primary/40 transition-colors"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileText size={14} className="text-primary flex-shrink-0" />
+                          <span className="truncate font-medium text-foreground">{doc.name}</span>
+                        </div>
+                        <a
+                          href={doc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          className="flex items-center gap-1 px-2 py-1 bg-muted hover:bg-muted/80 text-foreground rounded text-[11px] font-medium transition-colors"
+                        >
+                          <Download size={12} /> Download
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Lightbox Modal */}
+                {lightboxIndex !== null && (
+                  <ImageLightboxModal
+                    images={imageFiles.map(i => ({ url: i.url, title: `${request.id} — ${i.name}` }))}
+                    currentIndex={lightboxIndex}
+                    onClose={() => setLightboxIndex(null)}
+                    onSelectIndex={(newIdx) => setLightboxIndex(newIdx)}
+                  />
+                )}
+              </div>
+            );
+          })()}
 
           {/* Feedback rating — visible to admin/officer when request is closed */}
           {["admin","officer"].includes(currentUser.role) && request.status === "closed" && (() => {

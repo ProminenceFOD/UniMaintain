@@ -243,13 +243,38 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
                 setFiles(selected.map(f => f.name));
               }}
             />
-            {files.length > 0 && (
-              <div className="mt-2 space-y-1">
-                {files.map(f => (
-                  <div key={f} className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <Paperclip size={11} /> {f}
-                  </div>
-                ))}
+            {fileObjects.length > 0 && (
+              <div className="mt-2.5 space-y-2">
+                <div className="grid grid-cols-3 gap-2">
+                  {fileObjects.map((file, idx) => {
+                    const isImg = file.type.startsWith("image/");
+                    const previewUrl = isImg ? URL.createObjectURL(file) : null;
+                    return (
+                      <div key={idx} className="relative group rounded border border-border/80 p-1 bg-muted/20 flex flex-col items-center justify-center text-center">
+                        {isImg && previewUrl ? (
+                          <img src={previewUrl} alt={file.name} className="w-full h-16 object-cover rounded mb-1" />
+                        ) : (
+                          <div className="w-full h-16 bg-muted rounded flex items-center justify-center mb-1 text-muted-foreground">
+                            <Paperclip size={16} />
+                          </div>
+                        )}
+                        <span className="text-[10px] text-foreground font-mono truncate w-full px-1">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = fileObjects.filter((_, i) => i !== idx);
+                            setFileObjects(updated);
+                            setFiles(updated.map(f => f.name));
+                          }}
+                          className="absolute -top-1.5 -right-1.5 p-1 bg-destructive text-destructive-foreground rounded-full shadow hover:bg-destructive/90 transition-colors"
+                          title="Remove file"
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>

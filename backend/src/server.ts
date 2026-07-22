@@ -60,8 +60,16 @@ app.use(express.urlencoded({ extended: true }));
 // Attach io to req so controllers can emit events
 app.use((req: any, _res, next) => { req.io = io; next(); });
 
-// Serve uploaded files statically
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+// Serve uploaded files statically with CORS & Cross-Origin-Resource-Policy headers
+const uploadsDir = process.env.UPLOAD_DIR || (require("fs").existsSync(path.resolve(process.cwd(), "uploads"))
+  ? path.resolve(process.cwd(), "uploads")
+  : path.join(__dirname, "../../uploads"));
+
+app.use("/uploads", (req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Cross-Origin-Resource-Policy", "cross-origin");
+  next();
+}, express.static(uploadsDir));
 
 // ─── API DOCUMENTATION ────────────────────────────────────────────────────────
 app.use("/api/docs", swaggerUi.serve as any, swaggerUi.setup(swaggerSpec, {

@@ -21,13 +21,16 @@ export const PRIORITY_CONFIG: Record<Priority, { label: string; color: string }>
 };
 
 export type CatConfig = { label: string; icon: React.ReactNode };
-export const CATEGORY_CONFIG: Record<Category, CatConfig> = {
-  plumbing:   { label: "Plumbing",   icon: <AlertCircle className="w-4 h-4" /> },
-  electrical: { label: "Electrical", icon: <AlertCircle className="w-4 h-4" /> },
-  hvac:       { label: "HVAC",       icon: <AlertCircle className="w-4 h-4" /> },
-  furniture:  { label: "Furniture",  icon: <Info className="w-4 h-4" /> },
-  cleaning:   { label: "Cleaning",   icon: <Info className="w-4 h-4" /> },
-  general:    { label: "General",    icon: <Info className="w-4 h-4" /> },
+export const CATEGORY_CONFIG: Record<string, CatConfig> & Record<Category, CatConfig> = {
+  electricity: { label: "Electricity", icon: <AlertCircle className="w-4 h-4" /> },
+  electrical:  { label: "Electricity", icon: <AlertCircle className="w-4 h-4" /> },
+  plumbing:    { label: "Plumbing",    icon: <AlertCircle className="w-4 h-4" /> },
+  hvac:        { label: "HVAC",        icon: <AlertCircle className="w-4 h-4" /> },
+  internet:    { label: "Internet",    icon: <Info className="w-4 h-4" /> },
+  furniture:   { label: "Furniture",   icon: <Info className="w-4 h-4" /> },
+  cleaning:    { label: "Cleaning",    icon: <Info className="w-4 h-4" /> },
+  other:       { label: "Other",       icon: <Info className="w-4 h-4" /> },
+  general:     { label: "General",     icon: <Info className="w-4 h-4" /> },
 };
 
 export const SETTINGS_KEY = "unimaintain_site_settings";

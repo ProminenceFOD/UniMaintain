@@ -779,7 +779,7 @@ export default function App() {
       </div>
 
       {selectedRequest && (
-        <RequestDetail request={requests.find(r => r.id === selectedRequest.id) ?? selectedRequest} currentUser={currentUser}
+        <RequestDetail request={selectedRequest} currentUser={currentUser}
           onClose={() => setSelectedRequest(null)}
           onStatusUpdate={handleStatusUpdate}
           onDelete={handleDelete}

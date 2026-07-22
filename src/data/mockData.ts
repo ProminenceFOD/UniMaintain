@@ -50,6 +50,7 @@ export const INITIAL_REQUESTS: Request[] = [
     submittedBy: "u10", submittedByName: "Janet Folakemi", submittedByRole: "staff",
     assignedTo: "u7", assignedToName: "Tom Brennan",
     createdAt: "2026-06-19T10:00:00Z", updatedAt: "2026-06-19T14:30:00Z", resolvedAt: "2026-06-19T14:30:00Z", hasAttachment: true,
+    attachments: ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"],
     audit: [
       { id: "j2a", action: "Request Submitted", performedByName: "Janet Folakemi", details: "Cracked floor tiles with raised edges — trip hazard. Photos attached.", timestamp: "2026-06-19T10:00:00Z" },
       { id: "j2b", action: "Assigned to Officer", performedByName: "Damilola Ogunlade", details: "Assigned to Tom Brennan (General Maintenance) — safety priority.", timestamp: "2026-06-19T10:30:00Z" },
@@ -120,6 +121,7 @@ export const INITIAL_REQUESTS: Request[] = [
     location: "Humanities Block — Seminar Room 2", submittedBy: "u3", submittedByName: "Priya Patel", submittedByRole: "student",
     assignedTo: "u7", assignedToName: "Tom Brennan",
     createdAt: "2026-06-14T09:00:00Z", updatedAt: "2026-06-16T11:00:00Z", hasAttachment: true,
+    attachments: ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80"],
     audit: [
       { id: "a5a", action: "Request Submitted", performedByName: "Priya Patel", details: "Large crack in window pane. Safety risk flagged.", timestamp: "2026-06-14T09:00:00Z" },
       { id: "a5b", action: "Priority Upgraded", performedByName: "Damilola Ogunlade", details: "Elevated to High due to structural safety concern.", timestamp: "2026-06-15T08:00:00Z" },
@@ -134,6 +136,7 @@ export const INITIAL_REQUESTS: Request[] = [
     location: "Humanities Block — Seminar Room 5", submittedBy: "u3", submittedByName: "Priya Patel", submittedByRole: "student",
     assignedTo: "u7", assignedToName: "Tom Brennan",
     createdAt: "2026-06-12T14:20:00Z", updatedAt: "2026-06-13T09:00:00Z", hasAttachment: true,
+    attachments: ["https://images.unsplash.com/photo-1580481072645-022f9a6d1290?auto=format&fit=crop&w=800&q=80"],
     audit: [
       { id: "a6a", action: "Request Submitted", performedByName: "Priya Patel", details: "Submitted with photos of broken chair and damaged table surfaces.", timestamp: "2026-06-12T14:20:00Z" },
       { id: "a6b", action: "Assigned to Officer", performedByName: "Damilola Ogunlade", details: "Assigned to Tom Brennan (General Maintenance).", timestamp: "2026-06-13T09:00:00Z" },
@@ -171,6 +174,7 @@ export const INITIAL_REQUESTS: Request[] = [
     location: "Engineering Block A — Lab 304", submittedBy: "u1", submittedByName: "Prominence Damilola", submittedByRole: "student",
     assignedTo: "u5", assignedToName: "Ademola Moyinoluwa",
     createdAt: "2026-06-02T09:15:00Z", updatedAt: "2026-06-04T14:30:00Z", resolvedAt: "2026-06-04T14:30:00Z", hasAttachment: true,
+    attachments: ["https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80", "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80"],
     audit: [
       { id: "a9a", action: "Request Submitted", performedByName: "Prominence Damilola", details: "Submitted with 2 photo attachments showing affected outlets.", timestamp: "2026-06-02T09:15:00Z" },
       { id: "a9b", action: "Priority Upgraded", performedByName: "Damilola Ogunlade", details: "Priority raised from Medium to High — active lab sessions impacted.", timestamp: "2026-06-02T16:00:00Z" },

@@ -112,8 +112,27 @@ export async function getAllRequests(req: Request, res: Response): Promise<void>
       [...values, limit, offset]
     );
 
+    const baseUrl = process.env.API_URL || process.env.RENDER_EXTERNAL_URL || `${req.protocol}://${req.get("host")}`;
+
+    const requests = await Promise.all(
+      dataResult.rows.map(async (row) => {
+        const formatted = formatRequest(row);
+        if (row.has_attachment) {
+          const attachRes = await pool.query(
+            "SELECT filename FROM attachments WHERE request_id = $1",
+            [row.id]
+          );
+          const attachments = attachRes.rows.map((a: any) =>
+            a.filename.startsWith("http") ? a.filename : `${baseUrl}/uploads/${a.filename}`
+          );
+          return { ...formatted, attachments };
+        }
+        return { ...formatted, attachments: [] };
+      })
+    );
+
     res.json({
-      requests: dataResult.rows.map(formatRequest),
+      requests,
       total,
       page:  parseInt(page as string),
       pages: Math.ceil(total / parseInt(limit as string)),

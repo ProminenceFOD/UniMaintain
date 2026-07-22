@@ -16,22 +16,25 @@ import {
 import type { CatConfig } from "../../lib/constants";
 
 export function CategoryTag({ category }: { category: string }) {
-  const c = CATEGORY_CONFIG[category as Category];
-  // For custom categories stored by ID (e.g. "c7"), look up name from localStorage
-  const customLabel = (() => {
-    if (c) return null;
+  const key = (category || "other").toLowerCase();
+  const c = CATEGORY_CONFIG[key as Category] || CATEGORY_CONFIG[category as Category];
+
+  const label = c?.label || (() => {
     try {
       const saved = localStorage.getItem("unimaintain_categories");
-      if (!saved) return null;
-      const items = JSON.parse(saved) as { id: string; name: string }[];
-      return items.find(i => i.id === category)?.name ?? category;
-    } catch { return category; }
+      if (saved) {
+        const items = JSON.parse(saved) as { id: string; name: string }[];
+        const found = items.find(i => i.id === category || i.name.toLowerCase() === key)?.name;
+        if (found) return found;
+      }
+    } catch {}
+    return category ? category.charAt(0).toUpperCase() + category.slice(1) : "Other";
   })();
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-md">
-      {c?.icon ?? <Layers className="w-4 h-4" />}
-      {c?.label ?? customLabel}
+    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
+      {c?.icon ?? <Layers className="w-4 h-4 text-slate-500" />}
+      <span>{label}</span>
     </span>
   );
 }

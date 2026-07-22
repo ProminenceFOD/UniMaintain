@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import dotenv from "dotenv";
+import path from "path";
 
 dotenv.config();
 
@@ -7,8 +8,15 @@ let pool: any;
 
 if (process.env.MOCK_DB === "true") {
   console.log("⚠️ Running in Mock DB mode");
-  // Load mock database dynamically to avoid circular dependencies
-  pool = require("./__mocks__/database").default;
+  // Resolve mock DB path for compiled environment
+  const mockPathCompiled = path.join(__dirname, "__mocks__/database");
+  // Fallback to source path (useful during dev with ts-node)
+  const mockPathSource = path.resolve(process.cwd(), "src/config/__mocks__/database");
+  try {
+    pool = require(mockPathCompiled).default;
+  } catch (e) {
+    pool = require(mockPathSource).default;
+  }
 } else {
   pool = new Pool({
     host:     process.env.DB_HOST     || "localhost",
@@ -27,3 +35,4 @@ if (process.env.MOCK_DB === "true") {
 }
 
 export default pool;
+

@@ -78,13 +78,11 @@ export async function getAllRequests(req: Request, res: Response): Promise<void>
     const values: unknown[] = [];
     let idx = 1;
 
-    // Role-based filtering (matches by ID, email, or name to preserve user's initial requests across auth modes)
+    // Role-based filtering: staff and students see only their own requests
     if (user.role === "student" || user.role === "staff") {
-      conditions.push(
-        `(sr.submitted_by = $${idx} OR LOWER(u.email) = LOWER($${idx + 1}) OR LOWER(u.name) = LOWER($${idx + 2}) OR NOT EXISTS (SELECT 1 FROM service_requests WHERE submitted_by = $${idx}))`
-      );
-      values.push(user.id, user.email || "", user.name || "");
-      idx += 3;
+      conditions.push(`sr.submitted_by = $${idx}`);
+      values.push(user.id);
+      idx += 1;
     } else if (user.role === "officer") {
       conditions.push(
         `(sr.assigned_to = $${idx} OR LOWER(o.email) = LOWER($${idx + 1}) OR LOWER(o.name) = LOWER($${idx + 2}) OR sr.assigned_to IS NULL OR NOT EXISTS (SELECT 1 FROM service_requests WHERE assigned_to = $${idx}))`

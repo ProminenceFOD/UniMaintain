@@ -61,44 +61,139 @@ const mockUsers: any[] = [
 
 const mockRequests: any[] = [
   {
-    id: "MR-2026-001",
-    title: "Power outlets non-functional in Computer Lab 3",
-    description: "Three power outlets on the east wall of Computer Lab 3 have been non-functional.",
-    category_id: 1,
-    category_slug: "electricity",
-    category_name: "Electricity",
-    priority: "high",
-    status: "resolved",
-    location: "Engineering Block A — Lab 304",
-    submitted_by_id: 1,
-    submitted_by_name: "Prominence Damilola",
-    submitted_by_email: "p.damilola@university.edu",
-    assigned_to_id: 3,
-    assigned_to_name: "Ademola Moyinoluwa",
-    has_attachment: true,
-    created_at: new Date("2026-06-02T09:15:00Z"),
-    updated_at: new Date("2026-06-05T14:30:00Z"),
-    resolved_at: new Date("2026-06-05T14:30:00Z"),
+    id: "MR-2026-015", title: "Ceiling fan making loud grinding noise — Staff Office 204",
+    description: "The ceiling fan in Staff Office Room 204 has been producing a loud grinding noise for two days. It is extremely disruptive during meetings and phone calls.",
+    category_id: 5, category_slug: "hvac", category_name: "HVAC", priority: "medium", status: "pending",
+    location: "Faculty of Sciences Block — Staff Office 204",
+    submitted_by_id: 4, submitted_by_name: "Janet Folakemi", submitted_by_email: "j.folakemi@university.edu",
+    assigned_to_id: null, assigned_to_name: null, has_attachment: false,
+    created_at: new Date("2026-06-19T16:00:00Z"), updated_at: new Date("2026-06-19T16:00:00Z"), resolved_at: null,
   },
   {
-    id: "MR-2026-002",
-    title: "Leaking supply pipe under sink — Block B Restroom",
-    description: "A persistent leak from the main supply pipe under sink #2.",
-    category_id: 2,
-    category_slug: "plumbing",
-    category_name: "Plumbing",
-    priority: "urgent",
-    status: "in_progress",
+    id: "MR-2026-014", title: "Ethernet ports dead — Library Study Pod 4",
+    description: "All ethernet wall ports in Study Pod 4 of the Main Library are providing no connectivity.",
+    category_id: 4, category_slug: "internet", category_name: "Internet", priority: "low", status: "pending",
+    location: "Main Library — Study Pod 4",
+    submitted_by_id: 2, submitted_by_name: "Marcus Johnson", submitted_by_email: "m.johnson@university.edu",
+    assigned_to_id: null, assigned_to_name: null, has_attachment: false,
+    created_at: new Date("2026-06-19T14:00:00Z"), updated_at: new Date("2026-06-19T14:00:00Z"), resolved_at: null,
+  },
+  {
+    id: "MR-2026-013", title: "Wi-Fi access point offline — Library Level 2",
+    description: "The Wi-Fi access point covering Level 2 of the Main Library (AP-LIB-L2-03) has been offline for 2 days.",
+    category_id: 4, category_slug: "internet", category_name: "Internet", priority: "high", status: "pending",
+    location: "Main Library — Level 2",
+    submitted_by_id: 1, submitted_by_name: "Prominence Damilola", submitted_by_email: "p.damilola@university.edu",
+    assigned_to_id: null, assigned_to_name: null, has_attachment: false,
+    created_at: new Date("2026-06-19T11:00:00Z"), updated_at: new Date("2026-06-19T11:00:00Z"), resolved_at: null,
+  },
+  {
+    id: "MR-2026-012", title: "Damaged floor tiles creating trip hazard — Faculty Corridor",
+    description: "Several floor tiles in the main corridor outside the Faculty of Sciences staff room are cracked and raised at the edges, creating a trip hazard.",
+    category_id: 6, category_slug: "other", category_name: "Other", priority: "high", status: "resolved",
+    location: "Faculty of Sciences Block — Main Corridor, Floor 2",
+    submitted_by_id: 4, submitted_by_name: "Janet Folakemi", submitted_by_email: "j.folakemi@university.edu",
+    assigned_to_id: 5, assigned_to_name: "Tom Brennan", has_attachment: true,
+    created_at: new Date("2026-06-19T10:00:00Z"), updated_at: new Date("2026-06-19T14:30:00Z"), resolved_at: new Date("2026-06-19T14:30:00Z"),
+  },
+  {
+    id: "MR-2026-011", title: "HVAC not cooling — Lecture Hall A",
+    description: "The air conditioning system in Lecture Hall A is running but producing no cool air. Room temperature consistently exceeds 28°C during lectures with 150+ students present.",
+    category_id: 5, category_slug: "hvac", category_name: "HVAC", priority: "high", status: "pending",
+    location: "Main Building — Lecture Hall A",
+    submitted_by_id: 4, submitted_by_name: "Aiden Walsh", submitted_by_email: "a.walsh@university.edu",
+    assigned_to_id: null, assigned_to_name: null, has_attachment: false,
+    created_at: new Date("2026-06-19T08:30:00Z"), updated_at: new Date("2026-06-19T08:30:00Z"), resolved_at: null,
+  },
+  {
+    id: "MR-2026-010", title: "Broken window blind — Faculty of Sciences Staff Office",
+    description: "The window blind in the staff office on the 3rd floor (Room 312) is broken — the cord has snapped and the blind is stuck in a fully raised position.",
+    category_id: 3, category_slug: "furniture", category_name: "Furniture", priority: "low", status: "assigned",
+    location: "Faculty of Sciences Block — Staff Office 312, Floor 3",
+    submitted_by_id: 4, submitted_by_name: "Janet Folakemi", submitted_by_email: "j.folakemi@university.edu",
+    assigned_to_id: 5, assigned_to_name: "Tom Brennan", has_attachment: false,
+    created_at: new Date("2026-06-19T07:00:00Z"), updated_at: new Date("2026-06-19T08:00:00Z"), resolved_at: null,
+  },
+  {
+    id: "MR-2026-009", title: "Faulty light switch — Faculty of Sciences Meeting Room",
+    description: "The light switch in the Faculty of Sciences meeting room (Room 204) is sparking when toggled and intermittently fails. This is a safety hazard.",
+    category_id: 1, category_slug: "electricity", category_name: "Electricity", priority: "high", status: "assigned",
+    location: "Faculty of Sciences Block — Meeting Room 204",
+    submitted_by_id: 4, submitted_by_name: "Janet Folakemi", submitted_by_email: "j.folakemi@university.edu",
+    assigned_to_id: 3, assigned_to_name: "Ademola Moyinoluwa", has_attachment: false,
+    created_at: new Date("2026-06-18T15:30:00Z"), updated_at: new Date("2026-06-18T16:00:00Z"), resolved_at: null,
+  },
+  {
+    id: "MR-2026-008", title: "Poor ventilation — Staff Office Block 2, Floor 3",
+    description: "The ventilation in the staff offices on Floor 3 of Office Block 2 has been inadequate for the past week, affecting staff productivity.",
+    category_id: 5, category_slug: "hvac", category_name: "HVAC", priority: "medium", status: "pending",
+    location: "Office Block 2 — Floor 3, Staff Offices",
+    submitted_by_id: 4, submitted_by_name: "Janet Folakemi", submitted_by_email: "j.folakemi@university.edu",
+    assigned_to_id: null, assigned_to_name: null, has_attachment: false,
+    created_at: new Date("2026-06-18T09:15:00Z"), updated_at: new Date("2026-06-18T09:15:00Z"), resolved_at: null,
+  },
+  {
+    id: "MR-2026-007", title: "Leaking supply pipe under sink — Block B Restroom",
+    description: "A persistent leak from the main supply pipe under sink #2 in the ground-floor male restroom of Block B. Water is pooling on the floor creating a significant slip hazard.",
+    category_id: 2, category_slug: "plumbing", category_name: "Plumbing", priority: "urgent", status: "in_progress",
     location: "Block B — Ground Floor, Male Restroom",
-    submitted_by_id: 4, // staff
-    submitted_by_name: "Janet Folakemi",
-    submitted_by_email: "j.folakemi@university.edu",
-    assigned_to_id: 3,
-    assigned_to_name: "Ademola Moyinoluwa",
-    has_attachment: false,
-    created_at: new Date("2026-06-10T07:45:00Z"),
-    updated_at: new Date("2026-06-10T10:00:00Z"),
-    resolved_at: null,
+    submitted_by_id: 2, submitted_by_name: "Marcus Johnson", submitted_by_email: "m.johnson@university.edu",
+    assigned_to_id: 4, assigned_to_name: "Diana Osei", has_attachment: false,
+    created_at: new Date("2026-06-17T07:45:00Z"), updated_at: new Date("2026-06-17T10:00:00Z"), resolved_at: null,
+  },
+  {
+    id: "MR-2026-006", title: "Cracked window pane — Seminar Room 2",
+    description: "The large south-facing window in Seminar Room 2 has a significant crack running across the lower pane. This is a safety hazard, particularly during windy conditions.",
+    category_id: 6, category_slug: "other", category_name: "Other", priority: "high", status: "in_progress",
+    location: "Humanities Block — Seminar Room 2",
+    submitted_by_id: 3, submitted_by_name: "Priya Patel", submitted_by_email: "p.patel@university.edu",
+    assigned_to_id: 5, assigned_to_name: "Tom Brennan", has_attachment: true,
+    created_at: new Date("2026-06-14T09:00:00Z"), updated_at: new Date("2026-06-16T11:00:00Z"), resolved_at: null,
+  },
+  {
+    id: "MR-2026-005", title: "Broken chair and damaged tables — Seminar Room 5",
+    description: "One chair has a completely broken leg and two tables have severely gouged, unstable surfaces in Seminar Room 5.",
+    category_id: 3, category_slug: "furniture", category_name: "Furniture", priority: "medium", status: "assigned",
+    location: "Humanities Block — Seminar Room 5",
+    submitted_by_id: 3, submitted_by_name: "Priya Patel", submitted_by_email: "p.patel@university.edu",
+    assigned_to_id: 5, assigned_to_name: "Tom Brennan", has_attachment: true,
+    created_at: new Date("2026-06-12T14:20:00Z"), updated_at: new Date("2026-06-13T09:00:00Z"), resolved_at: null,
+  },
+  {
+    id: "MR-2026-004", title: "Projector lamp end-of-life — Tutorial Room 12",
+    description: "The projector in Tutorial Room 12 displays a lamp warning and produces a dim, unusable image.",
+    category_id: 6, category_slug: "other", category_name: "Other", priority: "medium", status: "assigned",
+    location: "Engineering Block B — Tutorial Room 12",
+    submitted_by_id: 4, submitted_by_name: "Aiden Walsh", submitted_by_email: "a.walsh@university.edu",
+    assigned_to_id: 5, assigned_to_name: "Tom Brennan", has_attachment: false,
+    created_at: new Date("2026-06-09T13:00:00Z"), updated_at: new Date("2026-06-10T09:00:00Z"), resolved_at: null,
+  },
+  {
+    id: "MR-2026-003", title: "Blocked drains — Science Block Women's Restroom",
+    description: "All 3 sinks in the women's restroom on Floor 2 of the Science Block have severely slow or completely blocked drains.",
+    category_id: 2, category_slug: "plumbing", category_name: "Plumbing", priority: "medium", status: "resolved",
+    location: "Science Block — Floor 2, Women's Restroom",
+    submitted_by_id: 3, submitted_by_name: "Priya Patel", submitted_by_email: "p.patel@university.edu",
+    assigned_to_id: 4, assigned_to_name: "Diana Osei", has_attachment: false,
+    created_at: new Date("2026-06-05T10:00:00Z"), updated_at: new Date("2026-06-07T14:00:00Z"), resolved_at: new Date("2026-06-07T14:00:00Z"),
+  },
+  {
+    id: "MR-2026-002", title: "Power outlets non-functional in Computer Lab 3",
+    description: "Three power outlets on the east wall of Computer Lab 3 have been non-functional since Monday, affecting students' ability to use desktop workstations.",
+    category_id: 1, category_slug: "electricity", category_name: "Electricity", priority: "high", status: "resolved",
+    location: "Engineering Block A — Lab 304",
+    submitted_by_id: 1, submitted_by_name: "Prominence Damilola", submitted_by_email: "p.damilola@university.edu",
+    assigned_to_id: 3, assigned_to_name: "Ademola Moyinoluwa", has_attachment: true,
+    created_at: new Date("2026-06-02T09:15:00Z"), updated_at: new Date("2026-06-04T14:30:00Z"), resolved_at: new Date("2026-06-04T14:30:00Z"),
+  },
+  {
+    id: "MR-2026-001", title: "Flickering and failed lights — Block C Corridor",
+    description: "Fluorescent lights in the main corridor of Block C near the student lounge have been flickering intermittently for a week. Three fixtures have gone completely dark.",
+    category_id: 1, category_slug: "electricity", category_name: "Electricity", priority: "medium", status: "closed",
+    location: "Block C — Main Corridor",
+    submitted_by_id: 2, submitted_by_name: "Marcus Johnson", submitted_by_email: "m.johnson@university.edu",
+    assigned_to_id: 3, assigned_to_name: "Ademola Moyinoluwa", has_attachment: false,
+    created_at: new Date("2026-06-01T16:00:00Z"), updated_at: new Date("2026-06-04T12:00:00Z"), resolved_at: new Date("2026-06-03T15:00:00Z"),
   },
 ];
 
@@ -327,7 +422,25 @@ const pool = {
 
     if (normalizedSql.includes("FROM audit_logs")) {
       const reqId = params[0];
-      const filtered = mockAuditLogs.filter((a) => a.request_id === reqId);
+      let filtered = mockAuditLogs.filter((a) => a.request_id === reqId);
+      const hasSubmission = filtered.some((a) => a.action === "Request Submitted");
+      if (!hasSubmission) {
+        const req = mockRequests.find((r) => r.id === reqId);
+        if (req) {
+          filtered = [
+            {
+              id: `init-${reqId}`,
+              request_id: reqId,
+              action: "Request Submitted",
+              performed_by: req.submitted_by_id,
+              performed_by_name: req.submitted_by_name || "Submitter",
+              details: req.description || "Submitted via portal.",
+              created_at: req.created_at || new Date(),
+            },
+            ...filtered,
+          ];
+        }
+      }
       return Promise.resolve({ rows: filtered });
     }
 
@@ -368,16 +481,25 @@ const pool = {
       });
     }
 
-    // ─── UPDATE REQUEST STATUS ───
+    // ─── UPDATE REQUEST STATUS / ASSIGNMENT ───
     if (normalizedSql.includes("UPDATE service_requests")) {
-      // Usually updates status or assignment
       const reqId = params[params.length - 1];
       const match = mockRequests.find((r) => r.id === reqId);
       if (match) {
-        if (normalizedSql.includes("status = $1")) {
-          match.status = params[0];
-          if (params[0] === "resolved") {
-            match.resolved_at = new Date();
+        if (normalizedSql.includes("assigned_to =")) {
+          const officerId = params[0];
+          const officer = mockUsers.find((u) => u.id === officerId);
+          match.assigned_to_id = officerId;
+          match.assigned_to_name = officer ? officer.name : "Officer";
+          match.status = "assigned";
+        }
+        if (normalizedSql.includes("status = $1") || normalizedSql.includes("status = $2")) {
+          const newStatus = params.find(p => typeof p === "string" && ["pending", "assigned", "in_progress", "resolved", "closed", "cancelled"].includes(p));
+          if (newStatus) {
+            match.status = newStatus;
+            if (newStatus === "resolved") {
+              match.resolved_at = new Date();
+            }
           }
         }
         match.updated_at = new Date();

@@ -103,11 +103,16 @@ export default function App() {
   useEffect(() => {
     if (selectedRequest) {
       const updated = requests.find(r => r.id === selectedRequest.id);
-      if (updated && updated !== selectedRequest) {
+      if (updated && (
+        updated.status !== selectedRequest.status ||
+        updated.assignedTo !== selectedRequest.assignedTo ||
+        updated.updatedAt !== selectedRequest.updatedAt ||
+        (updated.audit && updated.audit.length !== selectedRequest.audit?.length)
+      )) {
         setSelectedRequest(updated);
       }
     }
-  }, [requests, selectedRequest]);
+  }, [requests]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [globalSearch, setGlobalSearch] = useState("");

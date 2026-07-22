@@ -30,8 +30,14 @@ export function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, act
   onStatusUpdate: (id: string, status: Status, note: string) => void;
   activeTab: string; globalSearch: string;
 }) {
-  const assigned  = requests.filter(r => r.assignedTo === user.id && ["assigned","in_progress"].includes(r.status));
-  const completed = requests.filter(r => r.assignedTo === user.id && ["resolved","closed"].includes(r.status));
+  const assigned = requests.filter(r =>
+    (String(r.assignedTo) === String(user.id) || r.assignedToName?.toLowerCase() === user.name?.toLowerCase()) &&
+    ["pending", "assigned", "in_progress"].includes(r.status)
+  );
+  const completed = requests.filter(r =>
+    (String(r.assignedTo) === String(user.id) || r.assignedToName?.toLowerCase() === user.name?.toLowerCase()) &&
+    ["resolved", "closed"].includes(r.status)
+  );
 
   // Apply global search to assigned tasks tab
   const assignedFiltered = useMemo(() => {
@@ -107,7 +113,7 @@ export function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, act
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                          {r.status === "assigned" && (
+                          {["pending", "assigned"].includes(r.status) && (
                             <button onClick={e => { e.stopPropagation(); onStatusUpdate(r.id, "in_progress", "Work started."); }}
                               className="px-2.5 py-1 bg-primary text-primary-foreground rounded text-xs font-semibold hover:bg-primary/90 transition-colors whitespace-nowrap">
                               Start Work

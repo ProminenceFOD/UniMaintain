@@ -71,19 +71,27 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
   const [showComments, setShowComments] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  const isMyRequest = ["student","staff"].includes(currentUser.role) && request.submittedBy === currentUser.id;
-  const isMyTask    = currentUser.role === "officer"  && request.assignedTo  === currentUser.id;
+  const isMyRequest = ["student","staff"].includes((currentUser.role || "").toLowerCase()) && String(request.submittedBy) === String(currentUser.id);
+  const isMyTask    = (currentUser.role || "").toLowerCase() === "officer" && (
+    String(request.assignedTo) === String(currentUser.id) ||
+    request.assignedToName?.toLowerCase() === currentUser.name?.toLowerCase() ||
+    !request.assignedTo
+  );
 
   function nextStatus(): Status | null {
     if (isMyRequest) {
       if (request.status === "pending")  return "cancelled"; // cancel
       if (request.status === "resolved") return "closed"; // acknowledge
     }
-    if (isMyTask) {
-      if (request.status === "assigned")    return "in_progress";
+    if ((currentUser.role || "").toLowerCase() === "officer" && isMyTask) {
+      if (["pending", "assigned"].includes(request.status)) return "in_progress";
       if (request.status === "in_progress") return "resolved";
     }
-    if (currentUser.role === "admin" && request.status === "resolved") return "closed";
+    if ((currentUser.role || "").toLowerCase() === "admin") {
+      if (["pending", "assigned"].includes(request.status)) return "in_progress";
+      if (request.status === "in_progress") return "resolved";
+      if (request.status === "resolved") return "closed";
+    }
     return null;
   }
 

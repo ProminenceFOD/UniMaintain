@@ -1,5 +1,5 @@
 import { apiCreateRequest } from "../../lib/api";
-import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../../lib/constants";
+import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG, DEFAULT_CATEGORIES, CATEGORIES_KEY } from "../../lib/constants";
 import { generateId } from "../../lib/utils";
 import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, Paperclip, ChevronDown, ChevronLeft, ChevronRight, Send, Filter, Check, RefreshCw, Layers, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart, MoreVertical, User as UserIcon, Info, Mail } from "lucide-react";
 
@@ -94,21 +94,13 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
   // Load custom categories from Site Settings (falls back to defaults)
   const categories: { value: string; label: string }[] = (() => {
     try {
-      const saved = localStorage.getItem("unimaintain_categories");
+      const saved = localStorage.getItem(CATEGORIES_KEY);
       if (saved) {
         const items = JSON.parse(saved) as { id: string; name: string; desc: string }[];
         return items.map(c => ({ value: c.id, label: c.name }));
       }
     } catch { /* ignore */ }
-    // Default fallback matches CATEGORY_CONFIG
-    return [
-      { value: "electricity", label: "Electricity" },
-      { value: "plumbing",    label: "Plumbing" },
-      { value: "furniture",   label: "Furniture" },
-      { value: "internet",    label: "Internet / IT" },
-      { value: "hvac",        label: "HVAC" },
-      { value: "other",       label: "Other" },
-    ];
+    return DEFAULT_CATEGORIES.map(c => ({ value: c.id, label: c.name }));
   })();
   const priorities: Priority[] = ["low", "medium", "high", "urgent"];
   const buildings = [

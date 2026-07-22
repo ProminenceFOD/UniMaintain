@@ -13,7 +13,18 @@ function loadSiteSettings() {
 
 
 import type { CategoryItem } from "../../types";
-function loadCategories() { try { const c = localStorage.getItem(CATEGORIES_KEY); return c ? JSON.parse(c) : DEFAULT_CATEGORIES; } catch { return DEFAULT_CATEGORIES; } }
+function loadCategories(): CategoryItem[] {
+  try {
+    const c = localStorage.getItem(CATEGORIES_KEY);
+    if (!c) return DEFAULT_CATEGORIES;
+    const parsed = JSON.parse(c) as CategoryItem[];
+    const existingIds = new Set(parsed.map(item => item.id));
+    const missing = DEFAULT_CATEGORIES.filter(d => !existingIds.has(d.id));
+    return [...parsed, ...missing];
+  } catch {
+    return DEFAULT_CATEGORIES;
+  }
+}
 
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";

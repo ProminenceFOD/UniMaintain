@@ -5,7 +5,6 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
-    "postbuild": "cp -R src/config/__mocks__ dist/config/",
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "test": "jest --forceExit --detectOpenHandles",

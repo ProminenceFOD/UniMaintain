@@ -1,5 +1,7 @@
 import { Pool } from "pg";
 
+declare const jest: any;
+
 // Define global jest if running outside of Jest runner (e.g. in ts-node-dev)
 if (typeof (global as any).jest === "undefined") {
   (global as any).jest = {

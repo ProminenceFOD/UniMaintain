@@ -99,7 +99,7 @@ export async function getAllRequests(req: Request, res: Response): Promise<void>
     if (category) { conditions.push(`c.slug = $${idx++}`);          values.push(category); }
     if (priority) { conditions.push(`sr.priority = $${idx++}`);     values.push(priority); }
     if (search)   {
-      conditions.push(`(sr.title ILIKE $${idx} OR sr.id ILIKE $${idx})`);
+      conditions.push(`(sr.title ILIKE $${idx} OR sr.id ILIKE $${idx} OR sr.location ILIKE $${idx} OR u.name ILIKE $${idx} OR u.email ILIKE $${idx} OR o.name ILIKE $${idx})`);
       values.push(`%${search}%`);
       idx++;
     }

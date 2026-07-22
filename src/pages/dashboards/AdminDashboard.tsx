@@ -83,17 +83,28 @@ export function AdminDashboard({ requests, users, currentUser, onSelect, onAssig
   };
 
   const filtered = useMemo(() => {
-    const q = (globalSearch || search).toLowerCase();
+    const q = (globalSearch || search).toLowerCase().trim();
     return requests.filter(r => {
-      const submitter = users.find(u => u.id === r.submittedBy || (r.submittedByName && u.name.toLowerCase() === r.submittedByName.toLowerCase()))
-                     ?? USERS.find(u => u.id === r.submittedBy || (r.submittedByName && u.name.toLowerCase() === r.submittedByName.toLowerCase()));
+      const submitter = users.find(u =>
+        String(u.id).toLowerCase() === String(r.submittedBy).toLowerCase() ||
+        String(u.id).toLowerCase() === `u${String(r.submittedBy).toLowerCase()}` ||
+        `u${String(u.id).toLowerCase()}` === String(r.submittedBy).toLowerCase() ||
+        (r.submittedByName && u.name.toLowerCase() === r.submittedByName.toLowerCase())
+      ) ?? USERS.find(u =>
+        String(u.id).toLowerCase() === String(r.submittedBy).toLowerCase() ||
+        String(u.id).toLowerCase() === `u${String(r.submittedBy).toLowerCase()}` ||
+        `u${String(u.id).toLowerCase()}` === String(r.submittedBy).toLowerCase() ||
+        (r.submittedByName && u.name.toLowerCase() === r.submittedByName.toLowerCase())
+      );
+
+      const submitterName = (r.submittedByName || submitter?.name || "").toLowerCase();
       const submitterEmail = (r.submittedByEmail || submitter?.email || "").toLowerCase();
 
       const matchQ = !q ||
         r.title.toLowerCase().includes(q) ||
         r.id.toLowerCase().includes(q) ||
-        (r.submittedByName && r.submittedByName.toLowerCase().includes(q)) ||
-        (submitterEmail && submitterEmail.includes(q)) ||
+        submitterName.includes(q) ||
+        submitterEmail.includes(q) ||
         (r.submittedByRole && r.submittedByRole.toLowerCase().includes(q)) ||
         (r.location && r.location.toLowerCase().includes(q)) ||
         (r.assignedToName && r.assignedToName.toLowerCase().includes(q));

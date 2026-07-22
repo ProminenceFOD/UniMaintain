@@ -38,7 +38,22 @@ export function StudentDashboard({ user, requests, onNewRequest, onSelect, globa
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
-  const mine = requests.filter(r => r.submittedBy === user.id);
+  const mine = useMemo(() => {
+    const userIdStr = String(user.id).toLowerCase();
+    const userNameStr = (user.name || "").toLowerCase();
+    const userEmailStr = (user.email || "").toLowerCase();
+
+    return requests.filter(r => {
+      const subByStr = String(r.submittedBy || "").toLowerCase();
+      const subNameStr = (r.submittedByName || "").toLowerCase();
+
+      const matchId = subByStr === userIdStr || subByStr === `u${userIdStr}` || userIdStr === `u${subByStr}`;
+      const matchName = Boolean(userNameStr && subNameStr && (userNameStr.includes(subNameStr) || subNameStr.includes(userNameStr)));
+      const matchEmail = Boolean(userEmailStr && subByStr === userEmailStr);
+
+      return matchId || matchName || matchEmail;
+    });
+  }, [requests, user]);
 
   const filtered = useMemo(() => {
     return mine.filter(r => {

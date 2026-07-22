@@ -30,14 +30,35 @@ export function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, act
   onStatusUpdate: (id: string, status: Status, note: string) => void;
   activeTab: string; globalSearch: string;
 }) {
-  const assigned = requests.filter(r =>
-    (String(r.assignedTo) === String(user.id) || r.assignedToName?.toLowerCase() === user.name?.toLowerCase()) &&
-    ["pending", "assigned", "in_progress"].includes(r.status)
-  );
-  const completed = requests.filter(r =>
-    (String(r.assignedTo) === String(user.id) || r.assignedToName?.toLowerCase() === user.name?.toLowerCase()) &&
-    ["resolved", "closed"].includes(r.status)
-  );
+  const assigned = useMemo(() => {
+    const userIdStr = String(user.id).toLowerCase();
+    const userNameStr = (user.name || "").toLowerCase();
+
+    return requests.filter(r => {
+      const assignByStr = String(r.assignedTo || "").toLowerCase();
+      const assignNameStr = (r.assignedToName || "").toLowerCase();
+
+      const matchId = assignByStr && (assignByStr === userIdStr || assignByStr === `u${userIdStr}` || userIdStr === `u${assignByStr}`);
+      const matchName = Boolean(userNameStr && assignNameStr && (userNameStr.includes(assignNameStr) || assignNameStr.includes(userNameStr)));
+
+      return (matchId || matchName) && ["pending", "assigned", "in_progress"].includes(r.status);
+    });
+  }, [requests, user]);
+
+  const completed = useMemo(() => {
+    const userIdStr = String(user.id).toLowerCase();
+    const userNameStr = (user.name || "").toLowerCase();
+
+    return requests.filter(r => {
+      const assignByStr = String(r.assignedTo || "").toLowerCase();
+      const assignNameStr = (r.assignedToName || "").toLowerCase();
+
+      const matchId = assignByStr && (assignByStr === userIdStr || assignByStr === `u${userIdStr}` || userIdStr === `u${assignByStr}`);
+      const matchName = Boolean(userNameStr && assignNameStr && (userNameStr.includes(assignNameStr) || assignNameStr.includes(userNameStr)));
+
+      return (matchId || matchName) && ["resolved", "closed"].includes(r.status);
+    });
+  }, [requests, user]);
 
   // Apply global search to assigned tasks tab
   const assignedFiltered = useMemo(() => {

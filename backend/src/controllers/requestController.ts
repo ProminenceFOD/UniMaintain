@@ -115,7 +115,7 @@ export async function getAllRequests(req: Request, res: Response): Promise<void>
     const baseUrl = process.env.API_URL || process.env.RENDER_EXTERNAL_URL || `${req.protocol}://${req.get("host")}`;
 
     const requests = await Promise.all(
-      dataResult.rows.map(async (row) => {
+      dataResult.rows.map(async (row: any) => {
         const formatted = formatRequest(row);
         if (row.has_attachment) {
           const attachRes = await pool.query(

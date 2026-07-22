@@ -85,11 +85,15 @@ export function AdminDashboard({ requests, users, currentUser, onSelect, onAssig
   const filtered = useMemo(() => {
     const q = (globalSearch || search).toLowerCase();
     return requests.filter(r => {
+      const submitter = users.find(u => u.id === r.submittedBy || (r.submittedByName && u.name.toLowerCase() === r.submittedByName.toLowerCase()))
+                     ?? USERS.find(u => u.id === r.submittedBy || (r.submittedByName && u.name.toLowerCase() === r.submittedByName.toLowerCase()));
+      const submitterEmail = (r.submittedByEmail || submitter?.email || "").toLowerCase();
+
       const matchQ = !q ||
         r.title.toLowerCase().includes(q) ||
         r.id.toLowerCase().includes(q) ||
         (r.submittedByName && r.submittedByName.toLowerCase().includes(q)) ||
-        (r.submittedByEmail && r.submittedByEmail.toLowerCase().includes(q)) ||
+        (submitterEmail && submitterEmail.includes(q)) ||
         (r.submittedByRole && r.submittedByRole.toLowerCase().includes(q)) ||
         (r.location && r.location.toLowerCase().includes(q)) ||
         (r.assignedToName && r.assignedToName.toLowerCase().includes(q));
@@ -97,7 +101,7 @@ export function AdminDashboard({ requests, users, currentUser, onSelect, onAssig
       const matchS = !statusFilter || r.status === statusFilter;
       const matchC = !categoryFilter || r.category === categoryFilter;
 
-      const userRole = r.submittedByRole ?? users.find(u => u.id === r.submittedBy)?.role ?? USERS.find(u => u.id === r.submittedBy)?.role ?? "student";
+      const userRole = r.submittedByRole ?? submitter?.role ?? "student";
       const matchR = !reqRoleFilter || userRole.toLowerCase() === reqRoleFilter.toLowerCase();
 
       return matchQ && matchS && matchC && matchR;

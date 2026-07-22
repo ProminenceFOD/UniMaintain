@@ -43,6 +43,7 @@ export interface Request {
   location: string;
   submittedBy: string;
   submittedByName: string;
+  submittedByEmail?: string;
   submittedByRole?: Role;
   assignedTo?: string;
   assignedToName?: string;

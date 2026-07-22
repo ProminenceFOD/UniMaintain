@@ -106,6 +106,12 @@ app.use("/api/users",          userRoutes);
 app.use("/api/requests",       requestRoutes);
 app.use("/api/notifications",  notificationRoutes);
 
+// Fallback aliases without /api prefix to guarantee route matching
+app.use("/auth",          authRoutes);
+app.use("/users",         userRoutes);
+app.use("/requests",      requestRoutes);
+app.use("/notifications", notificationRoutes);
+
 // Health check
 app.get("/api/health", async (_req, res) => {
   try {

@@ -7,7 +7,14 @@ import type { Request } from "../types";
 // All communication with the Node.js + Express backend.
 // Base URL reads from Vite env var; falls back to localhost:5000.
 
-const BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+function getApiBaseUrl(): string {
+  let envUrl = (import.meta.env.VITE_API_URL as string) || "https://unimaintain-backend.onrender.com/api";
+  envUrl = envUrl.trim().replace(/\/+$/, "");
+  if (!envUrl.endsWith("/api")) {
+    envUrl = `${envUrl}/api`;
+  }
+  return envUrl;
+}
 
 function getToken(): string | null {
   return localStorage.getItem("unimaintain_token");
@@ -33,7 +40,10 @@ async function request<T>(
   if (token) headers["Authorization"] = `Bearer ${token}`;
   if (!isFormData) headers["Content-Type"] = "application/json";
 
-  const res = await fetch(`${BASE}${path}`, {
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const targetUrl = `${getApiBaseUrl()}${cleanPath}`;
+
+  const res = await fetch(targetUrl, {
     method,
     headers,
     body: isFormData ? (body as FormData) : body ? JSON.stringify(body) : undefined,

@@ -285,43 +285,42 @@ export default function App() {
 
           // 3. Restore demo session from localStorage
           const { user: demoUser, requests: demoRequests, users: demoUsers, notifications: demoNotifs } = loadDemoSession();
-          if (demoUser) {
-            const mergedUsers = USERS.map(base => {
-              const custom = demoUsers.find(u => u.id === base.id);
-              return custom ? { ...custom, name: base.name, email: base.email } : base;
-            });
-            const extraUsers    = demoUsers.filter(u => !USERS.find(b => b.id === u.id));
-            const restoredUsers = [...mergedUsers, ...extraUsers];
-            // Restore notification read states from storage
-            const savedUserNotifs = demoNotifs.filter(n => n.userId === demoUser.id);
-            const restoredNotifs  = savedUserNotifs.length > 0
-              ? savedUserNotifs
-              : INITIAL_NOTIFICATIONS.filter(n => n.userId === demoUser.id);
+          const activeUser = demoUser ?? USERS.find(u => u.id === "u8")!;
+          const mergedUsers = USERS.map(base => {
+            const custom = demoUsers.find(u => u.id === base.id);
+            return custom ? { ...custom, name: base.name, email: base.email } : base;
+          });
+          const extraUsers    = demoUsers.filter(u => !USERS.find(b => b.id === u.id));
+          const restoredUsers = [...mergedUsers, ...extraUsers];
+          // Restore notification read states from storage
+          const savedUserNotifs = demoNotifs.filter(n => n.userId === activeUser.id);
+          const restoredNotifs  = savedUserNotifs.length > 0
+            ? savedUserNotifs
+            : INITIAL_NOTIFICATIONS.filter(n => n.userId === activeUser.id);
 
-            const rawRequests = demoRequests.length > 0 ? demoRequests : INITIAL_REQUESTS;
-            const sanitizedRequests = rawRequests.map(r => {
-              const canonical = CANONICAL_MAP.get(r.id);
-              const updatedStatus = (r.assignedTo && r.status === "pending") ? ("assigned" as Status) : r.status;
-              if (canonical) {
-                return {
-                  ...r,
-                  status: updatedStatus,
-                  submittedByName: canonical.submittedByName,
-                  submittedByEmail: canonical.submittedByEmail,
-                  submittedByRole: canonical.submittedByRole,
-                  submittedBy: canonical.submittedBy,
-                };
-              }
-              return { ...r, status: updatedStatus };
-            });
+          const rawRequests = demoRequests.length > 0 ? demoRequests : INITIAL_REQUESTS;
+          const sanitizedRequests = rawRequests.map(r => {
+            const canonical = CANONICAL_MAP.get(r.id);
+            const updatedStatus = (r.assignedTo && r.status === "pending") ? ("assigned" as Status) : r.status;
+            if (canonical) {
+              return {
+                ...r,
+                status: updatedStatus,
+                submittedByName: canonical.submittedByName,
+                submittedByEmail: canonical.submittedByEmail,
+                submittedByRole: canonical.submittedByRole,
+                submittedBy: canonical.submittedBy,
+              };
+            }
+            return { ...r, status: updatedStatus };
+          });
 
-            setCurrentUser(demoUser);
-            setRequests(sanitizedRequests);
-            setUsers(restoredUsers);
-            setNotifications(restoredNotifs);
-            setActiveTab(loadActiveTab(demoUser.role));
-            nextScreen = "app";
-          }
+          setCurrentUser(activeUser);
+          setRequests(sanitizedRequests);
+          setUsers(restoredUsers);
+          setNotifications(restoredNotifs);
+          setActiveTab(loadActiveTab(activeUser.role));
+          nextScreen = "app";
         }
       }
 
@@ -339,26 +338,34 @@ export default function App() {
         apiGetRequests({ limit: 200 }),
         apiGetNotifications(),
       ]);
-      const apiAdapted = reqRes.requests.map(adaptRequest);
-      const { requests: localSaved } = loadDemoSession();
-      const existingIds = new Set(apiAdapted.map(r => r.id));
-      const extraLocal = localSaved.filter(r => !existingIds.has(r.id));
-      const currentList = [...extraLocal, ...apiAdapted];
-      const extraInitial = INITIAL_REQUESTS.filter(r => !currentList.some(c => c.id === r.id));
-      const combinedRequests = [...currentList, ...extraInitial];
-      setRequests(combinedRequests);
-      setNotifications(notifRes.notifications.map(n => ({
-        id: String(n.id), userId,
-        title: n.title, message: n.message,
-        read: n.read, timestamp: n.created_at, requestId: n.request_id ?? undefined,
-      })));
+      if (reqRes.requests && Array.isArray(reqRes.requests) && reqRes.requests.length > 0) {
+        const apiAdapted = reqRes.requests.map(adaptRequest);
+        const { requests: localSaved } = loadDemoSession();
+        const existingIds = new Set(apiAdapted.map(r => r.id));
+        const extraLocal = localSaved.filter(r => !existingIds.has(r.id));
+        const currentList = [...extraLocal, ...apiAdapted];
+        const extraInitial = INITIAL_REQUESTS.filter(r => !currentList.some(c => c.id === r.id));
+        const combinedRequests = [...currentList, ...extraInitial];
+        setRequests(combinedRequests);
+      }
+      if (notifRes.notifications && Array.isArray(notifRes.notifications)) {
+        setNotifications(notifRes.notifications.map(n => ({
+          id: String(n.id), userId,
+          title: n.title, message: n.message,
+          read: n.read, timestamp: n.created_at, requestId: n.request_id ?? undefined,
+        })));
+      }
 
       if (role === "admin") {
-        const userRes = await apiGetUsers();
-        setUsers(userRes.users.map(adaptUser));
+        try {
+          const userRes = await apiGetUsers();
+          if (userRes.users && Array.isArray(userRes.users) && userRes.users.length > 0) {
+            setUsers(userRes.users.map(adaptUser));
+          }
+        } catch { /* keep current users */ }
       }
     } catch (err) {
-      console.warn("Failed to refresh data:", err);
+      console.warn("Failed to refresh data from API:", err);
     }
   }, []);
 
@@ -368,21 +375,13 @@ export default function App() {
     const role = (user.role || "student").toLowerCase() as Role;
     const normalizedUser = { ...user, role };
 
-    if (apiMode) {
-      setCurrentUser(normalizedUser);
-      setActiveTab(loadActiveTab(role));
-      try {
-        await refreshData(role, normalizedUser.id);
-      } catch (err) {
-        console.error("Data refresh error:", err);
-      }
-    } else if (DEMO_USER_IDS.includes(user.id)) {
+    if (DEMO_USER_IDS.includes(user.id)) {
       // Always load from storage first — this preserves data across logouts
       const { requests: savedRequests, users: savedUsers, notifications: savedNotifs } = loadDemoSession();
-      const currentRequests = savedRequests.length > 0 ? savedRequests : (requests.length > 0 ? requests : INITIAL_REQUESTS);
+      const currentRequests = savedRequests.length > 0 ? savedRequests : INITIAL_REQUESTS;
       const mergedUsers = USERS.map(baseUser => {
         const saved = savedUsers.find(u => u.id === baseUser.id);
-        return saved ?? baseUser;
+        return saved ? { ...saved, name: baseUser.name, email: baseUser.email } : baseUser;
       });
       const newUsers = savedUsers.filter(u => !USERS.find(b => b.id === u.id));
       const currentUsers = [...mergedUsers, ...newUsers];
@@ -397,6 +396,18 @@ export default function App() {
       setNotifications(currentNotifs);
       setActiveTab(loadActiveTab(loggedInUser.role));
       saveDemoSession(loggedInUser, currentRequests, currentUsers, currentNotifs);
+
+      if (apiMode) {
+        refreshData(role, loggedInUser.id).catch(() => {});
+      }
+    } else if (apiMode) {
+      setCurrentUser(normalizedUser);
+      setActiveTab(loadActiveTab(role));
+      try {
+        await refreshData(role, normalizedUser.id);
+      } catch (err) {
+        console.error("Data refresh error:", err);
+      }
     } else {
       // Newly registered account — add to users list and start fresh
       setRequests([]);

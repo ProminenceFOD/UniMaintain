@@ -218,21 +218,48 @@ export async function createRequest(req: Request, res: Response): Promise<void> 
   const hasAttachment = !!(req.files && (req.files as Express.Multer.File[]).length > 0);
 
   try {
-    // Get category id
-    const catResult = await pool.query("SELECT id FROM categories WHERE slug = $1", [category]);
-    if (catResult.rows.length === 0) {
-      res.status(400).json({ error: "Invalid category" });
-      return;
+    // 1. Get or create category id gracefully
+    let catResult = await pool.query(
+      "SELECT id FROM categories WHERE slug = $1 OR LOWER(slug) = LOWER($1) OR LOWER(name) = LOWER($1)",
+      [category]
+    );
+    let categoryId: number;
+    if (catResult.rows.length > 0) {
+      categoryId = catResult.rows[0].id;
+    } else {
+      const slug = (category || "other").toLowerCase().replace(/[^a-z0-9]/g, "_");
+      const name = category || "Other";
+      const newCat = await pool.query(
+        "INSERT INTO categories (name, slug) VALUES ($1, $2) ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name RETURNING id",
+        [name, slug]
+      );
+      categoryId = newCat.rows[0]?.id || 1;
     }
 
-    // Generate request ID
+    // 2. Ensure submitting user exists in database
+    let userId = user.id;
+    const userCheck = await pool.query("SELECT id FROM users WHERE id = $1", [userId]);
+    if (userCheck.rows.length === 0) {
+      const emailCheck = await pool.query("SELECT id FROM users WHERE LOWER(email) = LOWER($1)", [user.email]);
+      if (emailCheck.rows.length > 0) {
+        userId = emailCheck.rows[0].id;
+      } else {
+        const newUser = await pool.query(
+          "INSERT INTO users (name, email, password, role, department) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+          [user.name || "User", user.email, "hash", user.role || "student", (user as any).department || "General"]
+        );
+        userId = newUser.rows[0].id;
+      }
+    }
+
+    // 3. Generate request ID
     const idResult = await pool.query("SELECT generate_request_id() AS id");
     const requestId: string = idResult.rows[0].id;
 
     await pool.query(
       `INSERT INTO service_requests (id, title, description, category_id, priority, location, submitted_by, has_attachment)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [requestId, title, description, catResult.rows[0].id, priority || "medium", location, user.id, hasAttachment]
+      [requestId, title, description, categoryId, priority || "medium", location, userId, hasAttachment]
     );
 
     // Save attachments metadata
@@ -247,7 +274,7 @@ export async function createRequest(req: Request, res: Response): Promise<void> 
       }
     }
 
-    await addAuditLog(requestId, "Request Submitted", user.id,
+    await addAuditLog(requestId, "Request Submitted", userId,
       `Submitted via portal${hasAttachment ? " with attachments." : "."}`);
 
     // Notify all admins
@@ -262,7 +289,7 @@ export async function createRequest(req: Request, res: Response): Promise<void> 
     }
 
     // Notify submitter
-    await createNotification(user.id, "Request Submitted",
+    await createNotification(userId, "Request Submitted",
       `${requestId}: Your request has been received and is pending review.`, requestId);
 
     // Fetch and return the created request

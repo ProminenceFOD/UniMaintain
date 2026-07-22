@@ -21,7 +21,7 @@ import {
 
 import type { CatConfig } from "../../lib/constants";
 
-export function OfficerTaskTable({ requests, onSelect, onStatusUpdate, emptyLabel }: {
+export function OfficerTaskTable({ requests, onSelect, onStatusUpdate, emptyLabel, currentUser }: { requests: Request[]; onSelect: (r: Request) => void; onStatusUpdate: (id: string, status: Status, note: string) => void; emptyLabel: string; currentUser: User; }) {
   requests: Request[]; onSelect: (r: Request) => void;
   onStatusUpdate: (id: string, status: Status, note: string) => void;
   emptyLabel: string;
@@ -101,7 +101,7 @@ export function OfficerTaskTable({ requests, onSelect, onStatusUpdate, emptyLabe
                           className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title="View details">
                           <Eye size={13} />
                         </button>
-                        {["pending", "assigned"].includes(r.status) && (
+                        {currentUser.role === "officer" && ["pending", "assigned"].includes(r.status) && (
                           <button onClick={() => onStatusUpdate(r.id, "in_progress", "Work started.")}
                             className="px-2.5 py-1 bg-primary text-primary-foreground rounded text-xs font-semibold hover:bg-primary/90 transition-colors whitespace-nowrap">
                             Start Work

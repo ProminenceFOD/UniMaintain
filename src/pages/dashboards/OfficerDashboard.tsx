@@ -231,12 +231,13 @@ export function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, act
 
         {/* ── ASSIGNED TASKS TAB ────────────────────────────────────── */}
         {activeTab === "tasks" && (
-          <OfficerTaskTable
-            requests={assignedFiltered}
-            onSelect={onSelect}
-            onStatusUpdate={onStatusUpdate}
-            emptyLabel="No active tasks assigned to you."
-          />
+                      <OfficerTaskTable
+              requests={assignedFiltered}
+              onSelect={onSelect}
+              onStatusUpdate={onStatusUpdate}
+              emptyLabel="No active tasks assigned to you."
+              currentUser={user}
+            />
         )}
 
         {/* ── COMPLETED TASKS TAB ───────────────────────────────────── */}

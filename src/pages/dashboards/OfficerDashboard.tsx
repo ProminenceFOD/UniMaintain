@@ -148,7 +148,7 @@ export function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, act
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                          {["pending", "assigned"].includes(r.status) && (
+                          {(user.role || "").toLowerCase() === "officer" && ["pending", "assigned"].includes(r.status) && (
                             <button onClick={e => { e.stopPropagation(); onStatusUpdate(r.id, "in_progress", "Work started."); }}
                               className="px-2.5 py-1 bg-primary text-primary-foreground rounded text-xs font-semibold hover:bg-primary/90 transition-colors whitespace-nowrap">
                               Start Work

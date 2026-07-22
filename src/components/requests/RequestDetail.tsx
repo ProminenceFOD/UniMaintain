@@ -88,7 +88,6 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
       if (request.status === "in_progress") return "resolved";
     }
     if ((currentUser.role || "").toLowerCase() === "admin") {
-      if (["pending", "assigned"].includes(request.status)) return "in_progress";
       if (request.status === "in_progress") return "resolved";
       if (request.status === "resolved") return "closed";
     }

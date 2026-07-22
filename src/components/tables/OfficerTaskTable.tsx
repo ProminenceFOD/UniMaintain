@@ -22,10 +22,8 @@ import {
 import type { CatConfig } from "../../lib/constants";
 
 export function OfficerTaskTable({ requests, onSelect, onStatusUpdate, emptyLabel, currentUser }: { requests: Request[]; onSelect: (r: Request) => void; onStatusUpdate: (id: string, status: Status, note: string) => void; emptyLabel: string; currentUser: User; }) {
-  requests: Request[]; onSelect: (r: Request) => void;
-  onStatusUpdate: (id: string, status: Status, note: string) => void;
-  emptyLabel: string;
-}) {
+
+
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);

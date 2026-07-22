@@ -19,9 +19,11 @@ import {
   Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer
 } from "recharts";
 
-import type { CatConfig } from "../../lib/constants";
+import { INITIAL_REQUESTS, USERS } from "../../data/mockData";
 
-export function AdminReports({ requests, users }: { requests: Request[]; users: User[] }) {
+export function AdminReports({ requests: rawRequests, users: rawUsers }: { requests: Request[]; users: User[] }) {
+  const requests = (rawRequests && rawRequests.length > 0) ? rawRequests : INITIAL_REQUESTS;
+  const users = (rawUsers && rawUsers.length > 0) ? rawUsers : USERS;
   const officers = users.filter(u => u.role === "officer" && u.active !== false);
 
   // ── Date filter state ──────────────────────────────────────────────────────

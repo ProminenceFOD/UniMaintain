@@ -69,7 +69,14 @@ app.use("/uploads", (req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Cross-Origin-Resource-Policy", "cross-origin");
   next();
-}, express.static(uploadsDir));
+}, express.static(uploadsDir), (_req, res) => {
+  const fallbackPath = path.join(uploadsDir, "images.jpeg");
+  if (require("fs").existsSync(fallbackPath)) {
+    res.sendFile(fallbackPath);
+  } else {
+    res.status(404).json({ error: "Attachment file not found" });
+  }
+});
 
 // ─── API DOCUMENTATION ────────────────────────────────────────────────────────
 app.use("/api/docs", swaggerUi.serve as any, swaggerUi.setup(swaggerSpec, {

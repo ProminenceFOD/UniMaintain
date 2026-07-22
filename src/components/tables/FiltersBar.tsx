@@ -15,20 +15,29 @@ import {
 
 import type { CatConfig } from "../../lib/constants";
 
-export function FiltersBar({ search, setSearch, statusFilter, setStatusFilter, categoryFilter, setCategoryFilter }: {
+export function FiltersBar({ search, setSearch, statusFilter, setStatusFilter, categoryFilter, setCategoryFilter, roleFilter, setRoleFilter }: {
   search: string; setSearch: (v: string) => void;
   statusFilter: string; setStatusFilter: (v: string) => void;
   categoryFilter: string; setCategoryFilter: (v: string) => void;
+  roleFilter?: string; setRoleFilter?: (v: string) => void;
 }) {
   return (
     <div className="flex items-center gap-3 flex-wrap">
       <div className="flex items-center gap-2 bg-card border border-border rounded px-3 py-2 flex-1 min-w-48">
         <Search size={13} className="text-muted-foreground flex-shrink-0" />
         <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search by title or ID…"
+          placeholder="Search by title, ID, requester, or location…"
           className="flex-1 bg-transparent text-xs focus:outline-none placeholder:text-muted-foreground"
         />
       </div>
+      {roleFilter !== undefined && setRoleFilter && (
+        <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)}
+          className="bg-card border border-border rounded px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary cursor-pointer">
+          <option value="">All Roles</option>
+          <option value="student">Student</option>
+          <option value="staff">Staff</option>
+        </select>
+      )}
       <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
         className="bg-card border border-border rounded px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary cursor-pointer">
         <option value="">All Statuses</option>

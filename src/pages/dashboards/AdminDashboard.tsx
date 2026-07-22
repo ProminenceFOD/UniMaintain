@@ -43,6 +43,7 @@ export function AdminDashboard({ requests, users, currentUser, onSelect, onAssig
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [reqRoleFilter, setReqRoleFilter] = useState("");
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [showInvite, setShowInvite] = useState(false);
@@ -84,12 +85,24 @@ export function AdminDashboard({ requests, users, currentUser, onSelect, onAssig
   const filtered = useMemo(() => {
     const q = (globalSearch || search).toLowerCase();
     return requests.filter(r => {
-      const matchQ = !q || r.title.toLowerCase().includes(q) || r.id.toLowerCase().includes(q);
+      const matchQ = !q ||
+        r.title.toLowerCase().includes(q) ||
+        r.id.toLowerCase().includes(q) ||
+        (r.submittedByName && r.submittedByName.toLowerCase().includes(q)) ||
+        (r.submittedByEmail && r.submittedByEmail.toLowerCase().includes(q)) ||
+        (r.submittedByRole && r.submittedByRole.toLowerCase().includes(q)) ||
+        (r.location && r.location.toLowerCase().includes(q)) ||
+        (r.assignedToName && r.assignedToName.toLowerCase().includes(q));
+
       const matchS = !statusFilter || r.status === statusFilter;
       const matchC = !categoryFilter || r.category === categoryFilter;
-      return matchQ && matchS && matchC;
+
+      const userRole = r.submittedByRole ?? users.find(u => u.id === r.submittedBy)?.role ?? USERS.find(u => u.id === r.submittedBy)?.role ?? "student";
+      const matchR = !reqRoleFilter || userRole.toLowerCase() === reqRoleFilter.toLowerCase();
+
+      return matchQ && matchS && matchC && matchR;
     });
-  }, [requests, search, globalSearch, statusFilter, categoryFilter]);
+  }, [requests, users, search, globalSearch, statusFilter, categoryFilter, reqRoleFilter]);
 
   const paginated = filtered.slice((page - 1) * perPage, page * perPage);
 
@@ -384,6 +397,7 @@ export function AdminDashboard({ requests, users, currentUser, onSelect, onAssig
               </div>
               <FiltersBar
                 search={search} setSearch={v => { setSearch(v); setPage(1); }}
+                roleFilter={reqRoleFilter} setRoleFilter={v => { setReqRoleFilter(v); setPage(1); }}
                 statusFilter={statusFilter} setStatusFilter={v => { setStatusFilter(v); setPage(1); }}
                 categoryFilter={categoryFilter} setCategoryFilter={v => { setCategoryFilter(v); setPage(1); }}
               />

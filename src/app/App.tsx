@@ -271,7 +271,7 @@ export default function App() {
   const refreshData = useCallback(async (role: string, userId: string) => {
     try {
       const [reqRes, notifRes] = await Promise.all([
-        apiGetRequests({ limit: 50 }),
+        apiGetRequests({ limit: 200 }),
         apiGetNotifications(),
       ]);
       setRequests(reqRes.requests.map(adaptRequest));

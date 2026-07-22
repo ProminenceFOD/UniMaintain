@@ -67,7 +67,7 @@ async function createNotification(
 
 // GET /api/requests
 export async function getAllRequests(req: Request, res: Response): Promise<void> {
-  const { status, category, priority, search, page = "1", limit = "10" } = req.query;
+  const { status, category, priority, search, page = "1", limit = "200" } = req.query;
   const user = req.user!;
   const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
 

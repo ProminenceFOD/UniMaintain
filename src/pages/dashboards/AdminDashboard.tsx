@@ -55,14 +55,20 @@ export function AdminDashboard({ requests, users, currentUser, onSelect, onAssig
 
   const officers = users.filter(u => u.role === "officer" && u.active !== false);
 
-  // User management filter + search
+  // User management filter + search + sort (latest to earliest joined date)
   const filteredUsers = useMemo(() => {
     const q = userSearch.toLowerCase();
-    return users.filter(u => {
-      const matchQ = !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.department.toLowerCase().includes(q);
-      const matchR = userRoleFilter === "all" || u.role === userRoleFilter;
-      return matchQ && matchR;
-    });
+    return users
+      .filter(u => {
+        const matchQ = !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.department.toLowerCase().includes(q);
+        const matchR = userRoleFilter === "all" || u.role === userRoleFilter;
+        return matchQ && matchR;
+      })
+      .sort((a, b) => {
+        const timeA = a.joinedAt ? new Date(a.joinedAt).getTime() : 0;
+        const timeB = b.joinedAt ? new Date(b.joinedAt).getTime() : 0;
+        return timeB - timeA; // Descending: latest date to earliest date
+      });
   }, [users, userSearch, userRoleFilter]);
   const pagedUsers = filteredUsers.slice((userPage - 1) * userPerPage, userPage * userPerPage);
 

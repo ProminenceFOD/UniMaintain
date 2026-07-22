@@ -7,7 +7,7 @@ export async function getAllUsers(req: Request, res: Response): Promise<void> {
     const result = await pool.query(
       `SELECT id, name, email, role, department, active, created_at
        FROM users
-       ORDER BY role, name`
+       ORDER BY created_at DESC, id DESC`
     );
     res.json({ users: result.rows });
   } catch (err) {

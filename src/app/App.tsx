@@ -133,11 +133,14 @@ export default function App() {
     const rawName = String(r.submittedByName || "");
     const isNewestUser = rawEmail.includes("newest.user") || rawName.includes("Newest User") || String(r.submittedBy) === "4" || String(r.submittedBy) === "u10";
 
+    const rawStatus = (r.status as Status) || "pending";
+    const finalStatus = (r.assignedTo && rawStatus === "pending") ? "assigned" : rawStatus;
+
     return {
       id: r.id, title: r.title, description: r.description,
       category: (r.category as Category) || "other",
       priority: (r.priority as Priority) || "medium",
-      status: (r.status as Status) || "pending",
+      status: finalStatus,
       location: r.location, submittedBy: String(r.submittedBy),
       submittedByName: isNewestUser ? "Janet Folakemi" : (r.submittedByName || "Janet Folakemi"),
       submittedByEmail: isNewestUser ? "j.folakemi@university.edu" : (r.submittedByEmail || "j.folakemi@university.edu"),
@@ -550,7 +553,7 @@ export default function App() {
             timestamp: new Date().toISOString(),
           };
           const mergedAudit = (adapted.audit && adapted.audit.length > 0) ? adapted.audit : [...(r.audit || []), newEntry];
-          return { ...r, ...adapted, audit: mergedAudit };
+          return { ...r, ...adapted, status: "assigned" as Status, audit: mergedAudit };
         }));
         apiGetNotifications().then(res => {
           if (!currentUser) return;

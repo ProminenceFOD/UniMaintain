@@ -29,6 +29,9 @@ function formatRequest(row: Record<string, unknown>) {
   const rawName = String(row.submitted_by_name || "");
   const isNewestUser = rawEmail.includes("newest.user") || rawName.includes("Newest User") || String(row.submitted_by_id) === "4";
 
+  const rawStatus = String(row.status || "pending");
+  const finalStatus = (row.assigned_to_id && rawStatus === "pending") ? "assigned" : rawStatus;
+
   return {
     id:              row.id,
     title:           row.title,
@@ -36,7 +39,7 @@ function formatRequest(row: Record<string, unknown>) {
     category:        row.category,
     categoryName:    row.category_name,
     priority:        row.priority,
-    status:          row.status,
+    status:          finalStatus,
     location:        row.location,
     hasAttachment:   row.has_attachment,
     createdAt:       row.created_at,

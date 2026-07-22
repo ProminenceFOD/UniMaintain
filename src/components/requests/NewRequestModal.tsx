@@ -66,7 +66,8 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
           status: "pending", location: request.location,
           submittedBy: currentUser.id, submittedByName: currentUser.name, submittedByRole: currentUser.role,
           createdAt: request.createdAt, updatedAt: request.updatedAt,
-          hasAttachment: request.hasAttachment,
+          hasAttachment: request.hasAttachment || files.length > 0,
+          attachments: (request.attachments && request.attachments.length > 0) ? request.attachments : files,
           audit: [{ id: "init", action: "Request Submitted", performedByName: currentUser.name,
             details: "Submitted via portal.", timestamp: now }],
         });
@@ -232,7 +233,20 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
               onChange={e => {
                 const selected = Array.from(e.target.files ?? []);
                 setFileObjects(selected);
-                setFiles(selected.map(f => f.name));
+                setFiles([]);
+                selected.forEach(file => {
+                  if (file.type.startsWith("image/")) {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                      if (evt.target?.result) {
+                        setFiles(prev => [...prev, evt.target!.result as string]);
+                      }
+                    };
+                    reader.readAsDataURL(file);
+                  } else {
+                    setFiles(prev => [...prev, file.name]);
+                  }
+                });
               }}
             />
             {fileObjects.length > 0 && (

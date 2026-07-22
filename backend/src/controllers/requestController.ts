@@ -183,8 +183,11 @@ export async function getRequestById(req: Request, res: Response): Promise<void>
       [id]
     );
 
+    const baseUrl = process.env.API_URL || process.env.RENDER_EXTERNAL_URL || `${req.protocol}://${req.get("host")}`;
     const attachments = attachResult.rows.map((row: any) => 
-      `${req.protocol}://${req.get("host")}/uploads/${row.filename}`
+      row.filename.startsWith("http") || row.filename.startsWith("data:")
+        ? row.filename
+        : `${baseUrl}/uploads/${row.filename}`
     );
 
     res.json({
@@ -268,9 +271,18 @@ export async function createRequest(req: Request, res: Response): Promise<void> 
       [requestId]
     );
 
+    const baseUrl = process.env.API_URL || process.env.RENDER_EXTERNAL_URL || `${req.protocol}://${req.get("host")}`;
+    const attachRes = await pool.query("SELECT filename FROM attachments WHERE request_id = $1", [requestId]);
+    const attachments = attachRes.rows.map((a: any) =>
+      a.filename.startsWith("http") || a.filename.startsWith("data:")
+        ? a.filename
+        : `${baseUrl}/uploads/${a.filename}`
+    );
+
     const formatted = formatRequest(created.rows[0]);
-    emit(req, "request:new", formatted);
-    res.status(201).json({ request: formatted });
+    const responseRequest = { ...formatted, attachments };
+    emit(req, "request:new", responseRequest);
+    res.status(201).json({ request: responseRequest });
   } catch (err) {
     console.error("Create request error:", err);
     res.status(500).json({ error: "Failed to create request" });

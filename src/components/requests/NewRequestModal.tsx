@@ -71,7 +71,8 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
     try {
       const base64Attachments = await readFilesAsDataUrls(fileObjects);
 
-      if (apiMode) {
+      // 1. Always attempt live API backend creation first to persist in PostgreSQL database
+      try {
         const { request } = await apiCreateRequest({
           title: form.title, description: form.description,
           category: form.category as string, priority: form.priority,
@@ -94,19 +95,26 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
           audit: [{ id: "init", action: "Request Submitted", performedByName: currentUser.name,
             details: "Submitted via portal.", timestamp: now }],
         });
-      } else {
-        const now = new Date().toISOString();
-        onSubmit({
-          id: generateId(existingRequests), title: form.title, description: form.description,
-          category: form.category as Category, priority: form.priority,
-          status: "pending", location,
-          submittedBy: currentUser.id, submittedByName: currentUser.name, submittedByRole: currentUser.role,
-          createdAt: now, updatedAt: now, hasAttachment: base64Attachments.length > 0,
-          attachments: base64Attachments,
-          audit: [{ id: `init-${Date.now()}`, action: "Request Submitted", performedByName: currentUser.name,
-            details: `Submitted via portal${base64Attachments.length > 0 ? ` with ${base64Attachments.length} attachment(s)` : ""}.`, timestamp: now }],
-        });
+        onClose();
+        return;
+      } catch (apiErr: unknown) {
+        if (apiMode) {
+          throw apiErr;
+        }
       }
+
+      // 2. Fallback for offline demo mode
+      const now = new Date().toISOString();
+      onSubmit({
+        id: generateId(existingRequests), title: form.title, description: form.description,
+        category: form.category as Category, priority: form.priority,
+        status: "pending", location,
+        submittedBy: currentUser.id, submittedByName: currentUser.name, submittedByRole: currentUser.role,
+        createdAt: now, updatedAt: now, hasAttachment: base64Attachments.length > 0,
+        attachments: base64Attachments,
+        audit: [{ id: `init-${Date.now()}`, action: "Request Submitted", performedByName: currentUser.name,
+          details: `Submitted via portal${base64Attachments.length > 0 ? ` with ${base64Attachments.length} attachment(s)` : ""}.`, timestamp: now }],
+      });
       onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to submit request");

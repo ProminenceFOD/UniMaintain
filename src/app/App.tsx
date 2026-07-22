@@ -276,9 +276,11 @@ export default function App() {
       ]);
       const apiAdapted = reqRes.requests.map(adaptRequest);
       const { requests: localSaved } = loadDemoSession();
-      const apiIds = new Set(apiAdapted.map(r => r.id));
-      const extraLocal = localSaved.filter(r => !apiIds.has(r.id));
-      const combinedRequests = [...extraLocal, ...apiAdapted];
+      const existingIds = new Set(apiAdapted.map(r => r.id));
+      const extraLocal = localSaved.filter(r => !existingIds.has(r.id));
+      const currentList = [...extraLocal, ...apiAdapted];
+      const extraInitial = INITIAL_REQUESTS.filter(r => !currentList.some(c => c.id === r.id));
+      const combinedRequests = [...currentList, ...extraInitial];
       setRequests(combinedRequests);
       setNotifications(notifRes.notifications.map(n => ({
         id: String(n.id), userId,

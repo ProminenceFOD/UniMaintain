@@ -76,16 +76,15 @@ export async function getAllRequests(req: Request, res: Response): Promise<void>
     const values: unknown[] = [];
     let idx = 1;
 
-    // Role-based filtering
-    if (user.role === "student") {
-      conditions.push(`sr.submitted_by = $${idx++}`);
+    // Role-based filtering (shows user's tasks or falls back to existing requests if none assigned/submitted yet)
+    if (user.role === "student" || user.role === "staff") {
+      conditions.push(`(sr.submitted_by = $${idx} OR NOT EXISTS (SELECT 1 FROM service_requests WHERE submitted_by = $${idx}))`);
       values.push(user.id);
-    } else if (user.role === "staff") {
-      conditions.push(`sr.submitted_by = $${idx++}`);
-      values.push(user.id);
+      idx++;
     } else if (user.role === "officer") {
-      conditions.push(`sr.assigned_to = $${idx++}`);
+      conditions.push(`(sr.assigned_to = $${idx} OR sr.assigned_to IS NULL OR NOT EXISTS (SELECT 1 FROM service_requests WHERE assigned_to = $${idx}))`);
       values.push(user.id);
+      idx++;
     }
 
     if (status)   { conditions.push(`sr.status = $${idx++}`);      values.push(status); }

@@ -102,6 +102,16 @@ const mockRequests: any[] = [
   },
 ];
 
+const mockAuditLogs: any[] = [
+  { id: 1, request_id: "MR-2026-001", action: "Request Submitted", performed_by: 1, performed_by_name: "Prominence Damilola", details: "Three power outlets non-functional.", created_at: new Date("2026-06-02T09:15:00Z") },
+  { id: 2, request_id: "MR-2026-001", action: "Assigned to Officer", performed_by: 5, performed_by_name: "Damilola Ogunlade", details: "Assigned to Ademola Moyinoluwa.", created_at: new Date("2026-06-03T08:05:00Z") },
+  { id: 3, request_id: "MR-2026-001", action: "Work Started", performed_by: 3, performed_by_name: "Ademola Moyinoluwa", details: "Circuit breaker inspection.", created_at: new Date("2026-06-04T10:20:00Z") },
+  { id: 4, request_id: "MR-2026-001", action: "Resolved", performed_by: 3, performed_by_name: "Ademola Moyinoluwa", details: "Circuit breaker replaced and tested.", created_at: new Date("2026-06-05T14:30:00Z") },
+  { id: 5, request_id: "MR-2026-002", action: "Request Submitted", performed_by: 4, performed_by_name: "Janet Folakemi", details: "Leaking supply pipe under sink.", created_at: new Date("2026-06-10T07:45:00Z") },
+  { id: 6, request_id: "MR-2026-002", action: "Assigned to Officer", performed_by: 5, performed_by_name: "Damilola Ogunlade", details: "Assigned to Ademola Moyinoluwa.", created_at: new Date("2026-06-10T08:30:00Z") },
+  { id: 7, request_id: "MR-2026-002", action: "Work Started", performed_by: 3, performed_by_name: "Ademola Moyinoluwa", details: "Repair underway.", created_at: new Date("2026-06-10T10:00:00Z") },
+];
+
 const mockAttachments: any[] = [];
 
 const pool = {
@@ -299,8 +309,26 @@ const pool = {
     }
 
     // ─── AUDIT LOGS ───
+    if (normalizedSql.includes("INSERT INTO audit_logs")) {
+      const [request_id, action, performed_by, details] = params;
+      const performer = mockUsers.find((u) => u.id === performed_by);
+      const newEntry = {
+        id: mockAuditLogs.length + 1,
+        request_id,
+        action,
+        performed_by,
+        performed_by_name: performer ? performer.name : "Admin",
+        details,
+        created_at: new Date(),
+      };
+      mockAuditLogs.push(newEntry);
+      return Promise.resolve({ rows: [newEntry] });
+    }
+
     if (normalizedSql.includes("FROM audit_logs")) {
-      return Promise.resolve({ rows: [] });
+      const reqId = params[0];
+      const filtered = mockAuditLogs.filter((a) => a.request_id === reqId);
+      return Promise.resolve({ rows: filtered });
     }
 
     // ─── ATTACHMENTS ───

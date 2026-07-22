@@ -81,7 +81,8 @@ export function RegisterScreen({ onBack, onRegister, apiMode }: {
 
     setLoading(true); setError("");
     try {
-      if (apiMode) {
+      // 1. Attempt live API registration first to persist user in PostgreSQL database
+      try {
         const { token, user } = await apiRegister({ ...form, role: form.role as Role });
         saveToken(token);
         const normalizedRole = (user.role || form.role || "student").toLowerCase() as Role;
@@ -91,19 +92,25 @@ export function RegisterScreen({ onBack, onRegister, apiMode }: {
           joinedAt: user.created_at?.split("T")[0] ?? new Date().toISOString().split("T")[0],
           active: user.active ?? true,
         });
-      } else {
-        const normalizedRole = (form.role || "student").toLowerCase() as Role;
-        const newUser: User = {
-          id: `u${Date.now()}`,
-          name: form.name,
-          email: form.email,
-          role: normalizedRole,
-          department: form.department,
-          joinedAt: new Date().toISOString().split("T")[0],
-          active: true,
-        };
-        onRegister(newUser);
+        return;
+      } catch (apiErr: any) {
+        if (apiMode) {
+          throw apiErr;
+        }
       }
+
+      // 2. Fall back to demo mode session registration if backend is completely offline
+      const normalizedRole = (form.role || "student").toLowerCase() as Role;
+      const newUser: User = {
+        id: `u${Date.now()}`,
+        name: form.name,
+        email: form.email,
+        role: normalizedRole,
+        department: form.department,
+        joinedAt: new Date().toISOString().split("T")[0],
+        active: true,
+      };
+      onRegister(newUser);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally {

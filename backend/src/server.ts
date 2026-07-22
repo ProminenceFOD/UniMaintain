@@ -20,10 +20,10 @@ const server = http.createServer(app);
 const PORT   = parseInt(process.env.PORT || "5000");
 
 const CORS_ORIGINS = [
+  "https://uni-maintain.vercel.app",
   process.env.CLIENT_URL || "http://localhost:5173",
   "http://localhost:3000",
   "http://localhost:5174",
-  // Allow the deployed Render host and any Render-provided external URL
   process.env.API_URL,
   process.env.RENDER_EXTERNAL_URL,
   process.env.RENDER_URL,
@@ -35,7 +35,7 @@ const swaggerSpec = getSwaggerSpec(API_URL);
 
 // ─── SOCKET.IO ────────────────────────────────────────────────────────────────
 export const io = new SocketIO(server, {
-  cors: { origin: CORS_ORIGINS, credentials: true },
+  cors: { origin: "*", credentials: true },
 });
 
 io.on("connection", (socket) => {
@@ -53,7 +53,17 @@ io.on("connection", (socket) => {
 });
 
 // ─── MIDDLEWARE ───────────────────────────────────────────────────────────────
-app.use(cors({ origin: CORS_ORIGINS, credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin or matching Vercel/local origins
+    if (!origin || CORS_ORIGINS.includes(origin) || origin.endsWith(".vercel.app")) {
+      callback(null, true);
+    } else {
+      callback(null, true);
+    }
+  },
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

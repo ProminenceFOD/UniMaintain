@@ -149,38 +149,62 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 
 async function syncDatabaseSeed() {
   try {
-    console.log("🔄 Syncing database request submitted_by foreign keys...");
+    console.log("🔄 Syncing full 15 service requests into PostgreSQL database...");
 
-    // Find student & staff IDs in database
-    const studentRes = await pool.query(
-      "SELECT id, email, name FROM users WHERE role = 'student' ORDER BY id ASC"
-    );
-    const staffRes = await pool.query(
-      "SELECT id, email, name FROM users WHERE role = 'staff' ORDER BY id ASC"
-    );
+    const studentRes = await pool.query("SELECT id, email, name FROM users WHERE role = 'student' ORDER BY id ASC");
+    const staffRes   = await pool.query("SELECT id, email, name FROM users WHERE role = 'staff' ORDER BY id ASC");
+    const officerRes = await pool.query("SELECT id, email, name FROM users WHERE role = 'officer' ORDER BY id ASC");
 
     if (studentRes.rows && studentRes.rows.length > 0) {
       const students = studentRes.rows;
-      const staff = (staffRes.rows && staffRes.rows.length > 0) ? staffRes.rows[0].id : students[0].id;
+      const staff    = (staffRes.rows && staffRes.rows.length > 0) ? staffRes.rows[0].id : students[0].id;
+      const officers = (officerRes.rows && officerRes.rows.length > 0) ? officerRes.rows : [];
+
       const s1 = students[0]?.id; // Prominence Damilola
       const s2 = students[1]?.id || s1; // Marcus Johnson
       const s3 = students[2]?.id || s1; // Priya Patel
       const s4 = students[3]?.id || s1; // Aiden Walsh
 
-      // Update service_requests table so student tickets point to actual student user IDs in database
-      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-001', 'MR-2026-004', 'MR-2026-013')", [s1]);
-      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-002', 'MR-2026-006', 'MR-2026-009', 'MR-2026-014')", [s2]);
-      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-003', 'MR-2026-007', 'MR-2026-010')", [s3]);
-      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-005', 'MR-2026-008')", [s4]);
-      await pool.query("UPDATE service_requests SET submitted_by = $1 WHERE id IN ('MR-2026-011', 'MR-2026-012', 'MR-2026-015')", [staff]);
+      const o1 = officers[0]?.id || null; // Ademola Moyinoluwa
+      const o2 = officers[1]?.id || null; // Diana Osei
+      const o3 = officers[2]?.id || null; // Tom Brennan
 
-      // Global safety fallback: reassign any admin or officer submitted_by requests to student Prominence Damilola
-      await pool.query(
-        "UPDATE service_requests SET submitted_by = $1 WHERE submitted_by IN (SELECT id FROM users WHERE role IN ('admin', 'officer'))",
-        [s1]
-      );
+      const requestsData = [
+        ['MR-2026-001', 'Flickering and failed lights — Block C Corridor', 'Fluorescent lights in main corridor flickering.', 1, 'medium', 'closed', 'Block C — Main Corridor', s2, o1, false, '2026-06-01 16:00:00', '2026-06-04 12:00:00', '2026-06-03 15:00:00'],
+        ['MR-2026-002', 'Power outlets non-functional in Computer Lab 3', 'Three power outlets on east wall non-functional.', 1, 'high', 'resolved', 'Engineering Block A — Lab 304', s1, o1, true, '2026-06-02 09:15:00', '2026-06-04 14:30:00', '2026-06-04 14:30:00'],
+        ['MR-2026-003', 'Blocked drains — Science Block Women Restroom', 'All 3 sinks in womens restroom blocked.', 2, 'medium', 'resolved', 'Science Block — Floor 2, Womens Restroom', s3, o2, false, '2026-06-05 10:00:00', '2026-06-07 14:00:00', '2026-06-07 14:00:00'],
+        ['MR-2026-004', 'Projector lamp end-of-life — Tutorial Room 12', 'Projector displays lamp warning and dim image.', 6, 'medium', 'assigned', 'Engineering Block B — Tutorial Room 12', s4, o3, false, '2026-06-09 13:00:00', '2026-06-10 09:00:00', null],
+        ['MR-2026-005', 'Broken chair and damaged tables — Seminar Room 5', 'Broken chair leg and damaged table surfaces.', 3, 'medium', 'assigned', 'Humanities Block — Seminar Room 5', s3, o3, true, '2026-06-12 14:20:00', '2026-06-13 09:00:00', null],
+        ['MR-2026-006', 'Cracked window pane — Seminar Room 2', 'Large crack in lower pane of window.', 6, 'high', 'in_progress', 'Humanities Block — Seminar Room 2', s3, o3, true, '2026-06-14 09:00:00', '2026-06-16 11:00:00', null],
+        ['MR-2026-007', 'Leaking supply pipe under sink — Block B Restroom', 'Persistent leak under sink #2 creating slip hazard.', 2, 'urgent', 'in_progress', 'Block B — Ground Floor, Male Restroom', s2, o2, false, '2026-06-17 07:45:00', '2026-06-17 10:00:00', null],
+        ['MR-2026-008', 'Poor ventilation — Staff Office Block 2, Floor 3', 'Inadequate airflow in staff offices for past week.', 5, 'medium', 'pending', 'Office Block 2 — Floor 3, Staff Offices', staff, null, false, '2026-06-18 09:15:00', '2026-06-18 09:15:00', null],
+        ['MR-2026-009', 'Faulty light switch — Faculty of Sciences Meeting Room', 'Light switch sparking when toggled.', 1, 'high', 'assigned', 'Faculty of Sciences Block — Meeting Room 204', staff, o1, false, '2026-06-18 15:30:00', '2026-06-18 16:00:00', null],
+        ['MR-2026-010', 'Broken window blind — Faculty of Sciences Staff Office', 'Window blind cord snapped, stuck open.', 3, 'low', 'assigned', 'Faculty of Sciences Block — Staff Office 312, Floor 3', staff, o3, false, '2026-06-19 07:00:00', '2026-06-19 08:00:00', null],
+        ['MR-2026-011', 'HVAC not cooling — Lecture Hall A', 'Air conditioning system running but not cooling.', 5, 'high', 'pending', 'Main Building — Lecture Hall A', s4, null, false, '2026-06-19 08:30:00', '2026-06-19 08:30:00', null],
+        ['MR-2026-012', 'Damaged floor tiles creating trip hazard — Faculty Corridor', 'Cracked and raised floor tiles in corridor.', 6, 'high', 'resolved', 'Faculty of Sciences Block — Main Corridor, Floor 2', staff, o3, true, '2026-06-19 10:00:00', '2026-06-19 14:30:00', '2026-06-19 14:30:00'],
+        ['MR-2026-013', 'Wi-Fi access point offline — Library Level 2', 'Wi-Fi AP-LIB-L2-03 offline for 2 days.', 4, 'high', 'pending', 'Main Library — Level 2', s1, null, false, '2026-06-19 11:00:00', '2026-06-19 11:00:00', null],
+        ['MR-2026-014', 'Ethernet ports dead — Library Study Pod 4', 'All ethernet wall ports in Study Pod 4 dead.', 4, 'low', 'pending', 'Main Library — Study Pod 4', s2, null, false, '2026-06-19 14:00:00', '2026-06-19 14:00:00', null],
+        ['MR-2026-015', 'Ceiling fan making loud grinding noise — Staff Office 204', 'Ceiling fan producing loud grinding noise.', 5, 'medium', 'pending', 'Faculty of Sciences Block — Staff Office 204', staff, null, false, '2026-06-19 16:00:00', '2026-06-19 16:00:00', null],
+      ];
 
-      console.log("✅ Database request submitted_by foreign keys updated successfully!");
+      for (const item of requestsData) {
+        await pool.query(
+          `INSERT INTO service_requests
+           (id, title, description, category_id, priority, status, location, submitted_by, assigned_to, has_attachment, created_at, updated_at, resolved_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+           ON CONFLICT (id) DO UPDATE SET
+             submitted_by = EXCLUDED.submitted_by,
+             title = EXCLUDED.title,
+             description = EXCLUDED.description,
+             category_id = EXCLUDED.category_id,
+             priority = EXCLUDED.priority,
+             status = EXCLUDED.status,
+             location = EXCLUDED.location`,
+          item
+        );
+      }
+
+      console.log("✅ All 15 service requests synced to PostgreSQL database successfully!");
     }
   } catch (err: any) {
     console.warn("Database seed sync warning:", err.message);

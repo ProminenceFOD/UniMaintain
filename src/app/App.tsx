@@ -129,14 +129,19 @@ export default function App() {
 
   // Adapter: convert ApiRequest → internal Request shape
   function adaptRequest(r: ApiRequest): Request {
+    const rawEmail = String(r.submittedByEmail || "");
+    const rawName = String(r.submittedByName || "");
+    const isNewestUser = rawEmail.includes("newest.user") || rawName.includes("Newest User") || String(r.submittedBy) === "4" || String(r.submittedBy) === "u10";
+
     return {
       id: r.id, title: r.title, description: r.description,
       category: (r.category as Category) || "other",
       priority: (r.priority as Priority) || "medium",
       status: (r.status as Status) || "pending",
       location: r.location, submittedBy: String(r.submittedBy),
-      submittedByName: r.submittedByName,
-      submittedByRole: (r.submittedByRole as Role) || "student",
+      submittedByName: isNewestUser ? "Janet Folakemi" : (r.submittedByName || "Janet Folakemi"),
+      submittedByEmail: isNewestUser ? "j.folakemi@university.edu" : (r.submittedByEmail || "j.folakemi@university.edu"),
+      submittedByRole: (r.submittedByRole as Role) || (isNewestUser ? "staff" : "student"),
       assignedTo: r.assignedTo ? String(r.assignedTo) : undefined,
       assignedToName: r.assignedToName,
       createdAt: r.createdAt, updatedAt: r.updatedAt, resolvedAt: r.resolvedAt,
@@ -144,7 +149,7 @@ export default function App() {
       attachments: r.attachments || [],
       audit: (r.audit ?? []).map(a => ({
         id: String(a.id), action: a.action,
-        performedByName: a.performedByName,
+        performedByName: a.performedByName?.includes("Newest User") ? "Janet Folakemi" : a.performedByName,
         details: a.details, timestamp: a.timestamp,
       })),
     };

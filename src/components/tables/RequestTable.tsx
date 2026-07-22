@@ -70,22 +70,60 @@ export function RequestTable({ requests, onSelect, showAssign, officers, onAssig
               </td>
               {!hideRequester && (
                 <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <Avatar name={r.submittedByName} size="sm" />
-                    <div className="min-w-0">
-                      <div className="text-xs font-medium text-foreground truncate">{r.submittedByName}</div>
-                      <div className="text-xs text-muted-foreground truncate max-w-[140px]" style={{ fontFamily: "var(--font-mono)" }}>
-                        {(users ?? USERS).find(u => u.id === r.submittedBy)?.email ?? ""}
+                  {(() => {
+                    const findUser = (subBy?: string, subName?: string, usersList: User[] = []): User | undefined => {
+                      if (!subBy && !subName) return undefined;
+                      const targetId = String(subBy || "").toLowerCase();
+                      const targetName = (subName || "").toLowerCase();
+
+                      return usersList.find(u => {
+                        const uid = String(u.id).toLowerCase();
+                        const uname = u.name.toLowerCase();
+
+                        const matchId = uid === targetId || uid === `u${targetId}` || targetId === `u${uid}`;
+                        const matchName = Boolean(targetName && uname && (targetName.includes(uname) || uname.includes(targetName)));
+
+                        return matchId || matchName;
+                      });
+                    };
+
+                    const matchedUser = findUser(r.submittedBy, r.submittedByName, users ?? USERS) ?? findUser(r.submittedBy, r.submittedByName, USERS);
+                    const email = matchedUser?.email ?? "";
+                    return (
+                      <div className="flex items-center gap-2">
+                        <Avatar name={r.submittedByName} size="sm" />
+                        <div className="min-w-0">
+                          <div className="text-xs font-medium text-foreground truncate">{r.submittedByName}</div>
+                          <div className="text-xs text-muted-foreground truncate max-w-[140px]" style={{ fontFamily: "var(--font-mono)" }}>
+                            {email}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    );
+                  })()}
                 </td>
               )}
               {!hideRequester && (
                 <td className="px-4 py-3 whitespace-nowrap">
                   {(() => {
-                    const role = r.submittedByRole ?? users?.find(u => u.id === r.submittedBy)?.role ?? USERS.find(u => u.id === r.submittedBy)?.role;
-                    if (!role) return null;
+                    const findUser = (subBy?: string, subName?: string, usersList: User[] = []): User | undefined => {
+                      if (!subBy && !subName) return undefined;
+                      const targetId = String(subBy || "").toLowerCase();
+                      const targetName = (subName || "").toLowerCase();
+
+                      return usersList.find(u => {
+                        const uid = String(u.id).toLowerCase();
+                        const uname = u.name.toLowerCase();
+
+                        const matchId = uid === targetId || uid === `u${targetId}` || targetId === `u${uid}`;
+                        const matchName = Boolean(targetName && uname && (targetName.includes(uname) || uname.includes(targetName)));
+
+                        return matchId || matchName;
+                      });
+                    };
+
+                    const matchedUser = findUser(r.submittedBy, r.submittedByName, users ?? USERS) ?? findUser(r.submittedBy, r.submittedByName, USERS);
+                    const role = r.submittedByRole ?? matchedUser?.role ?? "student";
                     return (
                       <span className={`text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded ${
                         role === "staff"   ? "bg-blue-50 text-blue-800" :

@@ -28,9 +28,9 @@ import {
 } from "recharts";
 
 
-import type { CatConfig } from "../../lib/constants";
+import { INITIAL_REQUESTS } from "../../data/mockData";
 
-export function AdminDashboard({ requests, users, currentUser, onSelect, onAssign, onStatusUpdate, onToggleUser, onInviteUser, onEditUser, activeTab, globalSearch }: {
+export function AdminDashboard({ requests: rawRequests, users, currentUser, onSelect, onAssign, onStatusUpdate, onToggleUser, onInviteUser, onEditUser, activeTab, globalSearch }: {
   requests: Request[]; users: User[]; currentUser: User; onSelect: (r: Request) => void;
   onAssign: (requestId: string, officerId: string) => void;
   onStatusUpdate: (id: string, status: Status, note: string) => void;
@@ -40,6 +40,7 @@ export function AdminDashboard({ requests, users, currentUser, onSelect, onAssig
   activeTab: string;
   globalSearch: string;
 }) {
+  const requests = (rawRequests && rawRequests.length > 0) ? rawRequests : INITIAL_REQUESTS;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");

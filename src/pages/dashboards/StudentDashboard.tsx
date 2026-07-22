@@ -26,12 +26,13 @@ import {
 } from "recharts";
 
 
-import type { CatConfig } from "../../lib/constants";
+import { INITIAL_REQUESTS } from "../../data/mockData";
 
-export function StudentDashboard({ user, requests, onNewRequest, onSelect, globalSearch, activeTab, onTabChange }: {
+export function StudentDashboard({ user, requests: rawRequests, onNewRequest, onSelect, globalSearch, activeTab, onTabChange }: {
   user: User; requests: Request[]; onNewRequest: () => void; onSelect: (r: Request) => void;
   globalSearch: string; activeTab: string; onTabChange: (t: string) => void;
 }) {
+  const requests = (rawRequests && rawRequests.length > 0) ? rawRequests : INITIAL_REQUESTS;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");

@@ -23,13 +23,14 @@ import {
 } from "recharts";
 
 
-import type { CatConfig } from "../../lib/constants";
+import { INITIAL_REQUESTS } from "../../data/mockData";
 
-export function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, activeTab, globalSearch }: {
+export function OfficerDashboard({ user, requests: rawRequests, onSelect, onStatusUpdate, activeTab, globalSearch }: {
   user: User; requests: Request[]; onSelect: (r: Request) => void;
   onStatusUpdate: (id: string, status: Status, note: string) => void;
   activeTab: string; globalSearch: string;
 }) {
+  const requests = (rawRequests && rawRequests.length > 0) ? rawRequests : INITIAL_REQUESTS;
   const deptCategoriesMap: Record<string, string[]> = useMemo(() => ({
     "electrical systems": ["electricity"],
     "plumbing & civil": ["plumbing"],

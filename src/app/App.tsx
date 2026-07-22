@@ -131,6 +131,7 @@ export default function App() {
       status: (r.status as Status) || "pending",
       location: r.location, submittedBy: String(r.submittedBy),
       submittedByName: r.submittedByName,
+      submittedByRole: (r.submittedByRole as Role) || "student",
       assignedTo: r.assignedTo ? String(r.assignedTo) : undefined,
       assignedToName: r.assignedToName,
       createdAt: r.createdAt, updatedAt: r.updatedAt, resolvedAt: r.resolvedAt,

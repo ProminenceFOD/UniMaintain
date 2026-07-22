@@ -167,6 +167,7 @@ const pool = {
         submitted_by_id: submitted_by,
         submitted_by_name: creator ? creator.name : "Test User",
         submitted_by_email: creator ? creator.email : "test@test.com",
+        submitted_by_role: creator ? creator.role : "student",
         assigned_to_id: null,
         assigned_to_name: null,
         has_attachment: !!has_attachment,

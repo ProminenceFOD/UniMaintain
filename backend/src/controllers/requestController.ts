@@ -13,7 +13,7 @@ const REQUEST_FIELDS = `
   sr.id, sr.title, sr.description, sr.priority, sr.status, sr.location,
   sr.has_attachment, sr.created_at, sr.updated_at, sr.resolved_at,
   c.slug AS category, c.name AS category_name,
-  u.id AS submitted_by_id, u.name AS submitted_by_name,
+  u.id AS submitted_by_id, u.name AS submitted_by_name, u.role AS submitted_by_role, u.email AS submitted_by_email,
   o.id AS assigned_to_id, o.name AS assigned_to_name
 `;
 
@@ -40,6 +40,8 @@ function formatRequest(row: Record<string, unknown>) {
     resolvedAt:      row.resolved_at,
     submittedBy:     row.submitted_by_id,
     submittedByName: row.submitted_by_name,
+    submittedByRole: row.submitted_by_role,
+    submittedByEmail:row.submitted_by_email,
     assignedTo:      row.assigned_to_id,
     assignedToName:  row.assigned_to_name,
   };

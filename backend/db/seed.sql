@@ -31,52 +31,52 @@ INSERT INTO users (name, email, password, role, department, created_at) VALUES
 INSERT INTO service_requests (id, title, description, category_id, priority, status, location, submitted_by, assigned_to, has_attachment, created_at, updated_at, resolved_at) VALUES
   ('MR-2026-001', 'Power outlets non-functional in Computer Lab 3',
    'Three power outlets on the east wall of Computer Lab 3 have been non-functional since Monday, affecting students during scheduled lab sessions.',
-   1, 'high', 'resolved', 'Engineering Block A — Lab 304', 1, 5, TRUE,
+   1, 'high', 'resolved', 'Engineering Block A — Lab 304', 6, 3, TRUE,
    '2026-06-02 09:15:00', '2026-06-05 14:30:00', '2026-06-05 14:30:00'),
 
   ('MR-2026-002', 'Leaking supply pipe under sink — Block B Restroom',
    'A persistent leak from the main supply pipe under sink #2 in the ground-floor male restroom. Water is pooling, creating a slip hazard.',
-   2, 'urgent', 'in_progress', 'Block B — Ground Floor, Male Restroom', 2, 6, FALSE,
+   2, 'urgent', 'in_progress', 'Block B — Ground Floor, Male Restroom', 7, 4, FALSE,
    '2026-06-10 07:45:00', '2026-06-10 10:00:00', NULL),
 
   ('MR-2026-003', 'Broken chair and damaged tables — Seminar Room 5',
    'One chair has a completely broken leg and two tables have severely damaged surfaces. Safety concern for students using this room.',
-   3, 'medium', 'assigned', 'Humanities Block — Seminar Room 5', 3, 7, TRUE,
+   3, 'medium', 'assigned', 'Humanities Block — Seminar Room 5', 8, 5, TRUE,
    '2026-06-04 14:20:00', '2026-06-05 09:00:00', NULL),
 
   ('MR-2026-004', 'Wi-Fi access point offline — Library Level 2',
    'The Wi-Fi access point covering Level 2 of the Main Library (AP-LIB-L2-03) has been offline for 2 days.',
-   4, 'high', 'pending', 'Main Library — Level 2', 1, NULL, FALSE,
+   4, 'high', 'pending', 'Main Library — Level 2', 6, NULL, FALSE,
    '2026-06-19 11:00:00', '2026-06-19 11:00:00', NULL),
 
   ('MR-2026-005', 'HVAC not cooling — Lecture Hall A',
    'Air conditioning system is running but not cooling. Room temperature exceeds 28°C with 150+ students present.',
-   5, 'high', 'pending', 'Main Building — Lecture Hall A', 4, NULL, FALSE,
+   5, 'high', 'pending', 'Main Building — Lecture Hall A', 9, NULL, FALSE,
    '2026-06-19 08:30:00', '2026-06-19 08:30:00', NULL),
 
   ('MR-2026-006', 'Flickering and failed lights — Block C Corridor',
    'Fluorescent lights in the main corridor have been flickering for a week. Three fixtures have gone completely dark.',
-   1, 'medium', 'closed', 'Block C — Main Corridor', 2, 5, FALSE,
+   1, 'medium', 'closed', 'Block C — Main Corridor', 7, 3, FALSE,
    '2026-06-08 16:00:00', '2026-06-14 12:00:00', '2026-06-13 15:00:00'),
 
   ('MR-2026-007', 'Blocked drains — Science Block Women''s Restroom',
    'All 3 sinks in the women''s restroom on Floor 2 have severely blocked drains, causing water to back up.',
-   2, 'medium', 'resolved', 'Science Block — Floor 2, Women''s Restroom', 3, 6, FALSE,
+   2, 'medium', 'resolved', 'Science Block — Floor 2, Women''s Restroom', 8, 4, FALSE,
    '2026-06-14 10:00:00', '2026-06-02 14:00:00', '2026-06-02 14:00:00'),
 
   ('MR-2026-008', 'Projector lamp end-of-life — Tutorial Room 12',
    'Projector displays a lamp warning and produces a dim, unusable image. Lamp requires replacement.',
-   6, 'medium', 'assigned', 'Engineering Block B — Tutorial Room 12', 4, 7, FALSE,
+   6, 'medium', 'assigned', 'Engineering Block B — Tutorial Room 12', 9, 5, FALSE,
    '2026-06-05 13:00:00', '2026-06-10 09:00:00', NULL),
 
   ('MR-2026-009', 'Ethernet ports dead — Library Study Pod 4',
    'All ethernet wall ports in Study Pod 4 are providing no connectivity.',
-   4, 'low', 'pending', 'Main Library — Study Pod 4', 2, NULL, FALSE,
+   4, 'low', 'pending', 'Main Library — Study Pod 4', 7, NULL, FALSE,
    '2026-06-19 14:00:00', '2026-06-19 14:00:00', NULL),
 
   ('MR-2026-010', 'Cracked window pane — Seminar Room 2',
    'The large south-facing window has a significant crack. Safety hazard during windy conditions.',
-   6, 'high', 'in_progress', 'Humanities Block — Seminar Room 2', 3, 7, TRUE,
+   6, 'high', 'in_progress', 'Humanities Block — Seminar Room 2', 8, 5, TRUE,
    '2026-06-03 09:00:00', '2026-06-05 11:00:00', NULL);
 
 -- ─── AUDIT LOGS ───────────────────────────────────────────────────────────────

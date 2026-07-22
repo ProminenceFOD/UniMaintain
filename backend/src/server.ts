@@ -70,12 +70,17 @@ app.use("/uploads", (req, res, next) => {
   res.header("Cross-Origin-Resource-Policy", "cross-origin");
   next();
 }, express.static(uploadsDir), (_req, res) => {
-  const fallbackPath = path.join(uploadsDir, "images.jpeg");
-  if (require("fs").existsSync(fallbackPath)) {
-    res.sendFile(fallbackPath);
-  } else {
-    res.status(404).json({ error: "Attachment file not found" });
-  }
+  // If physical file isn't on disk (e.g. ephemeral cloud storage), serve a clean SVG image placeholder
+  const svgPlaceholder = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" fill="none">
+    <rect width="800" height="600" fill="#0F172A"/>
+    <rect x="200" y="140" width="400" height="280" rx="16" fill="#1E293B" stroke="#334155" stroke-width="4"/>
+    <circle cx="400" cy="240" r="48" fill="#10B981" opacity="0.8"/>
+    <path d="M260 360 L340 270 L400 320 L480 240 L540 360 Z" fill="#34D399" opacity="0.6"/>
+    <text x="400" y="470" text-anchor="middle" fill="#94A3B8" font-family="system-ui, sans-serif" font-size="22" font-weight="600">UniMaintain Ticket Attachment</text>
+    <text x="400" y="505" text-anchor="middle" fill="#64748B" font-family="system-ui, sans-serif" font-size="14">Sample Image Preview</text>
+  </svg>`;
+
+  res.type("image/svg+xml").send(svgPlaceholder);
 });
 
 // ─── API DOCUMENTATION ────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import { AlertCircle, Info } from "lucide-react";
+import { Zap, Droplets, Wind, Wifi, Armchair, Sparkles, HelpCircle, Layers } from "lucide-react";
 
 import type { Status, Priority, Category, CategoryItem } from "../types";
 
@@ -22,15 +22,15 @@ export const PRIORITY_CONFIG: Record<Priority, { label: string; color: string }>
 
 export type CatConfig = { label: string; icon: React.ReactNode };
 export const CATEGORY_CONFIG: Record<string, CatConfig> & Record<Category, CatConfig> = {
-  electricity: { label: "Electricity", icon: <AlertCircle className="w-4 h-4" /> },
-  electrical:  { label: "Electricity", icon: <AlertCircle className="w-4 h-4" /> },
-  plumbing:    { label: "Plumbing",    icon: <AlertCircle className="w-4 h-4" /> },
-  hvac:        { label: "HVAC",        icon: <AlertCircle className="w-4 h-4" /> },
-  internet:    { label: "Internet",    icon: <Info className="w-4 h-4" /> },
-  furniture:   { label: "Furniture",   icon: <Info className="w-4 h-4" /> },
-  cleaning:    { label: "Cleaning",    icon: <Info className="w-4 h-4" /> },
-  other:       { label: "Other",       icon: <Info className="w-4 h-4" /> },
-  general:     { label: "General",     icon: <Info className="w-4 h-4" /> },
+  electricity: { label: "Electricity", icon: <Zap className="w-4 h-4 text-amber-500" /> },
+  electrical:  { label: "Electricity", icon: <Zap className="w-4 h-4 text-amber-500" /> },
+  plumbing:    { label: "Plumbing",    icon: <Droplets className="w-4 h-4 text-blue-500" /> },
+  hvac:        { label: "HVAC",        icon: <Wind className="w-4 h-4 text-cyan-500" /> },
+  internet:    { label: "Internet",    icon: <Wifi className="w-4 h-4 text-indigo-500" /> },
+  furniture:   { label: "Furniture",   icon: <Armchair className="w-4 h-4 text-orange-500" /> },
+  cleaning:    { label: "Cleaning",    icon: <Sparkles className="w-4 h-4 text-purple-500" /> },
+  other:       { label: "Other",       icon: <HelpCircle className="w-4 h-4 text-slate-500" /> },
+  general:     { label: "General",     icon: <Layers className="w-4 h-4 text-slate-500" /> },
 };
 
 export const SETTINGS_KEY = "unimaintain_site_settings";

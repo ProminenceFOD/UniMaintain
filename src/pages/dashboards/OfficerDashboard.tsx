@@ -106,7 +106,7 @@ export function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, act
           <>
             {/* Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <StatCard label="Awaiting Start"  value={assigned.filter(r => r.status === "assigned").length}   icon={<Clock size={18} />} />
+              <StatCard label="Awaiting Start"  value={assigned.filter(r => ["pending", "assigned"].includes(r.status)).length}   icon={<Clock size={18} />} />
               <StatCard label="In Progress"     value={assigned.filter(r => r.status === "in_progress").length} icon={<RefreshCw size={18} />} accent />
               <StatCard label="Completed Today" value={completedToday}                                          icon={<CheckCircle size={18} />} />
               <StatCard label="Total Completed" value={completed.length}                                        icon={<CheckCheck size={18} />} />
@@ -195,7 +195,7 @@ export function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, act
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Work Summary</h3>
                   <div className="space-y-2">
                     {[
-                      { label: "Awaiting start", value: assigned.filter(r => r.status === "assigned").length, color: "text-amber-600" },
+                      { label: "Awaiting start", value: assigned.filter(r => ["pending", "assigned"].includes(r.status)).length, color: "text-amber-600" },
                       { label: "In progress",    value: assigned.filter(r => r.status === "in_progress").length, color: "text-violet-600" },
                       { label: "Resolved total", value: completed.filter(r => r.status === "resolved").length, color: "text-emerald-600" },
                       { label: "Closed total",   value: completed.filter(r => r.status === "closed").length, color: "text-gray-500" },

@@ -1,10 +1,7 @@
-import { apiCreateRequest } from "../../lib/api";
+import { apiCreateRequest, apiLogin, saveToken } from "../../lib/api";
 import { STATUS_CONFIG, PRIORITY_CONFIG, CATEGORY_CONFIG, DEFAULT_CATEGORIES, CATEGORIES_KEY } from "../../lib/constants";
 import { generateId } from "../../lib/utils";
 import { Bell, Search, LogOut, Plus, Download, X, Menu, UserPlus, EyeOff, CheckCircle, Clock, AlertTriangle, AlertCircle, BarChart2, Eye, FileText, Shield, MapPin, Paperclip, ChevronDown, ChevronLeft, ChevronRight, Send, Filter, Check, RefreshCw, Layers, TrendingUp, Settings, MessageSquare, Calendar, Key, Trash2, Edit, Hash, PieChart, MoreVertical, User as UserIcon, Info, Mail } from "lucide-react";
-
-
-
 
 import type { Role, Status, Priority, Category, User, AuditEntry, Request, Notification, Comment } from "../../types";
 
@@ -19,16 +16,12 @@ import {
 
 import type { CatConfig } from "../../lib/constants";
 
-export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, existingRequests }: {
-  currentUser: User; onClose: () => void;
-  onSubmit: (req: Request) => void;
+export function NewRequestModal({ currentUser, existingRequests, onClose, onSubmit, apiMode }: {
+  currentUser: User; existingRequests: Request[];
+  onClose: () => void; onSubmit: (request: Request) => void;
   apiMode: boolean;
-  existingRequests: Request[];
 }) {
-  const [form, setForm] = useState({
-    title: "", description: "", category: "" as string,
-    priority: "medium" as Priority, building: "", room: "",
-  });
+  const [form, setForm] = useState({ title: "", category: "hvac" as Category | "", priority: "medium" as Priority, building: "", room: "", description: "" });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const fileRef = useRef<HTMLInputElement>(null);
   const [fileObjects, setFileObjects] = useState<File[]>([]);
@@ -45,11 +38,11 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
   async function readFilesAsDataUrls(fileList: File[]): Promise<string[]> {
     return Promise.all(
       fileList.map(file => {
-        return new Promise<string>((resolve) => {
+        return new Promise<string>((resolve, reject) => {
           if (file.type.startsWith("image/")) {
             const reader = new FileReader();
             reader.onload = (evt) => resolve((evt.target?.result as string) || file.name);
-            reader.onerror = () => resolve(file.name);
+            reader.onerror = () => reject(new Error(`Failed to read file ${file.name}`));
             reader.readAsDataURL(file);
           } else {
             resolve(file.name);
@@ -73,6 +66,13 @@ export function NewRequestModal({ currentUser, onClose, onSubmit, apiMode, exist
 
       // 1. Always attempt live API backend creation first to persist in PostgreSQL database
       try {
+        if (!localStorage.getItem("unimaintain_token")) {
+          try {
+            const { token } = await apiLogin({ email: currentUser.email, password: "password" });
+            saveToken(token);
+          } catch { /* proceed */ }
+        }
+
         const { request } = await apiCreateRequest({
           title: form.title, description: form.description,
           category: form.category as string, priority: form.priority,

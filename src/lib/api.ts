@@ -17,15 +17,21 @@ function getApiBaseUrl(): string {
 }
 
 function getToken(): string | null {
-  return localStorage.getItem("unimaintain_token");
+  try {
+    return localStorage.getItem("unimaintain_token") || sessionStorage.getItem("unimaintain_token");
+  } catch {
+    return null;
+  }
 }
 
 export function saveToken(token: string): void {
-  localStorage.setItem("unimaintain_token", token);
+  try { localStorage.setItem("unimaintain_token", token); } catch { /* quota */ }
+  try { sessionStorage.setItem("unimaintain_token", token); } catch { /* quota */ }
 }
 
 export function clearToken(): void {
-  localStorage.removeItem("unimaintain_token");
+  try { localStorage.removeItem("unimaintain_token"); } catch { /* quota */ }
+  try { sessionStorage.removeItem("unimaintain_token"); } catch { /* quota */ }
 }
 
 // Core fetch wrapper — attaches JWT, handles errors uniformly

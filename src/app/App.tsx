@@ -201,7 +201,7 @@ export default function App() {
     async function checkSession() {
       // Automatic versioned cache buster to purge stale localStorage cache across deployments
       try {
-        const CACHE_VERSION = "unimaintain_v2026_07_23_v1";
+        const CACHE_VERSION = "unimaintain_v2026_07_23_v3";
         if (!localStorage.getItem(CACHE_VERSION)) {
           clearAllDemoData();
           localStorage.setItem(CACHE_VERSION, "true");
@@ -256,7 +256,10 @@ export default function App() {
           // 3. Restore demo session from localStorage
           const { user: demoUser, requests: demoRequests, users: demoUsers, notifications: demoNotifs } = loadDemoSession();
           if (demoUser) {
-            const mergedUsers   = USERS.map(base => demoUsers.find(u => u.id === base.id) ?? base);
+            const mergedUsers = USERS.map(base => {
+              const custom = demoUsers.find(u => u.id === base.id);
+              return custom ? { ...custom, name: base.name, email: base.email } : base;
+            });
             const extraUsers    = demoUsers.filter(u => !USERS.find(b => b.id === u.id));
             const restoredUsers = [...mergedUsers, ...extraUsers];
             // Restore notification read states from storage

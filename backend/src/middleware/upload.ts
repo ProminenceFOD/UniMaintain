@@ -2,20 +2,24 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-const UPLOAD_DIR = path.join(__dirname, "../../uploads");
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+export function getUploadsDir(): string {
+  const dir = process.env.UPLOAD_DIR || path.resolve(process.cwd(), "uploads");
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
 
 const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
+  destination: (_req, _file, cb) => cb(null, getUploadsDir()),
   filename: (_req, file, cb) => {
     const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${unique}${path.extname(file.originalname)}`);
+    const ext = path.extname(file.originalname) || ".jpg";
+    cb(null, `${unique}${ext}`);
   },
 });
 
 const fileFilter = (_req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   const allowed = ["image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf"];
-  if (allowed.includes(file.mimetype)) {
+  if (allowed.includes(file.mimetype) || file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
     cb(new Error("Only images and PDFs are allowed"));
@@ -25,5 +29,5 @@ const fileFilter = (_req: Express.Request, file: Express.Multer.File, cb: multer
 export const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
 });

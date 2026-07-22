@@ -60,10 +60,10 @@ app.use(express.urlencoded({ extended: true }));
 // Attach io to req so controllers can emit events
 app.use((req: any, _res, next) => { req.io = io; next(); });
 
+import { getUploadsDir } from "./middleware/upload";
+
 // Serve uploaded files statically with CORS & Cross-Origin-Resource-Policy headers
-const uploadsDir = process.env.UPLOAD_DIR || (require("fs").existsSync(path.resolve(process.cwd(), "uploads"))
-  ? path.resolve(process.cwd(), "uploads")
-  : path.join(__dirname, "../../uploads"));
+const uploadsDir = getUploadsDir();
 
 app.use("/uploads", (req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");

@@ -247,6 +247,7 @@ export function OfficerDashboard({ user, requests, onSelect, onStatusUpdate, act
             onSelect={onSelect}
             onStatusUpdate={onStatusUpdate}
             emptyLabel="No completed tasks yet."
+            currentUser={user}
           />
         )}
 

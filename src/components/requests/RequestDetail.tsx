@@ -71,22 +71,7 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
   const [showComments, setShowComments] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  const userIdStr    = String(currentUser.id || "").trim().toLowerCase();
-  const userEmailStr = (currentUser.email || "").trim().toLowerCase();
-  const userNameStr  = (currentUser.name || "").trim().toLowerCase();
-
-  const subByStr    = String(request.submittedBy || "").trim().toLowerCase();
-  const subNameStr  = (request.submittedByName || "").trim().toLowerCase();
-  const subEmailStr = (request.submittedByEmail || "").trim().toLowerCase();
-
-  const isMyRequest = ["student","staff"].includes((currentUser.role || "").toLowerCase()) && (
-    subByStr === userIdStr ||
-    subByStr === `u${userIdStr}` ||
-    userIdStr === `u${subByStr}` ||
-    (userEmailStr && subEmailStr && userEmailStr === subEmailStr) ||
-    (userNameStr && subNameStr && (userNameStr.includes(subNameStr) || subNameStr.includes(userNameStr))) ||
-    (currentUser.role === "staff" && (request.submittedByRole === "staff" || subNameStr.includes("janet") || userEmailStr.includes("folakemi")))
-  );
+  const isMyRequest = ["student","staff"].includes((currentUser.role || "").toLowerCase());
   const isMyTask    = (currentUser.role || "").toLowerCase() === "officer" && (
     String(request.assignedTo) === String(currentUser.id) ||
     request.assignedToName?.toLowerCase() === currentUser.name?.toLowerCase() ||

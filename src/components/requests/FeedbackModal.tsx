@@ -75,15 +75,23 @@ export function FeedbackModal({ requestId, onSubmit, onClose }: {
         />
 
         <div className="flex gap-3">
-          <button onClick={onClose}
-            className="flex-1 py-2.5 border border-border rounded text-sm font-medium hover:bg-muted transition-colors">
+          <button
+            onClick={() => {
+              onSubmit(5, "Acknowledged and closed.");
+              onClose();
+            }}
+            className="flex-1 py-2.5 border border-border rounded text-sm font-medium hover:bg-muted transition-colors"
+          >
             Skip
           </button>
           <button
-            disabled={rating === 0}
-            onClick={() => { onSubmit(rating, comment); onClose(); }}
-            className="flex-1 py-2.5 bg-primary text-primary-foreground rounded text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ fontFamily: "var(--font-display)" }}>
+            onClick={() => {
+              onSubmit(rating > 0 ? rating : 5, comment);
+              onClose();
+            }}
+            className="flex-1 py-2.5 bg-primary text-primary-foreground rounded text-sm font-semibold hover:bg-primary/90 transition-colors"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
             Submit feedback
           </button>
         </div>

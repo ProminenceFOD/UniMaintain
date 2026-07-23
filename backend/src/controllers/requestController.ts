@@ -343,8 +343,8 @@ export async function updateStatus(req: Request, res: Response): Promise<void> {
   const user = req.user!;
 
   const validTransitions: Record<string, string[]> = {
-    student: ["cancelled"],
-    staff:   ["cancelled"],
+    student: ["cancelled", "closed"],
+    staff:   ["cancelled", "closed"],
     officer: ["in_progress", "resolved"],
     admin:   ["closed", "pending", "cancelled"],
   };

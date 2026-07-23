@@ -25,10 +25,6 @@ const REQUEST_JOINS = `
 `;
 
 function formatRequest(row: Record<string, unknown>) {
-  const rawEmail = String(row.submitted_by_email || "");
-  const rawName = String(row.submitted_by_name || "");
-  const isNewestUser = rawEmail.includes("newest.user") || rawName.includes("Newest User") || String(row.submitted_by_id) === "4";
-
   const rawStatus = String(row.status || "pending");
   const finalStatus = (row.assigned_to_id && rawStatus === "pending") ? "assigned" : rawStatus;
 
@@ -46,9 +42,9 @@ function formatRequest(row: Record<string, unknown>) {
     updatedAt:       row.updated_at,
     resolvedAt:      row.resolved_at,
     submittedBy:     row.submitted_by_id,
-    submittedByName: isNewestUser ? "Janet Folakemi" : (row.submitted_by_name || "Janet Folakemi"),
-    submittedByRole: row.submitted_by_role || (isNewestUser ? "staff" : undefined),
-    submittedByEmail:isNewestUser ? "j.folakemi@university.edu" : (row.submitted_by_email || "j.folakemi@university.edu"),
+    submittedByName: String(row.submitted_by_name || "User"),
+    submittedByRole: String(row.submitted_by_role || "student"),
+    submittedByEmail:String(row.submitted_by_email || ""),
     assignedTo:      row.assigned_to_id,
     assignedToName:  row.assigned_to_name,
   };

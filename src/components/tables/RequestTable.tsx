@@ -90,10 +90,9 @@ export function RequestTable({ requests, onSelect, showAssign, officers, onAssig
                     const matchedUser = findUser(r.submittedBy, r.submittedByName, users ?? USERS) ?? findUser(r.submittedBy, r.submittedByName, USERS);
                     const rawEmail = matchedUser?.email || r.submittedByEmail || "";
                     const rawName = r.submittedByName || matchedUser?.name || "";
-                    const isNewest = rawEmail.includes("newest.user") || rawName.includes("Newest User") || String(r.submittedBy) === "4" || String(r.submittedBy) === "u10";
 
-                    const displayName = isNewest ? "Janet Folakemi" : (rawName || "Janet Folakemi");
-                    const displayEmail = isNewest ? "j.folakemi@university.edu" : (rawEmail || "j.folakemi@university.edu");
+                    const displayName = rawName || "User";
+                    const displayEmail = rawEmail || "";
 
                     return (
                       <div className="flex items-center gap-2">

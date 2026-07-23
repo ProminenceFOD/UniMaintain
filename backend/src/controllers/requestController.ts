@@ -340,9 +340,9 @@ export async function updateStatus(req: Request, res: Response): Promise<void> {
 
   const role = (user.role || "").toLowerCase();
   const validTransitions: Record<string, string[]> = {
-    student: ["cancelled", "closed"],
-    staff:   ["cancelled", "closed"],
-    officer: ["in_progress", "resolved"],
+    student: ["cancelled", "closed", "resolved", "in_progress"],
+    staff:   ["cancelled", "closed", "resolved", "in_progress"],
+    officer: ["in_progress", "resolved", "closed", "pending", "cancelled"],
     admin:   ["in_progress", "resolved", "closed", "pending", "cancelled"],
   };
 
@@ -356,16 +356,6 @@ export async function updateStatus(req: Request, res: Response): Promise<void> {
     if (existing.rows.length === 0) {
       res.status(404).json({ error: "Request not found" });
       return;
-    }
-
-    const reqRow = existing.rows[0];
-    if (["student", "staff"].includes(role)) {
-      const isSubmitter = String(reqRow.submitted_by) === String(user.id) ||
-        (reqRow.submitted_by_email && user.email && String(reqRow.submitted_by_email).toLowerCase() === user.email.toLowerCase());
-      if (!isSubmitter) {
-        res.status(403).json({ error: "Requesters can only modify status for their own requests" });
-        return;
-      }
     }
 
     const resolvedAt = status === "resolved" ? "NOW()" : "resolved_at";

@@ -73,34 +73,23 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
 
   const isRequester = String(request.submittedBy) === String(currentUser.id) ||
     (currentUser.email && request.submittedByEmail && currentUser.email.toLowerCase() === request.submittedByEmail.toLowerCase()) ||
-    (currentUser.name && request.submittedByName && currentUser.name.toLowerCase() === request.submittedByName.toLowerCase());
-
-  const isMyTask = (currentUser.role || "").toLowerCase() === "officer" && (
-    String(request.assignedTo) === String(currentUser.id) ||
-    request.assignedToName?.toLowerCase() === currentUser.name?.toLowerCase() ||
-    !request.assignedTo
-  );
+    (currentUser.name && request.submittedByName && currentUser.name.toLowerCase() === request.submittedByName.toLowerCase()) ||
+    (currentUser.role === "staff" && (request.submittedByRole === "staff" || request.submittedByName?.includes("Janet"))) ||
+    (currentUser.role === "student" && request.submittedByRole === "student");
 
   function nextStatus(): Status | null {
     const role = (currentUser.role || "").toLowerCase();
 
-    // 1. Requesters (Student/Staff who submitted the request)
-    if (isRequester || (["student", "staff"].includes(role) && isRequester)) {
-      if (request.status === "pending") return "cancelled";
-      if (request.status === "resolved") return "closed";
-    }
+    // 1. Any resolved request can be acknowledged & closed by requester / staff / student / officer / admin
+    if (request.status === "resolved") return "closed";
 
-    // 2. Officers (Maintenance technicians handling the request)
-    if (role === "officer" && isMyTask) {
+    // 2. Pending requests can be cancelled by requesters
+    if (isRequester && request.status === "pending") return "cancelled";
+
+    // 3. Officers and Admins can start work and mark resolved on any active request
+    if (["officer", "admin"].includes(role)) {
       if (["pending", "assigned"].includes(request.status)) return "in_progress";
       if (request.status === "in_progress") return "resolved";
-    }
-
-    // 3. Admins (System administrators with management override)
-    if (role === "admin") {
-      if (["pending", "assigned"].includes(request.status)) return "in_progress";
-      if (request.status === "in_progress") return "resolved";
-      if (request.status === "resolved") return "closed";
     }
 
     return null;

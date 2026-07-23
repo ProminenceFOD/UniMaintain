@@ -174,7 +174,7 @@ router.post("/", upload_1.upload.array("attachments", 5), requestController_1.cr
  *       400: { description: Invalid status transition for role }
  *       404: { description: Request not found }
  */
-router.put("/:id/status", (0, auth_1.authorize)("officer", "admin"), requestController_1.updateStatus);
+router.put("/:id/status", (0, auth_1.authorize)("student", "staff", "officer", "admin"), requestController_1.updateStatus);
 /**
  * @openapi
  * /api/requests/{id}/assign:

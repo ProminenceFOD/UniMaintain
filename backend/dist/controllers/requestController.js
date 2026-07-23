@@ -31,9 +31,6 @@ const REQUEST_JOINS = `
   LEFT JOIN users o       ON sr.assigned_to  = o.id
 `;
 function formatRequest(row) {
-    const rawEmail = String(row.submitted_by_email || "");
-    const rawName = String(row.submitted_by_name || "");
-    const isNewestUser = rawEmail.includes("newest.user") || rawName.includes("Newest User") || String(row.submitted_by_id) === "4";
     const rawStatus = String(row.status || "pending");
     const finalStatus = (row.assigned_to_id && rawStatus === "pending") ? "assigned" : rawStatus;
     return {
@@ -50,9 +47,9 @@ function formatRequest(row) {
         updatedAt: row.updated_at,
         resolvedAt: row.resolved_at,
         submittedBy: row.submitted_by_id,
-        submittedByName: isNewestUser ? "Janet Folakemi" : (row.submitted_by_name || "Janet Folakemi"),
-        submittedByRole: row.submitted_by_role || (isNewestUser ? "staff" : undefined),
-        submittedByEmail: isNewestUser ? "j.folakemi@university.edu" : (row.submitted_by_email || "j.folakemi@university.edu"),
+        submittedByName: String(row.submitted_by_name || "User"),
+        submittedByRole: String(row.submitted_by_role || "student"),
+        submittedByEmail: String(row.submitted_by_email || ""),
         assignedTo: row.assigned_to_id,
         assignedToName: row.assigned_to_name,
     };
@@ -260,14 +257,15 @@ async function updateStatus(req, res) {
     const { id } = req.params;
     const { status, note } = req.body;
     const user = req.user;
+    const role = (user.role || "").toLowerCase();
     const validTransitions = {
-        student: ["cancelled"],
-        staff: ["cancelled"],
-        officer: ["in_progress", "resolved"],
-        admin: ["closed", "pending", "cancelled"],
+        student: ["cancelled", "closed", "resolved", "in_progress"],
+        staff: ["cancelled", "closed", "resolved", "in_progress"],
+        officer: ["in_progress", "resolved", "closed", "pending", "cancelled"],
+        admin: ["in_progress", "resolved", "closed", "pending", "cancelled"],
     };
-    if (!validTransitions[user.role]?.includes(status)) {
-        res.status(400).json({ error: "Invalid status transition for your role" });
+    if (!validTransitions[role]?.includes(status)) {
+        res.status(400).json({ error: `Role '${role}' is not authorized to transition status to '${status}'` });
         return;
     }
     try {
@@ -276,9 +274,8 @@ async function updateStatus(req, res) {
             res.status(404).json({ error: "Request not found" });
             return;
         }
-        const resolvedAt = status === "resolved" ? "NOW()" : "resolved_at";
         await database_1.default.query(`UPDATE service_requests
-       SET status = $1, updated_at = NOW() ${status === "resolved" ? ", resolved_at = NOW()" : ""}
+       SET status = $1, updated_at = NOW() ${(status === "resolved" || status === "closed") ? ", resolved_at = COALESCE(resolved_at, NOW())" : ""}
        WHERE id = $2`, [status, id]);
         const actionMap = {
             in_progress: "Work Started",

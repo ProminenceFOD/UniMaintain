@@ -358,10 +358,9 @@ export async function updateStatus(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const resolvedAt = status === "resolved" ? "NOW()" : "resolved_at";
     await pool.query(
       `UPDATE service_requests
-       SET status = $1, updated_at = NOW() ${status === "resolved" ? ", resolved_at = NOW()" : ""}
+       SET status = $1, updated_at = NOW() ${(status === "resolved" || status === "closed") ? ", resolved_at = COALESCE(resolved_at, NOW())" : ""}
        WHERE id = $2`,
       [status, id]
     );

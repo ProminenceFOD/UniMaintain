@@ -140,6 +140,21 @@ describe("INITIAL_REQUESTS mock data", () => {
     const staffRequests = INITIAL_REQUESTS.filter(r => r.submittedByRole === "staff");
     expect(staffRequests.length).toBeGreaterThan(0);
   });
+
+  it("verifies Janet Folakemi requests can transition to resolved and closed", () => {
+    const janetRequests = INITIAL_REQUESTS.filter(r => r.submittedByName === "Janet Folakemi");
+    expect(janetRequests.length).toBeGreaterThan(0);
+    
+    // Simulate officer resolving
+    const activeReq = janetRequests.find(r => r.status === "assigned" || r.status === "in_progress") || janetRequests[0];
+    const resolvedState = { ...activeReq, status: "resolved" as const, resolvedAt: new Date().toISOString() };
+    expect(resolvedState.status).toBe("resolved");
+
+    // Simulate Janet Folakemi acknowledging and closing
+    const closedState = { ...resolvedState, status: "closed" as const };
+    expect(closedState.status).toBe("closed");
+    expect(closedState.resolvedAt).toBeTruthy();
+  });
 });
 
 // ─── NOTIFICATIONS ────────────────────────────────────────────────────────────

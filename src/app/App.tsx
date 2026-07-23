@@ -515,7 +515,8 @@ export default function App() {
     const req = requestsRef.current.find(r => r.id === requestId); // read BEFORE state update
     const updatedRequests = requestsRef.current.map(r => {
       if (r.id !== requestId) return r;
-      return { ...r, status, updatedAt: now, resolvedAt: status === "resolved" ? now : status === "closed" ? r.resolvedAt : undefined, audit: [...r.audit, newEntry] };
+      const targetResolvedAt = status === "resolved" ? now : status === "closed" ? (r.resolvedAt || now) : undefined;
+      return { ...r, status, updatedAt: now, resolvedAt: targetResolvedAt, audit: [...r.audit, newEntry] };
     });
     setRequests(updatedRequests);
     setSelectedRequest(prev => prev?.id === requestId ? (updatedRequests.find(r => r.id === requestId) ?? prev) : prev);
@@ -523,7 +524,12 @@ export default function App() {
       saveDemoSession(currentUser, updatedRequests, usersRef.current, notificationsRef.current);
       if (req) {
         // Notify the submitter (if someone else changed the status)
-        if (req.submittedBy !== currentUser.id) {
+        const isSelf = String(req.submittedBy) === String(currentUser.id) ||
+          String(req.submittedBy) === `u${currentUser.id}` ||
+          `u${req.submittedBy}` === String(currentUser.id) ||
+          (req.submittedByEmail && currentUser.email && req.submittedByEmail.toLowerCase() === currentUser.email.toLowerCase());
+
+        if (!isSelf) {
           const statusMessages: Partial<Record<Status, string>> = {
             in_progress: `${requestId}: Work has started on your request.`,
             resolved:    `${requestId}: Your request has been resolved. Please acknowledge.`,

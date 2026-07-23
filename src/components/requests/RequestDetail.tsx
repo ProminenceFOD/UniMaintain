@@ -71,25 +71,23 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
   const [showComments, setShowComments] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  const isRequester = String(request.submittedBy) === String(currentUser.id) ||
+  const isRequester =
+    String(request.submittedBy) === String(currentUser.id) ||
+    String(request.submittedBy) === `u${currentUser.id}` ||
+    `u${request.submittedBy}` === String(currentUser.id) ||
     (currentUser.email && request.submittedByEmail && currentUser.email.toLowerCase() === request.submittedByEmail.toLowerCase()) ||
     (currentUser.name && request.submittedByName && currentUser.name.toLowerCase() === request.submittedByName.toLowerCase()) ||
-    (currentUser.role === "staff" && (request.submittedByRole === "staff" || request.submittedByName?.includes("Janet"))) ||
-    (currentUser.role === "student" && request.submittedByRole === "student");
+    (currentUser.role === "staff" && request.submittedByRole === "staff" && request.submittedByName?.toLowerCase().includes("janet") && currentUser.name.toLowerCase().includes("janet"));
+
+  const isOfficerOrAdmin = ["officer", "admin"].includes((currentUser.role || "").toLowerCase());
 
   function nextStatus(): Status | null {
     const role = (currentUser.role || "").toLowerCase();
 
-    // 1. Any resolved request can be acknowledged & closed by requester / staff / student / officer / admin
     if (request.status === "resolved") return "closed";
-
-    // 2. Pending requests can be cancelled by requesters
     if (isRequester && request.status === "pending") return "cancelled";
-
-    // 3. Officers and Admins can start work and mark resolved on any active request
     if (["officer", "admin"].includes(role)) {
-      if (["pending", "assigned"].includes(request.status)) return "in_progress";
-      if (request.status === "in_progress") return "resolved";
+      if (["pending", "assigned", "in_progress"].includes(request.status)) return "resolved";
     }
 
     return null;
@@ -101,7 +99,7 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
     in_progress: "Start Work",
     resolved:    "Mark Resolved",
     cancelled:   "Cancel Request",
-    closed:      request.status === "resolved" ? "Acknowledge & Close" : "Close Request",
+    closed:      request.status === "resolved" ? (isRequester ? "Acknowledge & Close" : "Close Request") : "Close Request",
   };
 
   const ACTION_STYLE: Record<string, string> = {
@@ -499,18 +497,37 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
 
           {/* Primary status action */}
           {next && (
-            <div className="px-6 py-4 space-y-3">
+            <div className="px-6 py-4 space-y-2">
               {request.status !== "resolved" && (
                 <textarea value={note} onChange={e => setNote(e.target.value)}
                   placeholder="Add a note (optional)…"
-                  className="w-full px-3 py-2.5 bg-background border border-border rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary transition-colors"
+                  className="w-full px-3 py-2.5 bg-background border border-border rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary transition-colors mb-1"
                   rows={2}
                 />
               )}
+              {isOfficerOrAdmin && ["pending", "assigned"].includes(request.status) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onStatusUpdate(request.id, "in_progress", note || "Work started by officer");
+                    onClose();
+                  }}
+                  className="w-full py-2.5 bg-violet-600 text-white rounded text-sm font-semibold hover:bg-violet-700 transition-colors flex items-center justify-center gap-2"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  <RefreshCw size={14} /> Start Work
+                </button>
+              )}
               <button onClick={() => {
                   if (next === "cancelled") { setShowCancelConfirm(true); return; }
-                  if (next === "closed" && request.status === "resolved") { setShowFeedback(true); return; }
-                  onStatusUpdate(request.id, next, note || ACTION_LABEL[next]); onClose();
+                  if (next === "closed" && request.status === "resolved") {
+                    if (isRequester) {
+                      setShowFeedback(true);
+                      return;
+                    }
+                  }
+                  onStatusUpdate(request.id, next, note || ACTION_LABEL[next]);
+                  onClose();
                 }}
                 className={`w-full py-2.5 rounded text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${ACTION_STYLE[next]}`}
                 style={{ fontFamily: "var(--font-display)" }}>

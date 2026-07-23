@@ -497,8 +497,8 @@ const pool = {
           const newStatus = params.find(p => typeof p === "string" && ["pending", "assigned", "in_progress", "resolved", "closed", "cancelled"].includes(p));
           if (newStatus) {
             match.status = newStatus;
-            if (newStatus === "resolved") {
-              match.resolved_at = new Date();
+            if (newStatus === "resolved" || newStatus === "closed") {
+              if (!match.resolved_at) match.resolved_at = new Date();
             }
           }
         }

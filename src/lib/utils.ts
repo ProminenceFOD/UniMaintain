@@ -28,12 +28,19 @@ export function generateId(existingRequests: Request[]): string {
 export function exportCSV(requests: Request[]) {
   const headers = ["ID", "Title", "Category", "Priority", "Status", "Location", "Submitted By", "Assigned To", "Created", "Updated"];
   const rows = requests.map(r => [
-    r.id, r.title, r.category, r.priority, r.status, r.location,
-    r.submittedByName, r.assignedToName ?? "Unassigned",
-    formatDate(r.createdAt), formatDate(r.updatedAt),
+    r.id,
+    (r.title || "").replace(/"/g, '""'),
+    r.category,
+    r.priority,
+    r.status,
+    (r.location || "").replace(/"/g, '""'),
+    (r.submittedByName || "").replace(/"/g, '""'),
+    (r.assignedToName || "Unassigned").replace(/"/g, '""'),
+    formatDate(r.createdAt),
+    formatDate(r.updatedAt),
   ]);
-  const csv = [headers, ...rows].map(row => row.map(v => `"${v}"`).join(",")).join("\\n");
-  const blob = new Blob([csv], { type: "text/csv" });
+  const csvContent = [headers, ...rows].map(row => row.map(v => `"${v}"`).join(",")).join("\r\n");
+  const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement("a");
   a.href = url; a.download = "maintenance_requests.csv"; a.click();

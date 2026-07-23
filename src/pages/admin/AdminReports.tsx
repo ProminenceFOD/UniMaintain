@@ -165,9 +165,10 @@ export function AdminReports({ requests: rawRequests, users: rawUsers }: { reque
       "",
       "ALL REQUESTS",
       "ID,Title,Category,Priority,Status,Submitted By,Assigned To,Date",
-      ...filtered.map(r => `${r.id},"${r.title}",${r.category},${r.priority},${r.status},${r.submittedByName},${r.assignedToName ?? "Unassigned"},${formatDate(r.createdAt)}`),
+      ...filtered.map(r => `${r.id},"${(r.title || "").replace(/"/g, '""')}",${r.category},${r.priority},${r.status},"${(r.submittedByName || "").replace(/"/g, '""')}","${(r.assignedToName ?? "Unassigned").replace(/"/g, '""')}",${formatDate(r.createdAt)}`),
     ];
-    const blob = new Blob([lines.join("\\n")], { type: "text/csv" });
+    const csvContent = lines.join("\r\n");
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
     a.href = url; a.download = `unimaintain-report-${new Date().toISOString().slice(0,10)}.csv`; a.click();

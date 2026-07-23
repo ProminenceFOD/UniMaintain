@@ -12,7 +12,7 @@ async function getAllUsers(req, res) {
     try {
         const result = await database_1.default.query(`SELECT id, name, email, role, department, active, created_at
        FROM users
-       ORDER BY role, name`);
+       ORDER BY created_at DESC, id DESC`);
         res.json({ users: result.rows });
     }
     catch (err) {

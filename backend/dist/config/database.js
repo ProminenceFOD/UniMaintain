@@ -5,12 +5,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const pg_1 = require("pg");
 const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
 dotenv_1.default.config();
 let pool;
 if (process.env.MOCK_DB === "true") {
     console.log("⚠️ Running in Mock DB mode");
-    // Load mock database dynamically to avoid circular dependencies
-    pool = require("./__mocks__/database").default;
+    // Resolve mock DB path for compiled environment
+    const mockPathCompiled = path_1.default.join(__dirname, "__mocks__/database");
+    // Fallback to source path (useful during dev with ts-node)
+    const mockPathSource = path_1.default.resolve(process.cwd(), "src/config/__mocks__/database");
+    try {
+        pool = require(mockPathCompiled).default;
+    }
+    catch (e) {
+        pool = require(mockPathSource).default;
+    }
 }
 else {
     pool = new pg_1.Pool({

@@ -35,19 +35,48 @@ export function NewRequestModal({ currentUser, existingRequests, onClose, onSubm
     return !(form as any)[field];
   }
 
+  async function compressImageFile(file: File, maxDim = 1200, quality = 0.75): Promise<string> {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL("image/jpeg", quality));
+          } else {
+            resolve((e.target?.result as string) || file.name);
+          }
+        };
+        img.onerror = () => resolve((e.target?.result as string) || file.name);
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => resolve(file.name);
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function readFilesAsDataUrls(fileList: File[]): Promise<string[]> {
     return Promise.all(
       fileList.map(file => {
-        return new Promise<string>((resolve, reject) => {
-          if (file.type.startsWith("image/")) {
-            const reader = new FileReader();
-            reader.onload = (evt) => resolve((evt.target?.result as string) || file.name);
-            reader.onerror = () => reject(new Error(`Failed to read file ${file.name}`));
-            reader.readAsDataURL(file);
-          } else {
-            resolve(file.name);
-          }
-        });
+        if (file.type.startsWith("image/")) {
+          return compressImageFile(file);
+        }
+        return Promise.resolve(file.name);
       })
     );
   }
@@ -261,23 +290,18 @@ export function NewRequestModal({ currentUser, existingRequests, onClose, onSubm
             </button>
             <input ref={fileRef} type="file" multiple accept="image/*,.pdf"
               className="hidden"
-              onChange={e => {
+              onChange={async (e) => {
                 const selected = Array.from(e.target.files ?? []);
                 setFileObjects(selected);
-                setFiles([]);
-                selected.forEach(file => {
-                  if (file.type.startsWith("image/")) {
-                    const reader = new FileReader();
-                    reader.onload = (evt) => {
-                      if (evt.target?.result) {
-                        setFiles(prev => [...prev, evt.target!.result as string]);
-                      }
-                    };
-                    reader.readAsDataURL(file);
-                  } else {
-                    setFiles(prev => [...prev, file.name]);
-                  }
-                });
+                const processed = await Promise.all(
+                  selected.map(async (file) => {
+                    if (file.type.startsWith("image/")) {
+                      return compressImageFile(file);
+                    }
+                    return file.name;
+                  })
+                );
+                setFiles(processed);
               }}
             />
             {fileObjects.length > 0 && (
@@ -285,7 +309,7 @@ export function NewRequestModal({ currentUser, existingRequests, onClose, onSubm
                 <div className="grid grid-cols-3 gap-2">
                   {fileObjects.map((file, idx) => {
                     const isImg = file.type.startsWith("image/");
-                    const previewUrl = isImg ? URL.createObjectURL(file) : null;
+                    const previewUrl = isImg ? (files[idx] && files[idx].startsWith("data:") ? files[idx] : URL.createObjectURL(file)) : null;
                     return (
                       <div key={idx} className="relative group rounded border border-border/80 p-1 bg-muted/20 flex flex-col items-center justify-center text-center">
                         {isImg && previewUrl ? (

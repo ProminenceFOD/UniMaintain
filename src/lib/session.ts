@@ -45,18 +45,28 @@ export function saveDemoSession(user: User, requests: Request[], users: User[], 
     users:         JSON.stringify(users),
     notifications: notifications ? JSON.stringify(notifications) : null,
   };
-  try {
-    sessionStorage.setItem(DEMO_USER_KEY,     data.user);
-    sessionStorage.setItem(DEMO_REQUESTS_KEY, data.requests);
-    sessionStorage.setItem(DEMO_USERS_KEY,    data.users);
-    if (data.notifications) sessionStorage.setItem(DEMO_NOTIFICATIONS_KEY, data.notifications);
-  } catch { /* quota exceeded */ }
-  try {
-    localStorage.setItem(DEMO_USER_KEY,     data.user);
-    localStorage.setItem(DEMO_REQUESTS_KEY, data.requests);
-    localStorage.setItem(DEMO_USERS_KEY,    data.users);
-    if (data.notifications) localStorage.setItem(DEMO_NOTIFICATIONS_KEY, data.notifications);
-  } catch { /* quota exceeded */ }
+
+  const saveToStorage = (storage: Storage) => {
+    try {
+      storage.setItem(DEMO_USER_KEY,     data.user);
+      storage.setItem(DEMO_REQUESTS_KEY, data.requests);
+      storage.setItem(DEMO_USERS_KEY,    data.users);
+      if (data.notifications) storage.setItem(DEMO_NOTIFICATIONS_KEY, data.notifications);
+    } catch {
+      try {
+        const sanitizedRequests = requests.map(r => ({
+          ...r,
+          attachments: (r.attachments || []).map(att =>
+            att.length > 500000 ? "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='225' viewBox='0 0 400 225'><rect width='100%' height='100%' fill='%230f172a'/><text x='50%' y='50%' fill='%2394a3b8' font-family='sans-serif' font-size='14' text-anchor='middle'>Image Attachment</text></svg>" : att
+          )
+        }));
+        storage.setItem(DEMO_REQUESTS_KEY, JSON.stringify(sanitizedRequests));
+      } catch { /* storage unavailable */ }
+    }
+  };
+
+  saveToStorage(sessionStorage);
+  saveToStorage(localStorage);
 }
 
 export function loadDemoSession(): { user: User | null; requests: Request[]; users: User[]; notifications: Notification[] } {

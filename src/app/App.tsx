@@ -507,6 +507,7 @@ export default function App() {
       return { ...r, status, updatedAt: now, resolvedAt: status === "resolved" ? now : status === "closed" ? r.resolvedAt : undefined, audit: [...r.audit, newEntry] };
     });
     setRequests(updatedRequests);
+    setSelectedRequest(prev => prev?.id === requestId ? (updatedRequests.find(r => r.id === requestId) ?? prev) : prev);
     if (!apiMode && currentUser) {
       saveDemoSession(currentUser, updatedRequests, usersRef.current, notificationsRef.current);
       if (req) {
@@ -542,6 +543,7 @@ export default function App() {
         const { request: updated } = await apiUpdateStatus(requestId, status, note);
         const adapted = adaptRequest(updated);
         setRequests(p => p.map(r => r.id === requestId ? adapted : r));
+        setSelectedRequest(prev => prev?.id === requestId ? adapted : prev);
         apiGetNotifications().then(res => {
           if (!currentUser) return;
           setNotifications(res.notifications.map(n => ({
@@ -585,7 +587,9 @@ export default function App() {
             timestamp: new Date().toISOString(),
           };
           const mergedAudit = (adapted.audit && adapted.audit.length > 0) ? adapted.audit : [...(r.audit || []), newEntry];
-          return { ...r, ...adapted, status: "assigned" as Status, audit: mergedAudit };
+          const updatedObj = { ...r, ...adapted, status: "assigned" as Status, audit: mergedAudit };
+          setSelectedRequest(prev => prev?.id === requestId ? updatedObj : prev);
+          return updatedObj;
         }));
         apiGetNotifications().then(res => {
           if (!currentUser) return;
@@ -620,6 +624,7 @@ export default function App() {
     });
     const req = requestsRef.current.find(r => r.id === requestId);
     setRequests(updatedRequests);
+    setSelectedRequest(prev => prev?.id === requestId ? (updatedRequests.find(r => r.id === requestId) ?? prev) : prev);
     if (currentUser) {
       saveDemoSession(currentUser, updatedRequests, usersRef.current, notificationsRef.current);
       pushNotif(officer.id, "New Assignment",

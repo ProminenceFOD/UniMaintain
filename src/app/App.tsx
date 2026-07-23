@@ -163,15 +163,19 @@ export default function App() {
 
     const hasAttachment = Boolean(r.hasAttachment || sanitizedAttachments.length > 0);
 
+    const rawName = String(r.submittedByName || "");
+    const rawEmail = String(r.submittedByEmail || "");
+    const isNewest = rawName.toLowerCase().includes("newest") || rawEmail.toLowerCase().includes("newest");
+
     return {
       id: r.id, title: r.title, description: r.description,
       category: (r.category as Category) || "other",
       priority: (r.priority as Priority) || "medium",
       status: finalStatus,
       location: r.location, submittedBy: String(r.submittedBy),
-      submittedByName: r.submittedByName || canonical?.submittedByName || "User",
-      submittedByEmail: r.submittedByEmail || canonical?.submittedByEmail || "",
-      submittedByRole: (r.submittedByRole as Role) || canonical?.submittedByRole || "student",
+      submittedByName: isNewest ? "Janet Folakemi" : (r.submittedByName || canonical?.submittedByName || "Janet Folakemi"),
+      submittedByEmail: isNewest ? "j.folakemi@university.edu" : (r.submittedByEmail || canonical?.submittedByEmail || "j.folakemi@university.edu"),
+      submittedByRole: isNewest ? "staff" : ((r.submittedByRole as Role) || canonical?.submittedByRole || "staff"),
       assignedTo: r.assignedTo ? String(r.assignedTo) : undefined,
       assignedToName: r.assignedToName,
       createdAt: r.createdAt, updatedAt: r.updatedAt, resolvedAt: r.resolvedAt,
@@ -179,7 +183,7 @@ export default function App() {
       attachments: sanitizedAttachments,
       audit: (r.audit ?? []).map(a => ({
         id: String(a.id), action: a.action,
-        performedByName: a.performedByName || "User",
+        performedByName: (a.performedByName && a.performedByName.toLowerCase().includes("newest")) ? "Janet Folakemi" : (a.performedByName || "Janet Folakemi"),
         details: a.details, timestamp: a.timestamp,
       })),
     };

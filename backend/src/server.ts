@@ -151,8 +151,22 @@ async function syncDatabaseSeed() {
   try {
     console.log("🔄 Syncing full 15 service requests into PostgreSQL database...");
 
+    // 1. Ensure Janet Folakemi exists as Staff user in PostgreSQL database
+    await pool.query(`
+      INSERT INTO users (name, email, password, role, department)
+      VALUES ('Janet Folakemi', 'j.folakemi@university.edu', '$2a$10$bBFttzsstcSH4/d5lZyAPeopyLjKbc0eBugjZqpmS1B58ncPZLUsq', 'staff', 'Faculty of Sciences')
+      ON CONFLICT (email) DO UPDATE SET name = 'Janet Folakemi', role = 'staff', department = 'Faculty of Sciences';
+    `);
+
+    // 2. Clean up any legacy "Newest User" placeholders in users table
+    await pool.query(`
+      UPDATE users
+      SET name = 'Janet Folakemi', email = 'j.folakemi@university.edu', role = 'staff', department = 'Faculty of Sciences'
+      WHERE name ILIKE '%newest%' OR email ILIKE '%newest%';
+    `);
+
     const studentRes = await pool.query("SELECT id, email, name FROM users WHERE role = 'student' ORDER BY id ASC");
-    const staffRes   = await pool.query("SELECT id, email, name FROM users WHERE role = 'staff' ORDER BY id ASC");
+    const staffRes   = await pool.query("SELECT id, email, name FROM users WHERE email = 'j.folakemi@university.edu' OR role = 'staff' ORDER BY id ASC");
     const officerRes = await pool.query("SELECT id, email, name FROM users WHERE role = 'officer' ORDER BY id ASC");
 
     if (studentRes.rows && studentRes.rows.length > 0) {

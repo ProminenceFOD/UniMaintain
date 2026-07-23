@@ -17,8 +17,8 @@ export function getValidActiveTab(tab: string | null | undefined, role?: string 
   return tab && allowedTabs.includes(tab) ? tab : "overview";
 }
 
-export function saveActiveTab(tab: string) {
-  const safeTab = getValidActiveTab(tab);
+export function saveActiveTab(tab: string, role?: string | null) {
+  const safeTab = getValidActiveTab(tab, role);
   try { sessionStorage.setItem(ACTIVE_TAB_KEY, safeTab); } catch { /* quota exceeded */ }
   try { localStorage.setItem(ACTIVE_TAB_KEY, safeTab); } catch { /* quota exceeded */ }
 }

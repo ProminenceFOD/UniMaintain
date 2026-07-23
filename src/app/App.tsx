@@ -92,6 +92,13 @@ export default function App() {
   const [showNewRequest, setShowNewRequest] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
 
+  // Persist active tab across page refreshes
+  useEffect(() => {
+    if (currentUser && activeTab) {
+      saveActiveTab(activeTab, currentUser.role);
+    }
+  }, [activeTab, currentUser]);
+
   // Refs so closures (logout, etc.) always read the latest state values
   const requestsRef     = useRef(requests);
   const usersRef        = useRef(users);

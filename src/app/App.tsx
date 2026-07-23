@@ -412,19 +412,18 @@ export default function App() {
     } else if (apiMode) {
       setCurrentUser(normalizedUser);
       setActiveTab(loadActiveTab(role));
-      try {
-        await refreshData(role, normalizedUser.id);
-      } catch (err) {
+      setRequests(prev => (prev && prev.length > 0) ? prev : INITIAL_REQUESTS);
+      refreshData(role, normalizedUser.id).catch(err => {
         console.error("Data refresh error:", err);
-      }
+      });
     } else {
       // Newly registered account — add to users list and start fresh
-      setRequests([]);
+      setRequests(INITIAL_REQUESTS);
       setNotifications([]);
       setUsers(prev => {
         const exists = prev.find(u => u.id === normalizedUser.id);
         const updated = exists ? prev : [normalizedUser, ...prev];
-        saveDemoSession(normalizedUser, [], updated);
+        saveDemoSession(normalizedUser, INITIAL_REQUESTS, updated);
         return updated;
       });
       setCurrentUser(normalizedUser);

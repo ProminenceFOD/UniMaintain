@@ -81,6 +81,8 @@ function loadCategories(): CategoryItem[] {
 // ─── LOADING SPINNER ──────────────────────────────────────────────────────────
 // ─── MAIN APP ���────────────────────────────────────────────────────────────────
 
+const CANONICAL_MAP = new Map(INITIAL_REQUESTS.map(r => [r.id, r]));
+
 export default function App() {
   const [screen, setScreen] = useState<"loading" | "login" | "register" | "app">("loading");
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -143,7 +145,7 @@ export default function App() {
     const rawStatus = (r.status as Status) || "pending";
     const finalStatus = (r.assignedTo && rawStatus === "pending") ? "assigned" : rawStatus;
 
-    const canonical = canonicalMap.get(r.id);
+    const canonical = CANONICAL_MAP.get(r.id);
     const rawAtts = (r.attachments && r.attachments.length > 0)
       ? r.attachments
       : (canonical?.attachments && canonical.attachments.length > 0 ? canonical.attachments : []);

@@ -81,13 +81,10 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
   function nextStatus(): Status | null {
     if (request.status === "resolved") return "closed";
     if (isMyRequest && request.status === "pending") return "cancelled";
-    if ((currentUser.role || "").toLowerCase() === "officer" && isMyTask) {
-      if (["pending", "assigned"].includes(request.status)) return "in_progress";
-      if (request.status === "in_progress") return "resolved";
-    }
-    if ((currentUser.role || "").toLowerCase() === "admin") {
-      if (["pending", "assigned"].includes(request.status)) return "in_progress";
-      if (request.status === "in_progress") return "resolved";
+
+    const isOfficerOrAdmin = ["officer", "admin"].includes((currentUser.role || "").toLowerCase());
+    if (isOfficerOrAdmin && ["pending", "assigned", "in_progress"].includes(request.status)) {
+      return "resolved";
     }
     return null;
   }

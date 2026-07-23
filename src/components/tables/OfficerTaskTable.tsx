@@ -99,13 +99,7 @@ export function OfficerTaskTable({ requests, onSelect, onStatusUpdate, emptyLabe
                           className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title="View details">
                           <Eye size={13} />
                         </button>
-                        {currentUser?.role === "officer" && ["pending", "assigned"].includes(r.status) && (
-                          <button onClick={() => onStatusUpdate(r.id, "in_progress", "Work started.")}
-                            className="px-2.5 py-1 bg-primary text-primary-foreground rounded text-xs font-semibold hover:bg-primary/90 transition-colors whitespace-nowrap">
-                            Start Work
-                          </button>
-                        )}
-                        {r.status === "in_progress" && (
+                        {["pending", "assigned", "in_progress"].includes(r.status) && (
                           <button onClick={() => onStatusUpdate(r.id, "resolved", "Work completed.")}
                             className="px-2.5 py-1 bg-emerald-600 text-white rounded text-xs font-semibold hover:bg-emerald-700 transition-colors whitespace-nowrap">
                             Mark Resolved

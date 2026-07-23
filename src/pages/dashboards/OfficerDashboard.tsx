@@ -149,13 +149,7 @@ export function OfficerDashboard({ user, requests: rawRequests, onSelect, onStat
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                          {(user.role || "").toLowerCase() === "officer" && ["pending", "assigned"].includes(r.status) && (
-                            <button onClick={e => { e.stopPropagation(); onStatusUpdate(r.id, "in_progress", "Work started."); }}
-                              className="px-2.5 py-1 bg-primary text-primary-foreground rounded text-xs font-semibold hover:bg-primary/90 transition-colors whitespace-nowrap">
-                              Start Work
-                            </button>
-                          )}
-                          {r.status === "in_progress" && (
+                          {["pending", "assigned", "in_progress"].includes(r.status) && (
                             <button onClick={e => { e.stopPropagation(); onStatusUpdate(r.id, "resolved", "Work completed."); }}
                               className="px-2.5 py-1 bg-emerald-600 text-white rounded text-xs font-semibold hover:bg-emerald-700 transition-colors whitespace-nowrap">
                               Mark Resolved

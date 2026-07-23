@@ -287,8 +287,8 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
             );
           })()}
 
-          {/* Feedback rating — visible to admin/officer when request is closed */}
-          {["admin","officer"].includes(currentUser.role) && request.status === "closed" && (() => {
+          {/* Feedback rating — visible when request is closed */}
+          {request.status === "closed" && (() => {
             const feedbackEntry = request.audit.find(a => a.details?.includes("Rating:"));
             if (!feedbackEntry) return null;
             const match = feedbackEntry.details.match(/Rating: (★+)(☆*)/);
@@ -296,10 +296,11 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
             const stars = match ? match[1].length : 0;
             const comment = commentMatch ? commentMatch[1] : null;
             if (stars === 0) return null;
+            const requesterName = request.submittedByName || feedbackEntry.performedByName || "Requester";
             return (
               <div className="bg-amber-50 border border-amber-100 rounded p-3.5">
                 <div className="text-xs font-semibold uppercase tracking-wider text-amber-800 mb-2">
-                  Requester Feedback
+                  Feedback from {requesterName}
                 </div>
                 <div className="flex items-center gap-1 mb-1.5">
                   {[1,2,3,4,5].map(s => (

@@ -79,17 +79,15 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
   );
 
   function nextStatus(): Status | null {
-    if (isMyRequest) {
-      if (request.status === "pending")  return "cancelled"; // cancel
-      if (request.status === "resolved") return "closed"; // acknowledge
-    }
+    if (request.status === "resolved") return "closed";
+    if (isMyRequest && request.status === "pending") return "cancelled";
     if ((currentUser.role || "").toLowerCase() === "officer" && isMyTask) {
       if (["pending", "assigned"].includes(request.status)) return "in_progress";
       if (request.status === "in_progress") return "resolved";
     }
     if ((currentUser.role || "").toLowerCase() === "admin") {
+      if (["pending", "assigned"].includes(request.status)) return "in_progress";
       if (request.status === "in_progress") return "resolved";
-      if (request.status === "resolved") return "closed";
     }
     return null;
   }
@@ -100,9 +98,7 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
     in_progress: "Start Work",
     resolved:    "Mark Resolved",
     cancelled:   "Cancel Request",
-    closed:      isMyRequest && request.status === "resolved"
-                   ? "Acknowledge & Close"
-                   : "Close Request",
+    closed:      request.status === "resolved" ? "Acknowledge & Close" : "Close Request",
   };
 
   const ACTION_STYLE: Record<string, string> = {
@@ -501,7 +497,7 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
           {/* Primary status action */}
           {next && (
             <div className="px-6 py-4 space-y-3">
-              {!(isMyRequest && request.status === "resolved") && (
+              {request.status !== "resolved" && (
                 <textarea value={note} onChange={e => setNote(e.target.value)}
                   placeholder="Add a note (optional)…"
                   className="w-full px-3 py-2.5 bg-background border border-border rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary transition-colors"
@@ -510,7 +506,7 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
               )}
               <button onClick={() => {
                   if (next === "cancelled") { setShowCancelConfirm(true); return; }
-                  if (next === "closed" && isMyRequest && request.status === "resolved") { setShowFeedback(true); return; }
+                  if (next === "closed" && request.status === "resolved") { setShowFeedback(true); return; }
                   onStatusUpdate(request.id, next, note || ACTION_LABEL[next]); onClose();
                 }}
                 className={`w-full py-2.5 rounded text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${ACTION_STYLE[next]}`}

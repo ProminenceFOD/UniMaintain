@@ -341,8 +341,8 @@ export async function updateStatus(req: Request, res: Response): Promise<void> {
   const validTransitions: Record<string, string[]> = {
     student: ["cancelled", "closed"],
     staff:   ["cancelled", "closed"],
-    officer: ["in_progress", "resolved"],
-    admin:   ["closed", "pending", "cancelled"],
+    officer: ["in_progress", "resolved", "closed"],
+    admin:   ["closed", "pending", "cancelled", "in_progress", "resolved"],
   };
   if (!validTransitions[user.role]?.includes(status)) {
     res.status(400).json({ error: "Invalid status transition for your role" });

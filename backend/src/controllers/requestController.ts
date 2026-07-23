@@ -338,14 +338,16 @@ export async function updateStatus(req: Request, res: Response): Promise<void> {
   const { status, note } = req.body;
   const user = req.user!;
 
+  const role = (user.role || "").toLowerCase();
   const validTransitions: Record<string, string[]> = {
     student: ["cancelled", "closed"],
     staff:   ["cancelled", "closed"],
-    officer: ["in_progress", "resolved", "closed"],
-    admin:   ["closed", "pending", "cancelled", "in_progress", "resolved"],
+    officer: ["in_progress", "resolved"],
+    admin:   ["in_progress", "resolved", "closed", "pending", "cancelled"],
   };
-  if (!validTransitions[user.role]?.includes(status)) {
-    res.status(400).json({ error: "Invalid status transition for your role" });
+
+  if (!validTransitions[role]?.includes(status)) {
+    res.status(400).json({ error: `Role '${role}' is not authorized to transition status to '${status}'` });
     return;
   }
 
@@ -354,6 +356,16 @@ export async function updateStatus(req: Request, res: Response): Promise<void> {
     if (existing.rows.length === 0) {
       res.status(404).json({ error: "Request not found" });
       return;
+    }
+
+    const reqRow = existing.rows[0];
+    if (["student", "staff"].includes(role)) {
+      const isSubmitter = String(reqRow.submitted_by) === String(user.id) ||
+        (reqRow.submitted_by_email && user.email && String(reqRow.submitted_by_email).toLowerCase() === user.email.toLowerCase());
+      if (!isSubmitter) {
+        res.status(403).json({ error: "Requesters can only modify status for their own requests" });
+        return;
+      }
     }
 
     const resolvedAt = status === "resolved" ? "NOW()" : "resolved_at";

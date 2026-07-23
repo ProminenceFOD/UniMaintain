@@ -182,23 +182,38 @@ export function RequestTable({ requests, onSelect, showAssign, officers, onAssig
                       {assignOpen === r.id && assignRect && createPortal(
                         <>
                           <div className="fixed inset-0 z-40" onClick={() => setAssignOpen(null)} />
-                          <div className="fixed z-50 w-48 bg-card border border-border rounded-lg shadow-xl overflow-hidden"
-                            style={{ top: assignRect.bottom + 4, left: assignRect.right - 192 }}>
-                            <div className="px-3 py-2 border-b border-border text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                              Assign Officer
-                            </div>
-                            {(officers ?? []).map(o => (
-                              <button key={o.id}
-                                onClick={() => { onAssign(r.id, o.id); setAssignOpen(null); }}
-                                className={`w-full text-left px-3 py-2 text-xs hover:bg-muted transition-colors border-b border-border last:border-0 ${r.assignedTo === o.id ? "bg-primary/5" : ""}`}>
-                                <div className="font-medium text-foreground flex items-center gap-1.5">
-                                  {o.name}
-                                  {r.assignedTo === o.id && <span className="text-primary text-[10px]">(current)</span>}
+                          {(() => {
+                            const officerCount = (officers ?? []).length;
+                            const estimatedHeight = Math.min(officerCount * 52 + 36, 220);
+                            const spaceBelow = window.innerHeight - assignRect.bottom;
+                            const showAbove = spaceBelow < estimatedHeight && assignRect.top > estimatedHeight;
+                            const topPos = showAbove
+                              ? Math.max(10, assignRect.top - estimatedHeight - 4)
+                              : Math.min(window.innerHeight - estimatedHeight - 10, assignRect.bottom + 4);
+                            const leftPos = Math.max(10, Math.min(window.innerWidth - 200, assignRect.right - 192));
+
+                            return (
+                              <div className="fixed z-50 w-48 bg-card border border-border rounded-lg shadow-xl overflow-hidden"
+                                style={{ top: topPos, left: leftPos }}>
+                                <div className="px-3 py-2 border-b border-border text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                                  Assign Officer
                                 </div>
-                                <div className="text-muted-foreground">{o.department}</div>
-                              </button>
-                            ))}
-                          </div>
+                                <div className="max-h-48 overflow-y-auto">
+                                  {(officers ?? []).map(o => (
+                                    <button key={o.id}
+                                      onClick={() => { onAssign(r.id, o.id); setAssignOpen(null); }}
+                                      className={`w-full text-left px-3 py-2 text-xs hover:bg-muted transition-colors border-b border-border last:border-0 ${r.assignedTo === o.id ? "bg-primary/5" : ""}`}>
+                                      <div className="font-medium text-foreground flex items-center gap-1.5">
+                                        {o.name}
+                                        {r.assignedTo === o.id && <span className="text-primary text-[10px]">(current)</span>}
+                                      </div>
+                                      <div className="text-muted-foreground">{o.department}</div>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </>,
                         document.body
                       )}

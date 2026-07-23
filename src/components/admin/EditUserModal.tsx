@@ -54,7 +54,8 @@ export function EditUserModal({ user, onClose, onSave }: { user: User; onClose: 
             <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5">Role</label>
             <select value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value as Role }))}
               className="w-full px-3 py-2.5 bg-background border border-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary transition-colors">
-              <option value="student">Student / Staff</option>
+              <option value="student">Student</option>
+              <option value="staff">Staff Member</option>
               <option value="officer">Maintenance Officer</option>
               <option value="admin">Administrator</option>
             </select>

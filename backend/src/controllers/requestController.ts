@@ -427,9 +427,13 @@ export async function assignOfficer(req: Request, res: Response): Promise<void> 
   const user = req.user!;
 
   try {
+    const rawIdStr = String(officerId);
+    const cleanId = rawIdStr.replace(/\D/g, "");
     const officerResult = await pool.query(
-      "SELECT id, name, department FROM users WHERE id = $1 AND role = 'officer'",
-      [officerId]
+      `SELECT id, name, department FROM users
+       WHERE (id = $1 OR ($2 <> '' AND id = $2::int) OR LOWER(email) LIKE LOWER($3) OR LOWER(name) LIKE LOWER($3))
+       LIMIT 1`,
+      [isNaN(Number(officerId)) ? -1 : Number(officerId), cleanId || "-1", `%${rawIdStr}%`]
     );
     if (officerResult.rows.length === 0) {
       res.status(404).json({ error: "Officer not found" });
@@ -439,14 +443,14 @@ export async function assignOfficer(req: Request, res: Response): Promise<void> 
 
     await pool.query(
       `UPDATE service_requests SET assigned_to = $1, status = 'assigned', updated_at = NOW() WHERE id = $2`,
-      [officerId, id]
+      [officer.id, id]
     );
 
     await addAuditLog(id, "Assigned to Officer", user.id,
       `Assigned to ${officer.name} (${officer.department}).`);
 
     // Notify officer
-    await createNotification(officerId, "New Assignment",
+    await createNotification(officer.id, "New Assignment",
       `${id}: A new maintenance task has been assigned to you.`, id);
 
     // Notify submitter

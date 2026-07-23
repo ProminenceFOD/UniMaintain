@@ -568,7 +568,6 @@ export default function App() {
   async function handleAssign(requestId: string, officerId: string) {
     const rawId = String(officerId);
     const cleanId = rawId.replace(/\D/g, "");
-    const numericOfficerId = parseInt(cleanId || rawId, 10);
 
     const officer = usersRef.current.find(u =>
       String(u.id) === rawId ||
@@ -577,68 +576,63 @@ export default function App() {
       (cleanId && String(u.id) === `u${cleanId}`)
     );
 
-    if (apiMode && !isNaN(numericOfficerId)) {
-      try {
-        const { request: updated } = await apiAssignOfficer(requestId, numericOfficerId);
-        const adapted = adaptRequest(updated);
-        setRequests(p => p.map(r => {
-          if (r.id !== requestId) return r;
-          const isReassign = !!r.assignedTo && String(r.assignedTo) !== rawId;
-          const newEntry: AuditEntry = {
-            id: `audit-${Date.now()}`,
-            action: isReassign ? "Reassigned to Officer" : "Assigned to Officer",
-            performedByName: currentUser?.name || "Admin",
-            details: isReassign
-              ? `Reassigned from ${r.assignedToName || "Officer"} to ${adapted.assignedToName || officer?.name || "Officer"}${officer?.department ? ` (${officer.department})` : ""}.`
-              : `Assigned to ${adapted.assignedToName || officer?.name || "Officer"}${officer?.department ? ` (${officer.department})` : ""}.`,
-            timestamp: new Date().toISOString(),
-          };
-          const mergedAudit = (adapted.audit && adapted.audit.length > 0) ? adapted.audit : [...(r.audit || []), newEntry];
-          const updatedObj = { ...r, ...adapted, status: "assigned" as Status, audit: mergedAudit };
-          setSelectedRequest(prev => prev?.id === requestId ? updatedObj : prev);
-          return updatedObj;
-        }));
-        apiGetNotifications().then(res => {
-          if (!currentUser) return;
-          setNotifications(res.notifications.map(n => ({
-            id: String(n.id), userId: currentUser.id,
-            title: n.title, message: n.message,
-            read: n.read, timestamp: n.created_at, requestId: n.request_id ?? undefined,
-          })));
-        }).catch(() => {});
-        return;
-      } catch (err) {
-        console.error("Assign failed:", err);
+    const now = new Date().toISOString();
+    const targetReq = requestsRef.current.find(r => r.id === requestId);
+    const isReassign = !!targetReq?.assignedTo && String(targetReq.assignedTo) !== rawId;
+    const officerName = officer?.name || "Officer";
+    const officerDept = officer?.department ? ` (${officer.department})` : "";
+    const entry: AuditEntry = {
+      id: `audit-${Date.now()}`,
+      action: isReassign ? "Reassigned to Officer" : "Assigned to Officer",
+      performedByName: currentUser?.name || "Admin",
+      details: isReassign
+        ? `Reassigned to ${officerName}${officerDept}.`
+        : `Assigned to ${officerName}${officerDept}.`,
+      timestamp: now,
+    };
+
+    // 1. Immediate optimistic UI update
+    const updatedRequests = requestsRef.current.map(r => {
+      if (r.id !== requestId) return r;
+      return {
+        ...r,
+        status: "assigned" as Status,
+        assignedTo: officer?.id || rawId,
+        assignedToName: officerName,
+        updatedAt: now,
+        audit: [...(r.audit || []), entry],
+      };
+    });
+    setRequests(updatedRequests);
+    setSelectedRequest(prev => {
+      if (!prev || prev.id !== requestId) return prev;
+      return {
+        ...prev,
+        status: "assigned" as Status,
+        assignedTo: officer?.id || rawId,
+        assignedToName: officerName,
+        updatedAt: now,
+        audit: [...(prev.audit || []), entry],
+      };
+    });
+
+    if (!apiMode && currentUser) {
+      saveDemoSession(currentUser, updatedRequests, usersRef.current, notificationsRef.current);
+      if (officer) {
+        pushNotif(officer.id, "New Assignment", `${requestId}: ${targetReq?.title ?? "A maintenance request"} has been assigned to you.`, requestId);
       }
     }
 
-    // Fallback local (demo mode, or API mode after failed request)
-    if (!officer) return; // officer not found — no-op
-    const now = new Date().toISOString();
-    const updatedRequests = requestsRef.current.map(r => {
-      if (r.id !== requestId) return r;
-      const isReassign = !!r.assignedTo && String(r.assignedTo) !== rawId;
-      const entry: AuditEntry = {
-        id: `audit-${Date.now()}`,
-        action: isReassign ? "Reassigned to Officer" : "Assigned to Officer",
-        performedByName: currentUser?.name || "Admin",
-        details: isReassign
-          ? `Reassigned from ${r.assignedToName || "Officer"} to ${officer.name} (${officer.department}).`
-          : `Assigned to ${officer.name} (${officer.department}).`,
-        timestamp: now,
-      };
-      return { ...r, status: "assigned" as Status, assignedTo: officer.id, assignedToName: officer.name, updatedAt: now, audit: [...(r.audit || []), entry] };
-    });
-    const req = requestsRef.current.find(r => r.id === requestId);
-    setRequests(updatedRequests);
-    setSelectedRequest(prev => prev?.id === requestId ? (updatedRequests.find(r => r.id === requestId) ?? prev) : prev);
-    if (currentUser) {
-      saveDemoSession(currentUser, updatedRequests, usersRef.current, notificationsRef.current);
-      pushNotif(officer.id, "New Assignment",
-        `${requestId}: ${req?.title ?? "A maintenance request"} has been assigned to you.`, requestId);
-      if (req && req.submittedBy !== currentUser.id) {
-        pushNotif(req.submittedBy, "Request Assigned",
-          `${requestId}: ${officer.name} has been assigned to your request.`, requestId);
+    // 2. Sync to live backend API
+    if (apiMode) {
+      try {
+        const payloadOfficerId = officer ? officer.id : (cleanId || rawId);
+        const { request: updated } = await apiAssignOfficer(requestId, payloadOfficerId as any);
+        const adapted = adaptRequest(updated);
+        setRequests(p => p.map(r => r.id === requestId ? adapted : r));
+        setSelectedRequest(prev => prev?.id === requestId ? adapted : prev);
+      } catch (err) {
+        console.error("Backend assign sync error (local state applied):", err);
       }
     }
   }

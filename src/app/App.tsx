@@ -407,15 +407,18 @@ export default function App() {
       saveDemoSession(loggedInUser, currentRequests, currentUsers, currentNotifs);
 
       if (apiMode) {
-        refreshData(role, loggedInUser.id).catch(() => {});
+        try {
+          await refreshData(role, loggedInUser.id);
+        } catch { /* proceed */ }
       }
     } else if (apiMode) {
       setCurrentUser(normalizedUser);
       setActiveTab(loadActiveTab(role));
-      setRequests(prev => (prev && prev.length > 0) ? prev : INITIAL_REQUESTS);
-      refreshData(role, normalizedUser.id).catch(err => {
+      try {
+        await refreshData(role, normalizedUser.id);
+      } catch (err) {
         console.error("Data refresh error:", err);
-      });
+      }
     } else {
       // Newly registered account — add to users list and start fresh
       setRequests(INITIAL_REQUESTS);

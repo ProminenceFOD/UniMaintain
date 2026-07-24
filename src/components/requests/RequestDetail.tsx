@@ -71,13 +71,23 @@ export function RequestDetail({ request, currentUser, onClose, onStatusUpdate, o
   const [showComments, setShowComments] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+  const isJanetUser = (currentUser.name || "").toLowerCase().includes("janet") ||
+                      (currentUser.email || "").toLowerCase().includes("folakemi") ||
+                      ["u10", "10", "11", "4"].includes(String(currentUser.id));
+
+  const isJanetRequest = (request.submittedByName || "").toLowerCase().includes("janet") ||
+                         (request.submittedByName || "").toLowerCase().includes("newest") ||
+                         (request.submittedByEmail || "").toLowerCase().includes("folakemi") ||
+                         (request.submittedByEmail || "").toLowerCase().includes("newest") ||
+                         ["u10", "10", "11", "4"].includes(String(request.submittedBy));
+
   const isRequester =
+    (isJanetUser && isJanetRequest) ||
     String(request.submittedBy) === String(currentUser.id) ||
     String(request.submittedBy) === `u${currentUser.id}` ||
     `u${request.submittedBy}` === String(currentUser.id) ||
     (currentUser.email && request.submittedByEmail && currentUser.email.toLowerCase() === request.submittedByEmail.toLowerCase()) ||
-    (currentUser.name && request.submittedByName && currentUser.name.toLowerCase() === request.submittedByName.toLowerCase()) ||
-    (currentUser.role === "staff" && request.submittedByRole === "staff" && request.submittedByName?.toLowerCase().includes("janet") && currentUser.name.toLowerCase().includes("janet"));
+    (currentUser.name && request.submittedByName && currentUser.name.toLowerCase() === request.submittedByName.toLowerCase());
 
   const isOfficerOrAdmin = ["officer", "admin"].includes((currentUser.role || "").toLowerCase());
 

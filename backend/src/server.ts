@@ -206,14 +206,7 @@ async function syncDatabaseSeed() {
           `INSERT INTO service_requests
            (id, title, description, category_id, priority, status, location, submitted_by, assigned_to, has_attachment, created_at, updated_at, resolved_at)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-           ON CONFLICT (id) DO UPDATE SET
-             submitted_by = EXCLUDED.submitted_by,
-             title = EXCLUDED.title,
-             description = EXCLUDED.description,
-             category_id = EXCLUDED.category_id,
-             priority = EXCLUDED.priority,
-             status = EXCLUDED.status,
-             location = EXCLUDED.location`,
+           ON CONFLICT (id) DO NOTHING`,
           item
         );
       }
